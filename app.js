@@ -7,12 +7,8 @@ var express = require('express'),
 	_ = require('lodash'),
 	Signal = require('signals'),
 	models = require('./m')(),
-	controllers = require('./c')(app, true);
-
-
-//	TODO: Create JSON API from controller pathes
-
-
+	controllers = require('./c')(app, true),
+	routegenerator = require('./server/routegenerator.js')(controllers);
 
 //	Our client-side JS
 app.use(express.static(path.join(__dirname, 'client')));
@@ -37,29 +33,8 @@ GLOBAL.store = {
 	}
 };
 
-//	TODO: Need to render the front-end version of the M/V/C.
-
-/*	
-
-//	http://lhorie.github.io/mithril/routing.html
-m.route(document.body, "/", {
-    "/": home,
-    "/login": login,
-    "/dashboard": dashboard,
-});
-
-
-{
-	"path": { controller: function, view: function }
-}
-
-
-*/
-
-console.log(controllers);
-
-console.log("--- model ---");
-console.log(JSON.stringify(models));
+// console.log("--- model ---");
+// console.log(models);
 
 var server = app.listen(3330, function () {
 	var host = server.address().address,

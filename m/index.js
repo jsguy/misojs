@@ -3,7 +3,6 @@
 */
 var fs			= require('fs'),
 	path		= require('path'),
-	lodash		= require('lodash'),
 	getExtension = function(filename) {
 		var ext = path.extname(filename||'').split('.');
 		return ext[ext.length - 1];

@@ -158,7 +158,7 @@ module.exports = function(app, verbose) {
 			//	for the controller and views
 			routeMap[args.path] = {
 				controller: args.route[args.action].toString(),
-				view: "function(){ return " + myView + " })"
+				view: "function(ctrl){ return " + myView + " })"
 			};
 		};
 

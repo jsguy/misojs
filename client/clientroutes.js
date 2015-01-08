@@ -19,66 +19,57 @@ var store = {
 getParam = function(key, params){
 	return m.route.param(key);
 };
-
-
 m.route.mode = "pathname";
-
-//	All the routes
-m.route(document.body, '/', {
-	'/': {
-		controller: function (params) {
-			var scope = {
-				name: "world",
-				rotate: m.prop(),
-				set: function(prop, value){
-					return function(){
-						prop(value);
-					};
-				}
+m.route(document.body, '/', {"/":{
+	"controller": function (params) {
+	var scope = {
+		name: "world",
+		rotate: m.prop(),
+		set: function(prop, value){
+			return function(){
+				prop(value);
 			};
-			return scope;
-		},
-		view: function(ctrl){
-			return DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
-				DIV('Hello ', ctrl.name, { rotate: ctrl.rotate }),
-				A({ href: '/user/1', config: m.route}, "User")
-			]) 
 		}
-	},
-	'/users': {
-		controller: function (params) {
-			var userId = params ? params.id : m.route.param('id'),
-				scope = {
-					user: null
-				};
+		//onReady: new Signal()
+	};
+	// setTimeout(function(){
+	// 	scope.onReady.dispatch();
+	// },10);
+	return scope;
+},
+	"view":function(ctrl){ return DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
+	DIV('Hello ', ctrl.name, { rotate: ctrl.rotate }),
+	A({ href: '/user/1', config: m.route}, "User")
+]) }},"/users":{
+	"controller": function (params) {
+	var userId = params ? params.id : m.route.param('id'),
+		scope = {
+			user: null,
+			onReady: new Signal()
+		};
 
-			store.load('user', userId).then(function(loadedUser) {
-				scope.user = loadedUser;
-			});
+	store.load('user', userId).then(function(loadedUser) {
+		console.log('and then...', loadedUser);
+		scope.user = loadedUser;
+		scope.onReady.dispatch();
+	});
 
-			return scope;
-		},
-		view: function(ctrl){
-			return DIV('All the users') 
-		}
-	},
-	'/user/:id': {
-		controller: function (params) {
-			console.log('user controller');
-			var userId = getParam('id', params),
-				scope = {
-					user: null
-				};
+	return scope;
+},
+	"view":function(ctrl){ return DIV('All the users') }},"/user/:user_id":{
+	"controller": function (params) {
+	var userId = getParam('id', params),
+		scope = {
+			user: null,
+			onReady: new Signal()
+		};
 
-			store.load('user', userId).then(function(loadedUser) {
-				scope.user = loadedUser;
-			});
+	store.load("user", userId).then(function(loadedUser) {
+		console.log('and then...', loadedUser);
+		scope.user = loadedUser;
+		scope.onReady.dispatch();
+	});
 
-			return scope;
-		},
-		view: function(ctrl){
-			console.log('ctrl', ctrl);
-			return DIV('waddup ' + ctrl.user.name + '!') 
-		} 
-	} 
-});
+	return scope;
+},
+	"view":function(ctrl){ return DIV('waddup ' + ctrl.user.name + '!') }}});

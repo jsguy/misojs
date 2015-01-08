@@ -1,4 +1,5 @@
 var Signal = require('signals'),
+	store = GLOBAL.store,
 	getParam = function(key, params){
 		return params[key];
 	};
@@ -20,7 +21,7 @@ module.exports.index = function(params) {
 			onReady: new Signal()
 		};
 
-	GLOBAL.store.load('user', userId).then(function(loadedUser) {
+	store.load('user', userId).then(function(loadedUser) {
 		console.log('and then...', loadedUser);
 		scope.user = loadedUser;
 		scope.onReady.dispatch();
@@ -39,7 +40,7 @@ module.exports.edit = function(params) {
 			onReady: new Signal()
 		};
 
-	GLOBAL.store.load('user', userId).then(function(loadedUser) {
+	store.load("user", userId).then(function(loadedUser) {
 		console.log('and then...', loadedUser);
 		scope.user = loadedUser;
 		scope.onReady.dispatch();
