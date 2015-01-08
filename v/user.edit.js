@@ -1,0 +1,1 @@
+DIV('waddup ' + ctrl.user.name + '!')
