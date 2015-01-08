@@ -2,22 +2,23 @@ var express = require('express'),
 	path = require('path'),
 	fs = require('fs'),
 	app = express(),
+	server = require('./cfg/server.cfg.json'),
 	m = require('mithril'),
 	render = require('mithril-node-render'),
 	_ = require('lodash'),
 	Signal = require('signals'),
 	models = require('./m')(),
 	controllers = require('./c')(app, true),
-	routegenerator = require('./server/routegenerator.js')(controllers);
+	routegenerator = require('./server/miso.routegenerator.js');
 
-//	Our client-side JS
+//	Generate the routes
+routegenerator(controllers);
+
+//	Static directory for our client-side JS
 app.use(express.static(path.join(__dirname, 'client')));
 
-
-// console.log("--- model ---");
-// console.log(models);
-
-var server = app.listen(3330, function () {
+//	Run the server
+var server = app.listen(server.port, function () {
 	var host = server.address().address,
 		port = server.address().port;
 	console.log('Example app listening at http://%s:%s', host, port)

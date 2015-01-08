@@ -1,5 +1,5 @@
 {
-  "name": "misojs",
+  "name": "miso",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,17 +7,20 @@
     "start": "node app.js"
   },
   "bin": {
-    "miso": "bin/nodemvc.bin.js"
+    "miso": "bin/miso.bin.js"
   },
   "dependencies": {
     "async": "*",
     "express": "~4.10.6",
-    "mithril": "*",
-    "mithril-node-render": "*",
+    "fs-extra": "^0.14.0",
     "grunt": "*",
     "lodash": ">=2.4.1",
+    "minimist": "^1.1.0",
+    "mithril": "*",
+    "mithril-node-render": "*",
     "nodemon": "^1.2.1",
-    "npm": "~2.1.16"
+    "npm": "~2.1.16",
+    "restify": "^2.8.4"
   },
   "description": "MISOJS (Mithril ISOmorphic JavaScript) is a node.js and mithril based MVC implementation that provides an isomorphic environment to create apps quickly.",
   "main": "app.js",

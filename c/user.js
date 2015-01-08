@@ -48,8 +48,6 @@ module.exports.index = function(params) {
 	return scope;
 };
 
-//	Index, edit, create, update, delete
-
 //	Edit user
 module.exports.edit = function(params) {
 	var userId = getParam('user_id', params),

@@ -1,9 +1,11 @@
 //	Create JSON API from controller pathes
+//	TODO: 
+//		* Use templates
+//		* Allow for lazy loading some routes (configure in cfg/routes.json)
 
 var fs = require('fs');
 
 module.exports = function(routes){
-
 	var cr = [
 		"//  Fake global storage for now..",
 		"var store = {",
@@ -55,9 +57,8 @@ module.exports = function(routes){
 		.split("})\"}").join("}}")
 		.split("\\\"").join("\"");
 
-
-
 	cr += ");\n";
 
+	
 	fs.writeFileSync("client/clientroutes.js", cr);
 };

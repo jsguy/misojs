@@ -40,11 +40,12 @@
 var fs			= require('fs'),
 	path		= require('path'),
 	_			= require('lodash'),
-	routeConfig	= require('../cfg/routes.json'),
+	routeConfig	= require('../cfg/routes.cfg.json'),
 	routes		= {},
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
+	templates = require('../server/mithril.templates.node.js'),
 	vm = require('vm'),
 	getView = function(fileName){
 		return fs.readFileSync("./v/" + fileName, "utf8");
@@ -120,6 +121,9 @@ var fs			= require('fs'),
 		}
 		return hasAction;
 	};
+
+
+console.log('templates', templates);
 
 //	Import all routes
 fs.readdirSync(__dirname)
