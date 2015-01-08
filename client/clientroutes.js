@@ -4,9 +4,6 @@ var store = {
 		if (!type) {
 			throw new Error('no type provided to load model');
 		}
-		if (!id) {
-			throw new Error('no id provided to load model');
-		}
 
 		return m.request({
 			method: 'GET',
@@ -15,6 +12,20 @@ var store = {
 		});
 	}
 },
+Signal = function(){
+	var onceBindings = [];
+	return {
+		addOnce: function(fn){
+			onceBindings.push(fn);
+		},
+		dispatch: function(){
+			for(var i = 0; i < onceBindings.length; i += 1) {
+				onceBindings[i]();
+			}
+			onceBindings = [];
+		}
+	};
+};
 //	Get a parameter
 getParam = function(key, params){
 	return m.route.param(key);
@@ -63,6 +74,8 @@ m.route(document.body, '/', {"/":{
 			user: null,
 			onReady: new Signal()
 		};
+
+	console.log('userId - ', userId);
 
 	store.load("user", userId).then(function(loadedUser) {
 		console.log('and then...', loadedUser);

@@ -13,25 +13,6 @@ var express = require('express'),
 //	Our client-side JS
 app.use(express.static(path.join(__dirname, 'client')));
 
-//  Fake global storage for now..
-GLOBAL.store = {
-	load: function load(type, id) {
-		return {
-			then: function(cb){
-				setTimeout(function(){
-					//	Read the user.json file
-					var r = JSON.parse(fs.readFileSync("client/user.json", 'utf8'));
-					cb(r);
-				}, 0);
-
-
-				// fs.readFileSync("client/user.json", { encoding: 'utf8'}, function(str){
-				// 	cb(JSON.parse(str));
-				// });
-			}
-		}
-	}
-};
 
 // console.log("--- model ---");
 // console.log(models);

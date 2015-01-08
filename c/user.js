@@ -1,5 +1,24 @@
 var Signal = require('signals'),
-	store = GLOBAL.store,
+	fs = require('fs'),
+	//  Fake storage for now..
+	store = {
+		load: function load(type, id) {
+			return {
+				then: function(cb){
+					setTimeout(function(){
+						//	Read the user.json file
+						var r = JSON.parse(fs.readFileSync("client/user.json", 'utf8'));
+						cb(r);
+					}, 0);
+
+
+					// fs.readFileSync("client/user.json", { encoding: 'utf8'}, function(str){
+					// 	cb(JSON.parse(str));
+					// });
+				}
+			}
+		}
+	},
 	getParam = function(key, params){
 		return params[key];
 	};
@@ -39,6 +58,8 @@ module.exports.edit = function(params) {
 			user: null,
 			onReady: new Signal()
 		};
+
+	console.log('userId - ', userId);
 
 	store.load("user", userId).then(function(loadedUser) {
 		console.log('and then...', loadedUser);
