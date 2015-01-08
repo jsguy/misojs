@@ -3,8 +3,6 @@
 var fs = require('fs');
 
 module.exports = function(routes){
-	//console.log(controllers.split("\\n").join("\n").split("\\t").join("\t"));
-	console.log('generator', routes);
 
 	var cr = [
 		"//  Fake global storage for now..",
@@ -13,9 +11,9 @@ module.exports = function(routes){
 		"		if (!type) {",
 		"			throw new Error('no type provided to load model');",
 		"		}",
-		// "		if (!id) {",
-		// "			throw new Error('no id provided to load model');",
-		// "		}",
+		"		if (!id) {",
+		"			throw new Error('no id provided to load model');",
+		"		}",
 		"",
 		"		return m.request({",
 		"			method: 'GET',",

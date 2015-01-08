@@ -34,14 +34,13 @@ var Signal = require('signals'),
 
 //	Index user
 module.exports.index = function(params) {
-	var userId = params ? params.id : m.route.param('id'),
+	var userId = params ? params.id : m.route.param('user_id'),
 		scope = {
 			user: null,
 			onReady: new Signal()
 		};
 
 	store.load('user', userId).then(function(loadedUser) {
-		console.log('and then...', loadedUser);
 		scope.user = loadedUser;
 		scope.onReady.dispatch();
 	});
@@ -53,16 +52,13 @@ module.exports.index = function(params) {
 
 //	Edit user
 module.exports.edit = function(params) {
-	var userId = getParam('id', params),
+	var userId = getParam('user_id', params),
 		scope = {
 			user: null,
 			onReady: new Signal()
 		};
 
-	console.log('userId - ', userId);
-
 	store.load("user", userId).then(function(loadedUser) {
-		console.log('and then...', loadedUser);
 		scope.user = loadedUser;
 		scope.onReady.dispatch();
 	});
