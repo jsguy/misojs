@@ -13,6 +13,7 @@ _NOTE:_ Not for public consumption just yet!
 * bin/miso.bin.js
 * http://localhost:6476/ (6476 = miso if you typed it on a keypad)
 
+You can now click the link to get to the user edit page - click it, then re-load that url, and you'll see that it can load that URL in the browser, and render it on the backend, whilst initalizing the app on the frontend, ie: isomorphic!
 
 ## How it works in general
 
@@ -23,15 +24,15 @@ _NOTE:_ Not for public consumption just yet!
 
 
 
-## TODO before making public
+## TODO before making publically available
 
 The main philosophy for miso is to be easy to get up and running whilst providing full support for best practice development.
 
-We need to address the following issues before making miso.js public.
+We need to address the following issues before making miso.js available to the public:
 
 ### General
 
-* Define what level of pluggability we want, for example
+* Define what level of pluggability we want - some parts make sense as libraries, but miso.js itself is a framework.
 * Documentation for how this all works
 
 ### Models
@@ -43,13 +44,20 @@ A proper way to enhance standard mithril models - we want to be able to handle:
 * Collections
 * Relations: has one, has many, belongs to one, belongs to many, etc...
 
-I'm considering using restify to create an API, and then a "store" object similar to what you mentioned.
+I'm considering using restify to create a JSON API, and then a "store" object similar to what you mentioned, using bookshelf.js, that looks quite neat, and would allow us to make it work both client and server side. It would also nicely separate concerns.
 
-### V
+### Views
 
-* Handling of composed views
-* Allow naming views anything - probably need to refactor routing setup a little to allow named views
+* Handling of composed views (this might be handy: https://github.com/philtoms/mithril.elements/)
+
+### General (not required for initial release, but nice to have)
+
+* Scaffolding solution that can create basic mvc (see bin/miso.bin.js)
+* Skeleton support, to allow user to generate a particular type of app, eg: "admin app", "blog", etc... 
 
 
+### Refactor libraries
+
+* Refactor sugartags/bindings/etc... to include require-style exposure by default.
 
 

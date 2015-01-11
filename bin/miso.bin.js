@@ -9,6 +9,7 @@
 		- User admin (current thing)
 		- [future] SPA (Single Page App)
 	. Only copy the required files for each skeleton type
+	. Add scaffolding for mvc
 
 */
 //	https://www.npmjs.com/package/minimist
