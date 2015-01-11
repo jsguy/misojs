@@ -50,14 +50,13 @@ I'm considering using restify to create a JSON API, and then a "store" object si
 
 * Handling of composed views (this might be handy: https://github.com/philtoms/mithril.elements/)
 
-### General (not required for initial release, but nice to have)
-
-* Scaffolding solution that can create basic mvc (see bin/miso.bin.js)
-* Skeleton support, to allow user to generate a particular type of app, eg: "admin app", "blog", etc... 
-
-
 ### Refactor libraries
 
 * Refactor sugartags/bindings/etc... to include require-style exposure by default.
+
+### Nice to have (not required for initial release, but high on the list)
+
+* Scaffolding solution that can create basic mvc (see bin/miso.bin.js)
+* Skeleton support, to allow user to generate a particular type of app, eg: "admin app", "blog", etc... 
 
 
