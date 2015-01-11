@@ -3,7 +3,7 @@ misojs
 
 misojs: MIthril iSOmorphic JavaScript framework
 
-NOTE: Not for public consumption just yet!
+_NOTE:_ Not for public consumption just yet!
 
 ## Install
 
@@ -19,14 +19,20 @@ NOTE: Not for public consumption just yet!
 * Convention over configuration is used when possible
 * Controllers can be manually configured, but are automatically routed based on actions (see c/index.js for details)
 * Views are (by default) named [controller][action].js, for example: for the "user edit" action, the view is "user.edit.js"
+* Client side code is generated from our rotes/controller/view/models - maybe we could use browserify instead?
 
 
 
 ## TODO before making public
 
-The main philosophy for miso is to be quick and easy, whilst providing support for best practice development.
+The main philosophy for miso is to be easy to get up and running whilst providing full support for best practice development.
 
-We need to address the following before making it public.
+We need to address the following issues before making miso.js public.
+
+### General
+
+* Define what level of pluggability we want, for example
+* Documentation for how this all works
 
 ### Models
 
@@ -42,6 +48,8 @@ I'm considering using restify to create an API, and then a "store" object simila
 ### V
 
 * Handling of composed views
+* Allow naming views anything - probably need to refactor routing setup a little to allow named views
 
-### Documentation for how the above works
+
+
 

@@ -1,4 +1,4 @@
-//	Create JSON API from controller pathes
+//	This generates the client side code from our routes/controller/views
 //	TODO: 
 //		* Use templates
 //		* Allow for lazy loading some routes (configure in cfg/routes.json)
