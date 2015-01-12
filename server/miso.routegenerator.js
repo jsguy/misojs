@@ -3,7 +3,20 @@
 //		* Use templates
 //		* Allow for lazy loading some routes (configure in cfg/routes.json)
 
-var fs = require('fs');
+var fs = require('fs'),
+	_ = require('lodash'),
+	browserify = require('browserify'),
+	b = browserify({
+		standalone: "mylib",
+		//	TODO: Way to set browser version of a lib - maybe transforms?
+		browser: {
+			"user.js": "" 
+		}
+	});
+
+// b.add('./browser/main.js');
+// b.bundle().pipe(process.stdout);
+
 
 module.exports = function(routes){
 	var cr = [
@@ -49,16 +62,39 @@ module.exports = function(routes){
 		"m.route(document.body, '/', "
 	].join("\n");
 
-	cr += JSON.stringify(routes)
-		.split("\\n").join("\n")
-		.split("\\t").join("\t")
-		.split("\"controller\":\"fu").join("\n\t\"controller\": fu")
-		.split("}\",\"view\":\"fu").join("},\n\t\"view\":fu")
-		.split("})\"}").join("}}")
-		.split("\\\"").join("\"");
+	//console.log('routes', routes);
 
-	cr += ");\n";
+	// cr += JSON.stringify(routes)
+	// 	.split("\\n").join("\n")
+	// 	.split("\\t").join("\t")
+	// 	.split("\"controller\":\"fu").join("\n\t\"controller\": fu")
+	// 	.split("}\",\"view\":\"fu").join("},\n\t\"view\":fu")
+	// 	.split("})\"}").join("}}")
+	// 	.split("\\\"").join("\"");
 
-	
-	fs.writeFileSync("client/clientroutes.js", cr);
+
+	cr = "";
+
+	var usedControllers = {};
+
+	_.forOwn(routes, function(route, idx){
+		if(!usedControllers[route.name]) {
+			console.log('rrrrr', route.name);
+			b.add("./c/" + route.file);
+			usedControllers[route.name] = route.name;
+		}
+	})
+
+	b.bundle(function(e, b){
+		cr += b.toString('utf8');
+		fs.writeFileSync("client/newclientroutes.js", cr);
+	});
+
+
+// b.add('./browser/main.js');
+// b.bundle().pipe(process.stdout);
+
+
+	// cr += ");\n";
+	// fs.writeFileSync("client/newclientroutes.js", cr);
 };

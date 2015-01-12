@@ -58,3 +58,5 @@ module.exports.edit = function(params) {
 
 	return scope;
 };
+
+console.log('here...');

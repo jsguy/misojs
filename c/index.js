@@ -78,7 +78,8 @@ var fs			= require('fs'),
 			//'<script src="/mithril.bindings.js"></script>',
 			//	Clientside "routes"
 
-			'<script src="/clientroutes.js"></script>',
+			//'<script src="/clientroutes.js"></script>',
+			'<script src="/newclientroutes.js"></script>',
 
 			'</body>',
 			'</html>'
@@ -130,9 +131,13 @@ fs.readdirSync(__dirname)
 		return (file.indexOf('.') !== 0) && (file !== 'index.js') && getExtension(file) == "js";
 	})
 	.forEach(function(file) {
-		var routeFile = require(path.join(__dirname, file)),
+		var route = require(path.join(__dirname, file)),
 			routeName = file.substr(0, file.lastIndexOf("."));
-		routes[routeName] = routeFile;
+		//console.log(file, route, routeName);
+		routes[routeName] = {
+			route: route,
+			file: file
+		};
 	});
 
 //	Map the routes for the controllers
@@ -156,20 +161,26 @@ module.exports = function(app, verbose) {
 				});
 			});
 
+			//console.log('args', args);
+
 			//	Idea: simply inject string representations of functions
 			//	for the controller and views
-			routeMap[args.path] = {
-				controller: args.route[args.action].toString(),
-				view: "function(ctrl){ return " + myView + " })"
-			};
+			routeMap[args.path] = args;
+			// {
+			// 	controller: args.route[args.action].toString(),
+			// 	view: "function(ctrl){ return " + myView + " })",
+			// 	file: args.file,
+			// 	name: args.name
+			// };
 		};
 
-	_.forOwn(routes, function(route, name){
+	_.forOwn(routes, function(routeInstance, name){
 		var cfg = {
 			secure: true,
 			name: name,
 			prefix: ""
-		}, path, method;
+		}, path, method,
+		route = routeInstance.route;
 
 		//	Add configured routes
 		if(routeConfig[name]) {
@@ -237,7 +248,8 @@ module.exports = function(app, verbose) {
 				path: path,
 				middleware: cfg.secure? auth: [],
 				method: method,
-				action: action
+				action: action,
+				file: routeInstance.file
 			});
 
 			verbose && console.log('     %s %s -> %s', method.toUpperCase(), path, action);
@@ -254,7 +266,8 @@ module.exports = function(app, verbose) {
 					path: path,
 					method: r.method,
 					action: r.action,
-					view: r.view
+					view: r.view,
+					file: routeInstance.file
 				});
 			});
 		}

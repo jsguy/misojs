@@ -54,7 +54,7 @@ m.route(document.body, '/', {"/":{
 	"view":function(ctrl){ return DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
 	DIV('Hello ', ctrl.name, { rotate: ctrl.rotate }),
 	A({ href: '/user/1', config: m.route}, "User")
-]) }},"/users":{
+]) })","file":"home.js"},"/users":{
 	"controller": function (params) {
 	var scope = {
 			users: [],
@@ -68,7 +68,7 @@ m.route(document.body, '/', {"/":{
 
 	return scope;
 },
-	"view":function(ctrl){ return DIV('All the users would be listed here') }},"/user/:user_id":{
+	"view":function(ctrl){ return DIV('All the users would be listed here') })","file":"user.js"},"/user/:user_id":{
 	"controller": function (params) {
 	var userId = getParam('user_id', params),
 		scope = {
@@ -84,4 +84,4 @@ m.route(document.body, '/', {"/":{
 
 	return scope;
 },
-	"view":function(ctrl){ return DIV('Hello ' + ctrl.user.name + '! Server: ' + ctrl.isServer) }}});
+	"view":function(ctrl){ return DIV('Hello ' + ctrl.user.name + '! Server: ' + ctrl.isServer) })","file":"user.js"}});
