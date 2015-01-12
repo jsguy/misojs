@@ -56,20 +56,19 @@ m.route(document.body, '/', {"/":{
 	A({ href: '/user/1', config: m.route}, "User")
 ]) }},"/users":{
 	"controller": function (params) {
-	var userId = params ? params.id : m.route.param('user_id'),
-		scope = {
-			user: null,
+	var scope = {
+			users: [],
 			onReady: new Signal()
 		};
 
-	store.load('user', userId).then(function(loadedUser) {
-		scope.user = loadedUser;
+	store.load('user').then(function(loadedUsers) {
+		scope.users = loadedUsers;
 		scope.onReady.dispatch();
 	});
 
 	return scope;
 },
-	"view":function(ctrl){ return DIV('All the users') }},"/user/:user_id":{
+	"view":function(ctrl){ return DIV('All the users would be listed here') }},"/user/:user_id":{
 	"controller": function (params) {
 	var userId = getParam('user_id', params),
 		scope = {
@@ -84,4 +83,4 @@ m.route(document.body, '/', {"/":{
 
 	return scope;
 },
-	"view":function(ctrl){ return DIV('waddup ' + ctrl.user.name + '!') }}});
+	"view":function(ctrl){ return DIV('Hello ' + ctrl.user.name + '!') }}});

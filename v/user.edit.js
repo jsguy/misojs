@@ -1,1 +1,1 @@
-DIV('waddup ' + ctrl.user.name + '!')
+DIV('Hello ' + ctrl.user.name + '!')
