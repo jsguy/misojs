@@ -73,6 +73,7 @@ m.route(document.body, '/', {"/":{
 	var userId = getParam('user_id', params),
 		scope = {
 			user: null,
+			isServer: !!(typeof module !== 'undefined' && module.exports),
 			onReady: new Signal()
 		};
 
@@ -83,4 +84,4 @@ m.route(document.body, '/', {"/":{
 
 	return scope;
 },
-	"view":function(ctrl){ return DIV('Hello ' + ctrl.user.name + '!') }}});
+	"view":function(ctrl){ return DIV('Hello ' + ctrl.user.name + '! Server: ' + ctrl.isServer) }}});

@@ -47,6 +47,7 @@ module.exports.edit = function(params) {
 	var userId = getParam('user_id', params),
 		scope = {
 			user: null,
+			isServer: !!(typeof module !== 'undefined' && module.exports),
 			onReady: new Signal()
 		};
 
