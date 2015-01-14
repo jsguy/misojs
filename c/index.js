@@ -72,9 +72,9 @@ var fs			= require('fs'),
 			content,
 			
 			//	Add any client JS here!
-			'<script src="/mithril.js"></script>',
-			'<script src="/mithril.animate.js"></script>',
-			'<script src="/mithril.sugartags.js"></script>',
+			//'<script src="/mithril.js"></script>',
+			//'<script src="/mithril.animate.js"></script>',
+			//'<script src="/mithril.sugartags.js"></script>',
 			//'<script src="/mithril.bindings.js"></script>',
 			//	Clientside "routes"
 

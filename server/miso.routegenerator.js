@@ -7,11 +7,18 @@ var fs = require('fs'),
 	_ = require('lodash'),
 	browserify = require('browserify'),
 	b = browserify({
-		standalone: "mylib",
-		//	TODO: Way to set browser version of a lib - maybe transforms?
+
+		//	Test separate client/server store
 		browser: {
-			"user.js": "" 
-		}
+			"./server/store.js": "./client/store.js"
+		},
+
+
+		standalone: "mylib"
+		//	TODO: Way to set browser version of a lib - maybe transforms?
+		// browser: {
+		// 	"user.js": "" 
+		// }
 	});
 
 // b.add('./browser/main.js');
@@ -74,6 +81,11 @@ module.exports = function(routes){
 
 
 	cr = "";
+
+
+	// b.add("./server/store.js", {
+	// 	browser: 		
+	// });
 
 	var usedControllers = {};
 

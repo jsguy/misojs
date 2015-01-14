@@ -1,0 +1,15 @@
+var store = {
+	load: function load(type, id) {
+		if (!type) {
+			throw new Error('no type provided to load model');
+		}
+		if (!id) {
+			throw new Error('no id provided to load model');
+		}
+		return m.request({
+			method: 'GET',
+			//url: 'api/' + type + '/' + id),
+			url: '/user.json'
+		});
+	}
+};
