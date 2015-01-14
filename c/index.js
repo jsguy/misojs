@@ -79,7 +79,8 @@ var fs			= require('fs'),
 			//	Clientside "routes"
 
 			//'<script src="/clientroutes.js"></script>',
-			'<script src="/newclientroutes.js"></script>',
+			//'<script src="/newclientroutes.js"></script>',
+			'<script src="/croutes.js"></script>',
 
 			'</body>',
 			'</html>'

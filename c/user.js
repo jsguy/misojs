@@ -1,20 +1,21 @@
 var Signal = require('signals'),
+	store = require('../server/store.js'),
 	fs = require('fs'),
 	//  Fake storage for now..
 	//  TODO: We need a JSON api
-	store = {
-		load: function load(type, id) {
-			return {
-				then: function(cb){
-					setTimeout(function(){
-						//	Just read the user.json file
-						var r = JSON.parse(fs.readFileSync("client/user.json", 'utf8'));
-						cb(r);
-					}, 0);
-				}
-			}
-		}
-	},
+	// store = {
+	// 	load: function load(type, id) {
+	// 		return {
+	// 			then: function(cb){
+	// 				setTimeout(function(){
+	// 					//	Just read the user.json file
+	// 					var r = JSON.parse(fs.readFileSync("client/user.json", 'utf8'));
+	// 					cb(r);
+	// 				}, 0);
+	// 			}
+	// 		}
+	// 	}
+	// },
 	getParam = function(key, params){
 		return params[key];
 	};

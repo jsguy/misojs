@@ -5,25 +5,7 @@
 
 var fs = require('fs'),
 	_ = require('lodash'),
-	browserify = require('browserify'),
-	b = browserify({
-
-		//	Test separate client/server store
-		browser: {
-			"./server/store.js": "./client/store.js"
-		},
-
-
-		standalone: "mylib"
-		//	TODO: Way to set browser version of a lib - maybe transforms?
-		// browser: {
-		// 	"user.js": "" 
-		// }
-	});
-
-// b.add('./browser/main.js');
-// b.bundle().pipe(process.stdout);
-
+	exec = require('child_process').exec;
 
 module.exports = function(routes){
 	var cr = [
@@ -69,44 +51,26 @@ module.exports = function(routes){
 		"m.route(document.body, '/', "
 	].join("\n");
 
-	//console.log('routes', routes);
 
-	// cr += JSON.stringify(routes)
-	// 	.split("\\n").join("\n")
-	// 	.split("\\t").join("\t")
-	// 	.split("\"controller\":\"fu").join("\n\t\"controller\": fu")
-	// 	.split("}\",\"view\":\"fu").join("},\n\t\"view\":fu")
-	// 	.split("})\"}").join("}}")
-	// 	.split("\\\"").join("\"");
-
-
-	cr = "";
-
-
-	// b.add("./server/store.js", {
-	// 	browser: 		
-	// });
-
-	var usedControllers = {};
+	//	Grab our controller file names
+	var usedControllers = {},
+		cFiles = [];
 
 	_.forOwn(routes, function(route, idx){
 		if(!usedControllers[route.name]) {
-			console.log('rrrrr', route.name);
-			b.add("./c/" + route.file);
+			cFiles.push("./c/" + route.file);
 			usedControllers[route.name] = route.name;
 		}
 	})
 
-	b.bundle(function(e, b){
-		cr += b.toString('utf8');
-		fs.writeFileSync("client/newclientroutes.js", cr);
+	//	Run browserify
+	//	TODO: Check if we need to do so - compare file dates to the output.
+	var output = "./client/croutes.js",
+		//cmd = "browserify -u mithril " + cFiles.join(" ") + ">" + output;
+		cmd = "browserify " + cFiles.join(" ") + ">" + output;
+
+	exec(cmd, function (error, stdout, stderr) {
+	  // output is in stdout
+	  console.log('bify', arguments);
 	});
-
-
-// b.add('./browser/main.js');
-// b.bundle().pipe(process.stdout);
-
-
-	// cr += ");\n";
-	// fs.writeFileSync("client/newclientroutes.js", cr);
 };

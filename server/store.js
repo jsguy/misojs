@@ -1,3 +1,4 @@
+var fs = require('fs');
 //	Simulated store
 //	TODO: This should interact with the API once we have it.
 var isServer = !!(typeof module !== 'undefined' && module.exports);
