@@ -1,5 +1,4 @@
-var Signal = require('signals'),
-	m = require('mithril');
+var m = require('mithril');
 
 //	Home page
 module.exports.home = function(params) {
@@ -11,10 +10,6 @@ module.exports.home = function(params) {
 				prop(value);
 			};
 		}
-		//onReady: new Signal()
 	};
-	// setTimeout(function(){
-	// 	scope.onReady.dispatch();
-	// },10);
 	return scope;
 };

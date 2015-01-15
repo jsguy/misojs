@@ -1,7 +1,28 @@
+//	Various utilities that normalise usage between client and server
+//	This is the client version
+//	See /server/miso.util.js for server version
+
 var m = require('mithril');
-//	Various utilities that normalise usage across client and server
+
 module.exports = {
-	//	Get a parameter
+	//	Are we on the server?
+	isServer: function() {
+		return false;
+	},
+	readyBinder: function(){
+		var bindings = [];
+		return {
+			bind: function(cb) {
+				bindings.push(cb);
+			},
+			ready: function(){
+				for(var i = 0; i < bindings.length; i += 1) {
+					bindings[i]();
+				}
+			}
+		};
+	},
+	//	Get parameters for an action
 	getParam: function(key, params){
 		return m.route.param(key);
 	}

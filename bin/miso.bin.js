@@ -22,17 +22,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	version = pjson.version,
 	misoPath = __dirname + "/../",
 	userPath = process.cwd(),
-	projectPath,
-
-	//	List of files to ignore
-	ignoreFiles = [
-		""
-	],
-
-	//	List of files we copy when using -u to update
-	updateFileList = [
-		"controllers/index.js"
-	];
+	projectPath;
 
 console.log("Miso version " + version);
 
@@ -113,5 +103,5 @@ try {
 } catch(ex) {
 	console.log("Error:", ex);
 }
-
+//	Add a new line at the end...
 console.log("");

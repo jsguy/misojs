@@ -67,6 +67,7 @@ var fs			= require('fs'),
 			'</head>',
 			'<body>',
 			content,
+			//	The generated client script
 			'<script src="/miso.js"></script>',
 			'</body>',
 			'</html>'
@@ -143,10 +144,16 @@ module.exports = function(app, verbose) {
 			//	Setup the route on the app
 			app[args.method](args.path, function(req, res) {
 				var	scope = args.route[args.action](req.params);
+				// if (!scope || !scope.onReady) {
+				// 	return res.end(skin(renderView(args.view, scope)));
+				// }
+				// scope.onReady.addOnce(function() {
+				// 	res.end(skin(renderView(args.view, scope)));
+				// });
 				if (!scope || !scope.onReady) {
 					return res.end(skin(renderView(args.view, scope)));
 				}
-				scope.onReady.addOnce(function() {
+				scope.onReady.bind(function() {
 					res.end(skin(renderView(args.view, scope)));
 				});
 			});

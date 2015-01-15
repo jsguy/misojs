@@ -1,7 +1,6 @@
-//	This generates the client side code from our routes/controller/views
-//	TODO: 
-//		* Allow for lazy loading some routes (configure in cfg/routes.json)
-
+/*
+	This generates the client side code from our routes/controller/views
+*/
 var fs = require('fs'),
 	_ = require('lodash'),
 	m = require('mithril'),
@@ -12,7 +11,7 @@ module.exports = function(routes){
 
 	//	TODO: 
 	//	
-	//	* Might want to externalise this
+	//	* Might want to externalise this?
 	//	* Add ability to configure things, add/remove required libs, etc.
 	//	
 	var view = function(ctrl) {
@@ -64,7 +63,11 @@ module.exports = function(routes){
 	var routeList = [],
 		mainFile = './c/main.js',
 		output = "./client/miso.js",
-		browserifyCmd = "browserify --igv m " + mainFile + " >" + output,
+		outputMap = "./client/miso.js.map.json",
+		browserifyCmd = "browserify " + mainFile + " >" + output,
+		//browserifyCmd = "browserify " + mainFile + " -d -p [minifyify --map /miso.js.map.json --output "+outputMap+"] >" + output,
+
+//
 		mainFileModified = fs.statSync(mainFile).mtime,
 		lastRouteModified = new Date(1970,0,1);
 
@@ -72,10 +75,12 @@ module.exports = function(routes){
 	_.forOwn(routes, function(route, idx){
 		routeList.push(route);
 
+		//	Check controller timestamp
 		lastRouteModified = (lastRouteModified > route.stats.mtime)?
 			lastRouteModified: 
 		 	route.stats.mtime;
 
+		//	Check view timestamp
 		lastRouteModified = (lastRouteModified > route.viewStats.mtime)?
 			lastRouteModified: 
 		 	route.viewStats.mtime;
@@ -86,8 +91,10 @@ module.exports = function(routes){
 		routes: routeList
 	})));
 
-	//	Run browserify, if we need to do so - compare file dates to the output.
+	//	Run browserify if we need to do so: only when 
+	//	either a controller or view has changed.
 	if(lastRouteModified > mainFileModified) {
+		//	We use exec to run it - this gives us a little more flexibility
 		exec(browserifyCmd, function (error, stdout, stderr) {
 			if(error) {
 				throw error

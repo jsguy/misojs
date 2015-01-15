@@ -6,7 +6,7 @@ var express = require('express'),
 	m = require('mithril'),
 	render = require('mithril-node-render'),
 	_ = require('lodash'),
-	Signal = require('signals'),
+	//Signal = require('signals'),
 	models = require('./m')(),
 	controllers = require('./c')(app, true),
 	routegenerator = require('./server/miso.routegenerator.js');
@@ -21,5 +21,5 @@ app.use(express.static(path.join(__dirname, 'client')));
 var server = app.listen(server.port, function () {
 	var host = server.address().address,
 		port = server.address().port;
-	console.log('Example app listening at http://%s:%s', host, port)
+	console.log('Miso is listening at http://%s:%s', host, port)
 })
