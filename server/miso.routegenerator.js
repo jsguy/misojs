@@ -1,77 +1,97 @@
 //	This generates the client side code from our routes/controller/views
 //	TODO: 
-//		* Use templates
 //		* Allow for lazy loading some routes (configure in cfg/routes.json)
 
 var fs = require('fs'),
 	_ = require('lodash'),
+	m = require('mithril'),
+	render = require('mithril-node-render'),
 	exec = require('child_process').exec;
 
 module.exports = function(routes){
-	var cr = [
-		"//  Fake global storage for now..",
-		"var store = {",
-		"	load: function load(type, id) {",
-		"		if (!type) {",
-		"			throw new Error('no type provided to load model');",
-		"		}",
-		"		if (!id) {",
-		"			throw new Error('no id provided to load model');",
-		"		}",
-		"",
-		"		return m.request({",
-		"			method: 'GET',",
-		"			//url: 'api/' + type + '/' + id),",
-		"			url: '/user.json'",
-		"		});",
-		"	}",
-		"},",
 
-		"Signal = function(){",
-		"	var onceBindings = [];",
-		"	return {",
-		"		addOnce: function(fn){",
-		"			onceBindings.push(fn);",
-		"		},",
-		"		dispatch: function(){",
-		"			for(var i = 0; i < onceBindings.length; i += 1) {",
-		"				onceBindings[i]();",
-		"			}",
-		"			onceBindings = [];",
-		"		}",
-		"	};",
-		"};",
+	//	TODO: 
+	//	
+	//	* Might want to externalise this
+	//	* Add ability to configure things, add/remove required libs, etc.
+	//	
+	var view = function(ctrl) {
+		var usedRoute = {};
+		return [
+			"/* NOTE: This is a generated file, please do not modify, your changes will be lost */",
+			"var m = require('mithril');",
+			
+			//	Required libs
+			"var sugartags = require('../server/mithril.sugartags.node.js')(m);",
+			"var bindings = require('../server/mithril.bindings.node.js')(m);",
+			"var store = require('../server/store.js');",
+			
+			//	All our route files
+			(ctrl.routes.map(function(route, idx) {
+				var result = usedRoute[route.name]? "" :
+					"var " + route.name + " = require('../c/" + route.name + "');";
+				usedRoute[route.name] = route;
+				return result;
+			})).join("\n"),
 
+			//	Expose mithril - might be good for debugging...
+			"if(typeof window !== 'undefined') {",
+			"	window.m = m;",
+			"}",
 
-		"//	Get a parameter",
-		"getParam = function(key, params){",
-		"	return m.route.param(key);",
-		"};",
-		"m.route.mode = \"pathname\";",
-		"m.route(document.body, '/', "
-	].join("\n");
+			"	",
+			"m.route.mode = 'pathname';",
+			"m.route(document.body, '/', {",
 
+			//	Add the route map for mithril here
+			(ctrl.routes.map(function(route, idx) {
+				return [
+					"'" + route.path + "': {",
+					"	controller: " + route.name + "." + route.action + ",",
+					"	view: function(ctrl){",
+					"		with(sugartags) {",
+					"			return 	" + route.view,
+					"		}",
+					"	}",
+					"}"
+				].join("\n");
+			})).join(",\n"),
+			"});"
+		].join("\n");
+	};
 
 	//	Grab our controller file names
-	var usedControllers = {},
-		cFiles = [];
+	var routeList = [],
+		mainFile = './c/main.js',
+		output = "./client/miso.js",
+		browserifyCmd = "browserify --igv m " + mainFile + " >" + output,
+		mainFileModified = fs.statSync(mainFile).mtime,
+		lastRouteModified = new Date(1970,0,1);
 
+	//	Generate list of routes
 	_.forOwn(routes, function(route, idx){
-		if(!usedControllers[route.name]) {
-			cFiles.push("./c/" + route.file);
-			usedControllers[route.name] = route.name;
-		}
-	})
+		routeList.push(route);
 
-	//	Run browserify
-	//	TODO: Check if we need to do so - compare file dates to the output.
-	var output = "./client/miso.js",
-		//cmd = "browserify -u mithril " + cFiles.join(" ") + ">" + output;
-		//cmd = "browserify " + cFiles.join(" ") + ">" + output;
-		cmd = "browserify --igv m ./c/main.js >" + output;
+		lastRouteModified = (lastRouteModified > route.stats.mtime)?
+			lastRouteModified: 
+		 	route.stats.mtime;
 
-	exec(cmd, function (error, stdout, stderr) {
-	  // output is in stdout
-	  console.log('bify', arguments);
+		lastRouteModified = (lastRouteModified > route.viewStats.mtime)?
+			lastRouteModified: 
+		 	route.viewStats.mtime;
 	});
+
+	//	Output our main JS file for browserify
+	fs.writeFileSync(mainFile, render(view({
+		routes: routeList
+	})));
+
+	//	Run browserify, if we need to do so - compare file dates to the output.
+	if(lastRouteModified > mainFileModified) {
+		exec(browserifyCmd, function (error, stdout, stderr) {
+			if(error) {
+				throw error
+			}
+		});
+	}
 };

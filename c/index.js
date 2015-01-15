@@ -22,7 +22,7 @@
 	Ref:
 	http://stackoverflow.com/questions/2456820/problem-with-jquery-ajax-with-delete-method-in-ie
 
-	Note: if you want custom routes, add a config object on the route, for example:
+	Note: if you want custom routes, add it to cfg/routes.cfg.json, or set a config object on the route, for example:
 
 		module.exports.config = {
 			routes: [
@@ -47,9 +47,6 @@ var fs			= require('fs'),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	//templates = require('../server/mithril.templates.node.js'),
 	vm = require('vm'),
-	getView = function(fileName){
-		return fs.readFileSync("./v/" + fileName, "utf8");
-	},
 	render = require('mithril-node-render'),
 	//  Render a view
 	//  The controller is always exposed as "ctrl"
@@ -118,15 +115,17 @@ var fs			= require('fs'),
 fs.readdirSync(__dirname)
 	.filter(function(file) {
 		//	All js files that don't start with '.' and are not index.js or main.js
-		return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'main.js') && getExtension(file) == "js";
+		return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'main.js') && (file !== 'maintest.js') && getExtension(file) == "js";
 	})
 	.forEach(function(file) {
-		var route = require(path.join(__dirname, file)),
+		var routeFile = path.join(__dirname, file),
+			routeStats = fs.statSync(routeFile),
+			route = require(routeFile),
 			routeName = file.substr(0, file.lastIndexOf("."));
-		//console.log(file, route, routeName);
 		routes[routeName] = {
 			route: route,
-			file: file
+			file: file,
+			stats: routeStats
 		};
 	});
 
@@ -136,16 +135,19 @@ module.exports = function(app, verbose) {
 	//var createRoute = function(route, name, path, method, action, template) {
 	var routeMap = {},
 		createRoute = function(args) {
+			var viewFile = "./v/" + (args.template? args.template: args.name + "." + args.action + ".js");
+			//	Set the view - assume if no template, the view is named [controller name][action].js
+			args.view = fs.readFileSync(viewFile, "utf8");
+			args.viewStats = fs.statSync(viewFile);
+
 			//	Setup the route on the app
 			app[args.method](args.path, function(req, res) {
-				//	Assume if no template, the view is named [controller name][action].js
-				var view = getView(args.template? args.template: args.name + "." + args.action + ".js"),
-					scope = args.route[args.action](req.params);
+				var	scope = args.route[args.action](req.params);
 				if (!scope || !scope.onReady) {
-					return res.end(skin(renderView(view, scope)));
+					return res.end(skin(renderView(args.view, scope)));
 				}
 				scope.onReady.addOnce(function() {
-					res.end(skin(renderView(view, scope)));
+					res.end(skin(renderView(args.view, scope)));
 				});
 			});
 
@@ -227,7 +229,8 @@ module.exports = function(app, verbose) {
 				middleware: cfg.secure? auth: [],
 				method: method,
 				action: action,
-				file: routeInstance.file
+				file: routeInstance.file,
+				stats: routeInstance.stats
 			});
 
 			verbose && console.log('     %s %s -> %s', method.toUpperCase(), path, action);
@@ -245,7 +248,8 @@ module.exports = function(app, verbose) {
 					method: r.method,
 					action: r.action,
 					view: r.view,
-					file: routeInstance.file
+					file: routeInstance.file,
+					stats: routeInstance.stats
 				});
 			});
 		}
