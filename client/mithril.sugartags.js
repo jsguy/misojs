@@ -22,6 +22,7 @@
 		(function(tag){
 			var lowerTag = tag.toLowerCase();
 			scope[tag] = function(){
+				console.log('sugar', tag);
 				return (context.m.e? context.m.e: context.m).apply(this, arg([lowerTag], arguments));
 			};
 		}(tagList[i]));

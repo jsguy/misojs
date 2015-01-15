@@ -66,22 +66,11 @@ var fs			= require('fs'),
 			'<!doctype html>',
 			'<html>',
 			'<head>',
-
+			'<style>html,body{ font-family: sans-serif }</style>',
 			'</head>',
 			'<body>',
 			content,
-			
-			//	Add any client JS here!
-			//'<script src="/mithril.js"></script>',
-			//'<script src="/mithril.animate.js"></script>',
-			//'<script src="/mithril.sugartags.js"></script>',
-			//'<script src="/mithril.bindings.js"></script>',
-			//	Clientside "routes"
-
-			//'<script src="/clientroutes.js"></script>',
-			//'<script src="/newclientroutes.js"></script>',
-			'<script src="/croutes.js"></script>',
-
+			'<script src="/miso.js"></script>',
 			'</body>',
 			'</html>'
 		].join('');
@@ -128,8 +117,8 @@ var fs			= require('fs'),
 //	Import all routes
 fs.readdirSync(__dirname)
 	.filter(function(file) {
-		//	All js files that don't start with '.' and are not index.js
-		return (file.indexOf('.') !== 0) && (file !== 'index.js') && getExtension(file) == "js";
+		//	All js files that don't start with '.' and are not index.js or main.js
+		return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'main.js') && getExtension(file) == "js";
 	})
 	.forEach(function(file) {
 		var route = require(path.join(__dirname, file)),
@@ -147,12 +136,10 @@ module.exports = function(app, verbose) {
 	//var createRoute = function(route, name, path, method, action, template) {
 	var routeMap = {},
 		createRoute = function(args) {
-			//var view = getView(args.template? args.template: args.name + "." + args.action + ".js");
-			var myView = getView(args.template? args.template: args.name + "." + args.action + ".js");
 			//	Setup the route on the app
 			app[args.method](args.path, function(req, res) {
-				//	Assume if no view, it is named [controller name][action].js
-				var view = myView = getView(args.template? args.template: args.name + "." + args.action + ".js"),
+				//	Assume if no template, the view is named [controller name][action].js
+				var view = getView(args.template? args.template: args.name + "." + args.action + ".js"),
 					scope = args.route[args.action](req.params);
 				if (!scope || !scope.onReady) {
 					return res.end(skin(renderView(view, scope)));
@@ -162,17 +149,7 @@ module.exports = function(app, verbose) {
 				});
 			});
 
-			//console.log('args', args);
-
-			//	Idea: simply inject string representations of functions
-			//	for the controller and views
 			routeMap[args.path] = args;
-			// {
-			// 	controller: args.route[args.action].toString(),
-			// 	view: "function(ctrl){ return " + myView + " })",
-			// 	file: args.file,
-			// 	name: args.name
-			// };
 		};
 
 	_.forOwn(routes, function(routeInstance, name){

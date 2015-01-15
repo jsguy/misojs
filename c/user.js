@@ -1,29 +1,10 @@
 var Signal = require('signals'),
 	store = require('../server/store.js'),
-	fs = require('fs'),
-	//  Fake storage for now..
-	//  TODO: We need a JSON api
-	// store = {
-	// 	load: function load(type, id) {
-	// 		return {
-	// 			then: function(cb){
-	// 				setTimeout(function(){
-	// 					//	Just read the user.json file
-	// 					var r = JSON.parse(fs.readFileSync("client/user.json", 'utf8'));
-	// 					cb(r);
-	// 				}, 0);
-	// 			}
-	// 		}
-	// 	}
-	// },
-	getParam = function(key, params){
-		return params[key];
-	};
+	miso = require('../server/miso.util.js');
 
 /*
 	TODO
 
-	* Extract method to get parameters
 	* Solution for Signal - might need a semaphore in the controller index file to see 
 		if we're loading anything, like mithril does on the frontend
 */
@@ -45,7 +26,7 @@ module.exports.index = function(params) {
 
 //	Edit user
 module.exports.edit = function(params) {
-	var userId = getParam('user_id', params),
+	var userId = miso.getParam('user_id', params),
 		scope = {
 			user: null,
 			isServer: !!(typeof module !== 'undefined' && module.exports),
@@ -59,5 +40,3 @@ module.exports.edit = function(params) {
 
 	return scope;
 };
-
-console.log('here...');

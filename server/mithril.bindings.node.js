@@ -153,7 +153,6 @@ module.exports = function(m){
 
 	//	Set hover states, a'la jQuery pattern
 	m.addBinding('hover', function(prop){
-		console.log('hover binding', this, prop);
 		this.onmouseover = prop[0];
 		if(prop[1]) {
 			this.onmouseout = prop[1];

@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"rundev": "nodemon --watch v/ --watch cfg/ --watch c/ --watch m/ --watch client/ --watch server/ --watch app.js app.js",
+		"rundev": "nodemon --watch package.json --watch v/ --watch cfg/ --watch c/ --watch m/ --watch client/ --watch server/ --watch app.js app.js",
 		"start": "node app.js"
 	},
 	"bin": {
@@ -50,6 +50,6 @@
 	},
 	"browser": {
 		"./server/store.js": "./client/store.js",
-		"mithril": ""
+		"./server/miso.util.js": "./client/miso.util.js"
 	}
 }

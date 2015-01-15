@@ -65,9 +65,10 @@ module.exports = function(routes){
 
 	//	Run browserify
 	//	TODO: Check if we need to do so - compare file dates to the output.
-	var output = "./client/croutes.js",
+	var output = "./client/miso.js",
 		//cmd = "browserify -u mithril " + cFiles.join(" ") + ">" + output;
-		cmd = "browserify " + cFiles.join(" ") + ">" + output;
+		//cmd = "browserify " + cFiles.join(" ") + ">" + output;
+		cmd = "browserify --igv m ./c/main.js >" + output;
 
 	exec(cmd, function (error, stdout, stderr) {
 	  // output is in stdout

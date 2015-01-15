@@ -1,4 +1,6 @@
-var store = {
+var m = require('mithril');
+
+module.exports = {
 	load: function load(type, id) {
 		if (!type) {
 			throw new Error('no type provided to load model');
