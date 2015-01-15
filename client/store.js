@@ -13,5 +13,8 @@ module.exports = {
 			//url: 'api/' + type + '/' + id),
 			url: '/user.json'
 		});
+	},
+	save: function(type, args){
+		console.log('Save', type, args);
 	}
 };

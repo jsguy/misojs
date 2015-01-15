@@ -1,4 +1,4 @@
-[
+DIV([
 	INPUT({onchange: m.withAttr("value", ctrl.description), value: ctrl.description()}),
 	BUTTON({onclick: ctrl.add.bind(ctrl, ctrl.description)}, "Add"),
 	TABLE([
@@ -11,4 +11,4 @@
 	        ])
 	    })
 	])
-]
+])

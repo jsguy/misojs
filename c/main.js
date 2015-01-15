@@ -19,7 +19,10 @@ m.route(document.body, '/', {
 		with(sugartags) {
 			return 	DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
 	DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
-	A({ href: '/user/1', config: m.route}, "User")
+	UL([
+		LI(A({ href: '/user/1', config: m.route}, "User view example")),
+		LI(A({ href: '/todos', config: m.route}, "Todos example"))
+	])
 ])
 		}
 	}
@@ -28,7 +31,7 @@ m.route(document.body, '/', {
 	controller: todo.index,
 	view: function(ctrl){
 		with(sugartags) {
-			return 	[
+			return 	DIV([
 	INPUT({onchange: m.withAttr("value", ctrl.description), value: ctrl.description()}),
 	BUTTON({onclick: ctrl.add.bind(ctrl, ctrl.description)}, "Add"),
 	TABLE([
@@ -41,7 +44,7 @@ m.route(document.body, '/', {
 	        ])
 	    })
 	])
-]
+])
 		}
 	}
 },

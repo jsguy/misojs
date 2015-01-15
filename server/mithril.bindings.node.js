@@ -1,9 +1,9 @@
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
-
-module.exports = function(m){
-	m = m || {};
+(function(){
+var mithrilBindings = function(m){
+	m.bindings = m.bindings || {};
 
 	//	Pub/Sub based extended properties
 	m.p = function(value) {
@@ -36,7 +36,7 @@ module.exports = function(m){
 				value.push(val);
 			}
 			prop(value);
-		}
+		};
 
 		//	Subscribe for when the value changes
 		prop.subscribe = function (func, context) {
@@ -69,7 +69,6 @@ module.exports = function(m){
 	//		. Some attributes can be removed when applied, eg: custom attributes
 	//	
 	m.e = function(element, attrs, children) {
-		var merged = []
 		for (var name in attrs) {
 			if (m.bindings[name]) {
 				m.bindings[name].func.apply(attrs, [attrs[name]]);
@@ -85,7 +84,6 @@ module.exports = function(m){
 	//	Non-standard attributes do not need to be rendered, eg: valueInput
 	//	so they are set as removable
 	m.addBinding = function(name, func, removeable){
-		m.bindings = m.bindings || {};
 		m.bindings[name] = {
 			func: func,
 			removeable: removeable
@@ -117,25 +115,6 @@ module.exports = function(m){
 		}
 	});
 
-	//	Add value bindings for various event types 
-	var events = ["Input", "Keyup", "Keypress"];
-	for(var i = 0; i < events.length; i += 1) {
-		var eve = events[i];
-		(function(name, eve){
-			//	Bi-directional binding of value
-			m.addBinding(name, function(prop) {
-				if (typeof prop == "function") {
-					this.value = prop();
-					this[eve] = m.withAttr("value", prop);
-				} else {
-					this.value = prop;
-				}
-			}, true);
-		}("value" + eve, "on" + eve.toLowerCase()));
-	}
-
-	/* Set of default bindings */
-	m = m || {};
 	//	Hide node
 	m.addBinding("hide", function(prop){
 		this.style = {
@@ -143,12 +122,34 @@ module.exports = function(m){
 		};
 	}, true);
 
-	//	Toggle boolean value on click
+	//	Toggle value(s) on click
 	m.addBinding('toggle', function(prop){
 		this.onclick = function(){
-			var value = prop();
-			prop(!value);
-		}
+			//	Toggle allows an enum list to be toggled, eg: [prop, value2, value2]
+			var isFunc = typeof prop === 'function', tmp, i, vals = [], val, tVal;
+
+			//	Toggle boolean
+			if(isFunc) {
+				value = prop();
+				prop(!value);
+			} else {
+				//	Toggle enumeration
+				tmp = prop[0];
+				val = tmp();
+				vals = prop.slice(1);
+				tVal = vals[0];
+
+				for(i = 0; i < vals.length; i += 1) {
+					if(val == vals[i]) {
+						if(typeof vals[i+1] !== 'undefined') {
+							tVal = vals[i+1];
+						}
+						break;
+					}
+				}
+				tmp(tVal);
+			}
+		};
 	}, true);
 
 	//	Set hover states, a'la jQuery pattern
@@ -158,4 +159,59 @@ module.exports = function(m){
 			this.onmouseout = prop[1];
 		}
 	}, true );
+
+	//	Add value bindings for various event types 
+	var events = ["Input", "Keyup", "Keypress"],
+		createBinding = function(name, eve){
+			//	Bi-directional binding of value
+			m.addBinding(name, function(prop) {
+				if (typeof prop == "function") {
+					this.value = prop();
+					this[eve] = m.withAttr("value", prop);
+				} else {
+					this.value = prop;
+				}
+			}, true);
+		};
+
+	for(var i = 0; i < events.length; i += 1) {
+		var eve = events[i];
+		createBinding("value" + eve, "on" + eve.toLowerCase());
+	}
+
+
+	//	Set a value on a property
+	m.set = function(prop, value){
+		return function() {
+			prop(value);
+		};
+	};
+
+	/*	Returns a function that can trigger a binding 
+		Usage: onclick: m.trigger('binding', prop)
+	*/
+	m.trigger = function(){
+		var args = Array.prototype.slice.call(arguments);
+		return function(){
+			var name = args[0],
+				argList = args.slice(1);
+			if (m.bindings[name]) {
+				m.bindings[name].func.apply(this, argList);
+			}
+		};
+	};
+
+	return m.bindings;
 };
+
+if (typeof module != "undefined" && module !== null && module.exports) {
+	module.exports = mithrilBindings;
+} else if (typeof define === "function" && define.amd) {
+	define(function() {
+		return mithrilBindings;
+	});
+} else {
+	mithrilBindings(typeof window != "undefined"? window.m || {}: {});
+}
+
+}());

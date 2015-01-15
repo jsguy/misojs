@@ -1,8 +1,9 @@
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
-(function(m){
-	m.bindings = m.bindings || {};
+
+module.exports = function(m){
+	m = m || {};
 
 	//	Pub/Sub based extended properties
 	m.p = function(value) {
@@ -68,6 +69,7 @@
 	//		. Some attributes can be removed when applied, eg: custom attributes
 	//	
 	m.e = function(element, attrs, children) {
+		var merged = []
 		for (var name in attrs) {
 			if (m.bindings[name]) {
 				m.bindings[name].func.apply(attrs, [attrs[name]]);
@@ -83,6 +85,7 @@
 	//	Non-standard attributes do not need to be rendered, eg: valueInput
 	//	so they are set as removable
 	m.addBinding = function(name, func, removeable){
+		m.bindings = m.bindings || {};
 		m.bindings[name] = {
 			func: func,
 			removeable: removeable
@@ -130,83 +133,29 @@
 			}, true);
 		}("value" + eve, "on" + eve.toLowerCase()));
 	}
-}(window.m || {}));;(function(context){
-	/* Set of default extended bindings */
-	context.m = context.m || {};
 
+	/* Set of default bindings */
+	m = m || {};
 	//	Hide node
-	context.m.addBinding("hide", function(prop){
+	m.addBinding("hide", function(prop){
 		this.style = {
-			display: context.m.unwrap(prop)? "none" : ""
+			display: m.unwrap(prop)? "none" : ""
 		};
 	}, true);
 
-	//	Toggle value(s) on click
-	context.m.addBinding('toggle', function(prop){
+	//	Toggle boolean value on click
+	m.addBinding('toggle', function(prop){
 		this.onclick = function(){
-			//	Toggle allows an enum list to be toggled, eg: [prop, value2, value2]
-			var isFunc = typeof prop === 'function', tmp, i, vals = [], val, tVal;
-
-			//	Toggle boolean
-			if(isFunc) {
-				value = prop();
-				prop(!value);
-			} else {
-				//	Toggle enumeration
-				tmp = prop[0];
-				val = tmp();
-				vals = prop.slice(1);
-				tVal = vals[0];
-
-				for(i = 0; i < vals.length; i += 1) {
-					if(val == vals[i]) {
-						if(typeof vals[i+1] !== 'undefined') {
-							tVal = vals[i+1];
-						}
-						break;
-					}
-				}
-				tmp(tVal);
-			}
+			var value = prop();
+			prop(!value);
 		}
 	}, true);
 
 	//	Set hover states, a'la jQuery pattern
-	context.m.addBinding('hover', function(prop){
+	m.addBinding('hover', function(prop){
 		this.onmouseover = prop[0];
 		if(prop[1]) {
 			this.onmouseout = prop[1];
 		}
 	}, true );
-
-}(window));;(function(context){
-	/* Set of userful binding-like functionality */
-	context.m = context.m || {};
-
-	context.m.set = function(prop, value){
-		return function() {
-			prop(value);
-		}
-	};
-
-	/* TODO: Add "binds" functionality as per lhorie example */
-
-
-
-
-	//	Return a function that can trigger a binding
-	//	Use might be: onclick: m.trigger('binding', prop)
-	m.trigger = function(){
-		var args = Array.prototype.slice.call(arguments);
-		return function(){
-			var name = args[0],
-				argList = args.slice(1);
-			if (m.bindings[name]) {
-				m.bindings[name].func.apply(this, argList);
-			}
-		}
-	}
-
-
-
-}(window));
+};
