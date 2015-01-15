@@ -14,13 +14,14 @@ module.exports.home = function(params) {
 	};
 	return scope;
 };
-},{"mithril":6}],2:[function(require,module,exports){
+},{"mithril":7}],2:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var store = require('../server/store.js');
 var home = require('../c/home');
+var todo = require('../c/todo');
 var user = require('../c/user');
 
 if(typeof window !== 'undefined') {
@@ -37,6 +38,27 @@ m.route(document.body, '/', {
 	DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
 	A({ href: '/user/1', config: m.route}, "User")
 ])
+		}
+	}
+},
+'/todos': {
+	controller: todo.index,
+	view: function(ctrl){
+		with(sugartags) {
+			return 	[
+	INPUT({onchange: m.withAttr("value", ctrl.description), value: ctrl.description()}),
+	BUTTON({onclick: ctrl.add.bind(ctrl, ctrl.description)}, "Add"),
+	TABLE([
+	    ctrl.list.map(function(task, index) {
+	        return TR([
+	            TD([
+	                m("input[type=checkbox]", {onclick: m.withAttr("checked", task.done), checked: task.done()})
+	            ]),
+	            TD({style: {textDecoration: task.done() ? "line-through" : "none"}}, task.description()),
+	        ])
+	    })
+	])
+]
 		}
 	}
 },
@@ -57,7 +79,33 @@ m.route(document.body, '/', {
 	}
 }
 });
-},{"../c/home":1,"../c/user":3,"../server/mithril.bindings.node.js":7,"../server/mithril.sugartags.node.js":8,"../server/store.js":5,"mithril":6}],3:[function(require,module,exports){
+},{"../c/home":1,"../c/todo":3,"../c/user":4,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../server/store.js":6,"mithril":7}],3:[function(require,module,exports){
+var m = require('mithril'),
+    //  TODO: Use store to store the todos.
+    store = require('../server/store.js');
+
+var todo = {
+    Todo: function(data) {
+        this.description = m.prop(data.description);
+        this.done = m.prop(false);
+    }
+};
+
+module.exports.index =function() {
+    return {
+        list: [],
+        description: m.prop(""),
+        add: function(description) {
+            if (description()) {
+                this.list.push(new todo.Todo({
+                    description: description()
+                }));
+                this.description("");
+            }
+        }
+    };
+};
+},{"../server/store.js":6,"mithril":7}],4:[function(require,module,exports){
 var store = require('../server/store.js'),
 	miso = require('../server/miso.util.js');
 
@@ -92,7 +140,7 @@ module.exports.edit = function(params) {
 
 	return scope;
 };
-},{"../server/miso.util.js":4,"../server/store.js":5}],4:[function(require,module,exports){
+},{"../server/miso.util.js":5,"../server/store.js":6}],5:[function(require,module,exports){
 //	Various utilities that normalise usage between client and server
 //	This is the client version
 //	See /server/miso.util.js for server version
@@ -122,7 +170,7 @@ module.exports = {
 		return m.route.param(key);
 	}
 };
-},{"mithril":6}],5:[function(require,module,exports){
+},{"mithril":7}],6:[function(require,module,exports){
 var m = require('mithril');
 
 module.exports = {
@@ -141,7 +189,7 @@ module.exports = {
 	}
 };
 
-},{"mithril":6}],6:[function(require,module,exports){
+},{"mithril":7}],7:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1155,7 +1203,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -1317,7 +1365,7 @@ module.exports = function(m){
 		}
 	}, true );
 };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed

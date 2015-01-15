@@ -4,6 +4,7 @@ var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var store = require('../server/store.js');
 var home = require('../c/home');
+var todo = require('../c/todo');
 var user = require('../c/user');
 
 if(typeof window !== 'undefined') {
@@ -20,6 +21,27 @@ m.route(document.body, '/', {
 	DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
 	A({ href: '/user/1', config: m.route}, "User")
 ])
+		}
+	}
+},
+'/todos': {
+	controller: todo.index,
+	view: function(ctrl){
+		with(sugartags) {
+			return 	[
+	INPUT({onchange: m.withAttr("value", ctrl.description), value: ctrl.description()}),
+	BUTTON({onclick: ctrl.add.bind(ctrl, ctrl.description)}, "Add"),
+	TABLE([
+	    ctrl.list.map(function(task, index) {
+	        return TR([
+	            TD([
+	                m("input[type=checkbox]", {onclick: m.withAttr("checked", task.done), checked: task.done()})
+	            ]),
+	            TD({style: {textDecoration: task.done() ? "line-through" : "none"}}, task.description()),
+	        ])
+	    })
+	])
+]
 		}
 	}
 },
