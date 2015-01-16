@@ -7,6 +7,7 @@ var Todo = function(data) {
     this.done = m.prop(false);
 };
 
+//  Export our method
 module.exports.index =function() {
     return {
         list: [],

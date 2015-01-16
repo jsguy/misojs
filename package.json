@@ -20,6 +20,7 @@
     "minimist": "^1.1.0",
     "mithril": "*",
     "mithril-node-render": "*",
+    "model": "^6.0.1",
     "nodemon": "^1.2.1",
     "npm": "~2.1.16",
     "restify": "^2.8.4"

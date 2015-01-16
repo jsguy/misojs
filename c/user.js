@@ -25,7 +25,7 @@ module.exports.edit = function(params) {
 			onReady: new miso.readyBinder()
 		};
 
-	store.load("user", userId).then(function(loadedUser) {
+	store.load('user', userId).then(function(loadedUser) {
 		scope.user = loadedUser;
 		scope.onReady.ready();
 	});
