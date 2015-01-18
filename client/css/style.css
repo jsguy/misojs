@@ -1,1 +1,30 @@
-html,body 		{ font-family: sans-serif }
+/* Reset: http://yuilibrary.com/yui/docs/cssreset/ */
+html{color:#000;background:#FFF}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}q:before,q:after{content:''}abbr,acronym{border:0;font-variant:normal}sup{vertical-align:text-top}sub{vertical-align:text-bottom}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit}input,textarea,select{*font-size:100%}legend{color:#000}#yui3-css-stamp.cssreset{display:none}
+
+/* Clearfix: http://nicolasgallagher.com/micro-clearfix-hack/ */
+.cf:before, .cf:after {content: " "; display: table; }
+.cf:after {clear: both; }
+.cf { *zoom: 1; }
+
+/* Natural box layout model to all elements: http://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+*, *:before, *:after {-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+/* Adjustment for 3rd party content that doesn't work with border-box */
+.contentBoxSized { box-sizing: content-box; }
+
+/* Example styles - you should make your own here... */
+html,body { background: #f3f3f3; font-family: sans-serif; height: 100%; }
+h1 { font-size: 2em }
+h2 { font-size: 1.5em }
+h3 { font-size: 1.17em }
+h4 { font-size: 1em }
+h5 { font-size: 0.83em }
+h6 { font-size: 0.67em }
+
+/* Center content wrappers: http://www.thesitewizard.com/css/center-div-block.shtml */
+.cw { width: 60em; margin-left: auto ; margin-right: auto; padding: 0 1em; }
+
+header 	{ padding: 1.25em 0; box-shadow: 0 0 0.25em #999; margin-bottom: 1em; background: #fff }
+
+#content { background: #f3f3f3; }
+#content .cw { background: #fff; padding: 1.2em 1em; }
+#footer { background: #ccc; padding: 1.2em 0; }

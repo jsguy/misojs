@@ -20,7 +20,7 @@ module.exports.index = {
 				DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
 				UL([
 					LI(A({ href: '/user/1', config: m.route}, "User view example")),
-					LI(A({ href: '/todo', config: m.route}, "Todos example"))
+					LI(A({ href: '/todos', config: m.route}, "Todos example"))
 				])
 			]);
 		}

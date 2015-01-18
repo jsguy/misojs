@@ -12,9 +12,9 @@ if(typeof window !== 'undefined') {
 }
 	
 m.route.mode = 'pathname';
-m.route(document.getElementById('misoAttachment'), '/', {
+m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/': home.index,
 '/user/:user_id': user.edit,
-'/todo': todo.index,
-'/user': user.index
+'/todos': todo.index,
+'/users': user.index
 });

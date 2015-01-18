@@ -72,7 +72,7 @@ module.exports.index = {
 				DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
 				UL([
 					LI(A({ href: '/user/1', config: m.route}, "User view example")),
-					LI(A({ href: '/todo', config: m.route}, "Todos example"))
+					LI(A({ href: '/todos', config: m.route}, "Todos example"))
 				])
 			]);
 		}
@@ -93,11 +93,11 @@ if(typeof window !== 'undefined') {
 }
 	
 m.route.mode = 'pathname';
-m.route(document.getElementById('misoAttachment'), '/', {
+m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/': home.index,
 '/user/:user_id': user.edit,
-'/todo': todo.index,
-'/user': user.index
+'/todos': todo.index,
+'/users': user.index
 });
 },{"../mvc/home.js":3,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../server/store.js":2,"mithril":7}],5:[function(require,module,exports){
 var m = require('mithril'),

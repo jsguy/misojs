@@ -9,7 +9,17 @@ var express = require('express'),
 app.use(express.static(path.join(__dirname, '/client')));
 
 //	Create our app
-mvc(app, routeConfig, true);
+mvc(app, {
+	routeConfig: routeConfig,
+	throwUnmappedActions: true,
+	verbose: true
+});
+
+//	Basic default error handling
+app.use(function(err, req, res, next){
+	console.error(err.stack);
+	res.status(500).send('Something broke!');
+});
 
 //	Run the server
 var server = app.listen(server.port, function () {

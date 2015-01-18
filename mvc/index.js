@@ -1,5 +1,7 @@
 /*
-	Main Miso MVC generator
+	Main Miso MVC generator - this is a singleton to load all controllers
+	and map their routes on startup of app. If a route is unmapped, we throw an
+	error
 */
 var fs			= require('fs'),
 	path		= require('path'),
@@ -13,9 +15,9 @@ var fs			= require('fs'),
 	exec = require('child_process').exec,
 	render = require('mithril-node-render'),
 
-	//	Force the browserify to run?
+	//	Force the browserify to run? (Note: this usually makes it loop a couple of times)
 	forceBrowserify = true,
-	attachmentNode = "document.getElementById('misoAttachment')",
+	attachmentNode = "document.getElementById('misoAttachmentNode')",
 
 	//	TODO: below belongs in layout templates
 	//  Puts the lotion on its...
@@ -27,10 +29,14 @@ var fs			= require('fs'),
 			'<link rel="stylesheet" href="/css/style.css"/>',
 			'</head>',
 			'<body>',
-			'<header><a href="/">MISO</a> - Mithril ISOmetric Javascript</header>',
-			'<div id="misoAttachment">',
-			content,
+			'<header>',
+			'<div class="cw cf">',
+			'<a href="/">MISO</a>',
 			'</div>',
+			'</header>',
+			'<section id="misoAttachmentNode" class="cw">',
+			content,
+			'</section>',
 			//	The generated client script
 			'<script src="/miso.js"></script>',
 			'</body>',
@@ -46,11 +52,10 @@ var fs			= require('fs'),
 
 //	Map the routes for the controllers
 //	This generates the client side code from our routes/controller/views
-module.exports = function(app, routeConfig, verbose) {
-
+module.exports = function(app, options) {
 	//	Add configured routes
-	if(routeConfig) {
-		_.forOwn(routeConfig, function(routeObj, routePath){
+	if(options.routeConfig) {
+		_.forOwn(options.routeConfig, function(routeObj, routePath){
 			var file = routeObj.name + ".js",
 				routeFile = path.join(__dirname, file),
 				route = require(routeFile),
@@ -85,23 +90,71 @@ module.exports = function(app, routeConfig, verbose) {
 				route = require(routeFile),
 				routeStats = fs.statSync(routeFile),
 				routeName = file.substr(0, file.lastIndexOf(".")),
-				routePath = "/" + routeName;
+				routePath = "/" + routeName,
+				method = "get",
+				//	TODO: The id, delete, new can be translated perhaps?
+				idPostfix = "_id",
+				deleteKeyword = "delete",
+				newKeyword = "new";
 
 			//	Create routes using path as key
 			//	TODO: different methods would change the key
 			_.forOwn(route, function(idx, action){
 				if(!hasMappedRouteActions[routeName + "." + action]) {
+
+					//	Note: The list is pluralised with an s always, 
+					//	so name your controller accordingly, eg: don't 
+					//	name it 'users', it should be 'user'
+					//	TODO: provide international pluralisation via
+					//	i18next or similar
+					switch (action) {
+						//	Display an index page with a list of items
+						case 'index':
+							method = 'get';
+							routePath = '/' + routeName + 's';
+							break;
+						//	An item to edit
+						case 'edit':
+							method = 'get';
+							routePath = '/' + routeName + '/:' + routeName + idPostfix;
+							break;
+						//	Delete an item
+						case 'delete':
+							method = 'post';
+							routePath = '/' + routeName + '/:' + routeName + idPostfix + '/' + deleteKeyword;
+							break;
+						case 'new':
+							method = 'get';
+							routePath = '/' + routeName + '/' + newKeyword;
+							break;
+						//	Create an item
+						case 'create':
+							method = 'post';
+							routePath = '/' + routeName;
+							break;
+						//	Update an item
+						case 'update':
+							method = 'post';
+							routePath = '/' + routeName + '/:' + routeName + idPostfix;
+							break;
+						default:
+							var message = 'ERROR: unmapped action: "' + routeName + '.' + action + '" - please map it or make it a private function';
+							if(options.throwUnmappedActions) {
+								throw new Error(message);
+							} else {
+								options.verbose && console.log(message);
+							}
+					}
+
 					routes[routePath] = {
 						route: route,
-						method: 'get',
+						method: method,
 						name: routeName,
 						action: action,
 						path: routePath,
 						file: file,
 						stats: routeStats
 					};
-				} else {
-					verbose && console.log('skip', routeName + "." + action);
 				}
 			});
 		});
@@ -131,7 +184,7 @@ module.exports = function(app, routeConfig, verbose) {
 				}
 			});
 
-			verbose && console.log('     %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
+			options.verbose && console.log('     %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
 
 			routeMap[args.path] = args;
 		};
