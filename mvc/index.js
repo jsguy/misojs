@@ -97,11 +97,35 @@ module.exports = function(app, options) {
 				deleteKeyword = "delete",
 				newKeyword = "new";
 
-			//	Create routes using path as key
-			//	TODO: different methods would change the key
+			/*
+				Here we generate routes based on supported action names, auto-mapped actions are:
+
+				Action 		Method 		URL 						Description
+
+				index 		GET 		[controller] + 's'			List the items
+				edit 		GET 		[controller]/[id]			Display a form to edit the item
+				delete 		POST 		[controller]/[id]/delete 	Deletes an item
+				new 		GET 		[controller]/new 			Display a form to add a new item
+				create 		POST 		[controller] 				Creates a new item
+				update 		POST 		[controller]/[id] 			Updates an item
+
+				Note: We are using RESTful-style URLs, but only GET and POST here,
+					we could obviously add PUT, DELETE and so on, but we're keeping 
+					this basic for now. This is because some browsers, eg: IE7/IE8
+					do not properly support PUT and DELETE, so it's safer to exclude
+					those methods. I know this is opinionated behaviour, but you can
+					always add a custom route if you really want it.
+
+				Ref:
+				http://stackoverflow.com/questions/2456820/problem-with-jquery-ajax-with-delete-method-in-ie
+
+				Action naming convention refs:
+				http://mvccontrib.codeplex.com/wikipage?title=SimplyRestfulRouting&referringTitle=Documentation
+				http://stephenwalther.com/archive/2008/06/27/asp-net-mvc-tip-11-use-standard-controller-action-names
+
+			*/
 			_.forOwn(route, function(idx, action){
 				if(!hasMappedRouteActions[routeName + "." + action]) {
-
 					//	Note: The list is pluralised with an s always, 
 					//	so name your controller accordingly, eg: don't 
 					//	name it 'users', it should be 'user'
