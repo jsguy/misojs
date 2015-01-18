@@ -1,0 +1,4 @@
+{
+	"/": { "method": "get", "name": "home", "action": "index" },
+	"/user/:user_id": { "method": "get", "name": "user", "action": "edit" }
+}

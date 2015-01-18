@@ -1,25 +1,18 @@
 var express = require('express'),
 	path = require('path'),
-	fs = require('fs'),
 	app = express(),
-	server = require('./cfg/server.cfg.json'),
-	m = require('mithril'),
-	render = require('mithril-node-render'),
-	_ = require('lodash'),
-	//Signal = require('signals'),
-	models = require('./m')(),
-	controllers = require('./c')(app, true),
-	routegenerator = require('./server/miso.routegenerator.js');
-
-//	Generate the routes
-routegenerator(controllers);
+	server = require('./cfg/server.json'),
+	routeConfig	= require('./cfg/routes.json'),
+	mvc = require('./mvc');
 
 //	Static directory for our client-side JS
-app.use(express.static(path.join(__dirname, 'client')));
+app.use(express.static(path.join(__dirname, '/client')));
+
+//	Create our app
+mvc(app, routeConfig, true);
 
 //	Run the server
 var server = app.listen(server.port, function () {
-	var host = server.address().address,
-		port = server.address().port;
-	console.log('Miso is listening at http://%s:%s', host, port)
-})
+	var info = server.address();;
+	console.log('Miso is listening at http://%s:%s', info.address, info.port);
+});

@@ -1,7 +1,6 @@
 //	Various utilities that normalise usage between client and server
 //	This is the client version
 //	See /server/miso.util.js for server version
-
 var m = require('mithril');
 
 module.exports = {

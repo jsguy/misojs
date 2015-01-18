@@ -1,1 +1,0 @@
-DIV('Hello ' + ctrl.user.name + '! Server: ' + ctrl.isServer)

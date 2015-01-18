@@ -1,5 +1,0 @@
-{
-	"home": [
-		{ "path": "/", "method": "get", "action": "home" }
-	]
-}

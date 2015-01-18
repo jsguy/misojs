@@ -1,5 +1,6 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
+	store = require('../server/store.js'),
 	bindings = require('../server/mithril.bindings.node.js')(m);
 
 //	Basic todo app
@@ -26,7 +27,10 @@ module.exports.index = {
 			self.todos(list);
 		};
 	},
-	controller: function() {
+	controller: function(params) {
+		var ctrl = this;
+		ctrl.onReady = new miso.readyBinder();
+
 		var model = this.model = new function() {
 			var self = this;
 			self.todos = m.p([
@@ -49,19 +53,30 @@ module.exports.index = {
 				self.todos(list);
 			};
 		}();
+
 		this.addTodo = function(){
 			var value = model.input();
 			if(value) {
+				console.log('add', value);
 				//	Using bindings model push for arrays
 				model.todos.push({text: model.input(), done: m.p(false)});
 				model.input("");
+				store.save('user', model);
 			}
 			return false;
 		};
+
+
+		store.load('todo', 1).then(function(loadedTodos) {
+			ctrl.onReady.ready();
+		});
+
+		return this;
 	},
-	view: function(data) {
-		var t = data.model;
+	view: function(ctrl) {
+		var t = ctrl.model;
 		return [
+			m.e("style", ".done{text-decoration: line-through;}"),
 			m.e("h1", "Mithril bindings Todos - " + t.left() + " of " + t.todos().length + " remaining"),
 			m.e("button", { onclick: t.archive }, "Archive"),
 			m.e("ul", [
@@ -69,7 +84,7 @@ module.exports.index = {
 					return m.e("li", { class: todo.done()? "done": "", toggle: todo.done }, todo.text);
 				})
 			]),
-			m.e("form", { onsubmit: data.addTodo }, [
+			m.e("form", { onsubmit: ctrl.addTodo }, [
 				m.e("input", { type: "text", value: t.input, placeholder: "Add todo"}),
 				m.e("button", { type: "submit"}, "Add")
 			])

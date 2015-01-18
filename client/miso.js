@@ -1,154 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var m = require('mithril');
-
-//	Home page
-module.exports.home = function(params) {
-	var scope = {
-		name: "world",
-		rotate: m.prop(),
-		set: function(prop, value){
-			return function(){
-				prop(value);
-			};
-		}
-	};
-	return scope;
-};
-},{"mithril":7}],2:[function(require,module,exports){
-/* NOTE: This is a generated file, please do not modify, your changes will be lost */
-var m = require('mithril');
-var sugartags = require('../server/mithril.sugartags.node.js')(m);
-var bindings = require('../server/mithril.bindings.node.js')(m);
-var store = require('../server/store.js');
-var home = require('../c/home');
-var todo = require('../c/todo');
-var user = require('../c/user');
-
-if(typeof window !== 'undefined') {
-	window.m = m;
-}
-	
-m.route.mode = 'pathname';
-m.route(document.body, '/', {
-'/': {
-	controller: home.home,
-	view: function(ctrl){
-		with(sugartags) {
-			return 	DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
-	DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
-	UL([
-		LI(A({ href: '/user/1', config: m.route}, "User view example")),
-		LI(A({ href: '/todos', config: m.route}, "Todos example"))
-	])
-])
-		}
-	}
-},
-'/todos': {
-	controller: todo.index,
-	view: function(ctrl){
-		with(sugartags) {
-			return 	DIV([
-	INPUT({onchange: m.withAttr("value", ctrl.description), value: ctrl.description()}),
-	BUTTON({onclick: ctrl.add.bind(ctrl, ctrl.description)}, "Add"),
-	TABLE([
-	    ctrl.list.map(function(task, index) {
-	        return TR([
-	            TD([
-	                m("input[type=checkbox]", {onclick: m.withAttr("checked", task.done), checked: task.done()})
-	            ]),
-	            TD({style: {textDecoration: task.done() ? "line-through" : "none"}}, task.description()),
-	        ])
-	    })
-	])
-])
-		}
-	}
-},
-'/users': {
-	controller: user.index,
-	view: function(ctrl){
-		with(sugartags) {
-			return 	DIV('All the users would be listed here')
-		}
-	}
-},
-'/user/:user_id': {
-	controller: user.edit,
-	view: function(ctrl){
-		with(sugartags) {
-			return 	DIV('Hello ' + ctrl.user.name + '! Server: ' + ctrl.isServer)
-		}
-	}
-}
-});
-},{"../c/home":1,"../c/todo":3,"../c/user":4,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../server/store.js":6,"mithril":7}],3:[function(require,module,exports){
-var m = require('mithril'),
-    //  TODO: Use store to store the todos.
-    store = require('../server/store.js');
-
-var Todo = function(data) {
-    this.description = m.prop(data.description);
-    this.done = m.prop(false);
-};
-
-//  Export our method
-module.exports.index =function() {
-    return {
-        list: [],
-        description: m.prop(""),
-        add: function(description) {
-            if (description()) {
-                var todo = new Todo({
-                    description: description()
-                });
-                this.list.push(todo);
-                this.description("");
-                store.save('todo', todo);
-            }
-        }
-    };
-};
-},{"../server/store.js":6,"mithril":7}],4:[function(require,module,exports){
-var store = require('../server/store.js'),
-	miso = require('../server/miso.util.js');
-
-//	Index user
-module.exports.index = function(params) {
-	var scope = {
-			users: [],
-			onReady: new miso.readyBinder()
-		};
-
-	store.load('user').then(function(loadedUsers) {
-		scope.users = loadedUsers;
-		scope.onReady.ready();
-	});
-
-	return scope;
-};
-
-//	Edit user
-module.exports.edit = function(params) {
-	var userId = miso.getParam('user_id', params),
-		scope = {
-			user: null,
-			isServer: miso.isServer(),
-			onReady: new miso.readyBinder()
-		};
-
-	store.load('user', userId).then(function(loadedUser) {
-		scope.user = loadedUser;
-		scope.onReady.ready();
-	});
-
-	return scope;
-};
-},{"../server/miso.util.js":5,"../server/store.js":6}],5:[function(require,module,exports){
 //	Various utilities that normalise usage between client and server
 //	This is the client version
 //	See /server/miso.util.js for server version
-
 var m = require('mithril');
 
 module.exports = {
@@ -174,7 +27,7 @@ module.exports = {
 		return m.route.param(key);
 	}
 };
-},{"mithril":7}],6:[function(require,module,exports){
+},{"mithril":7}],2:[function(require,module,exports){
 var m = require('mithril');
 
 module.exports = {
@@ -196,7 +49,203 @@ module.exports = {
 	}
 };
 
-},{"mithril":7}],7:[function(require,module,exports){
+},{"mithril":7}],3:[function(require,module,exports){
+var m = require('mithril'),
+	sugartags = require('../server/mithril.sugartags.node.js')(m);
+
+//	Home page
+module.exports.index = {
+	controller: function(){
+		this.name = "world";
+		this.rotate = m.prop();
+		this.set = function(prop, value){
+			return function(){
+				prop(value);
+			};
+		};
+
+		return this;
+	},
+	view: function(ctrl){
+		with(sugartags) {
+			return DIV({ hover: [ctrl.set(ctrl.rotate, 225), ctrl.set(ctrl.rotate, 0)] }, [
+				DIV("G'day ", ctrl.name, { rotate: ctrl.rotate }),
+				UL([
+					LI(A({ href: '/user/1', config: m.route}, "User view example")),
+					LI(A({ href: '/todo', config: m.route}, "Todos example"))
+				])
+			]);
+		}
+	}
+};
+},{"../server/mithril.sugartags.node.js":9,"mithril":7}],4:[function(require,module,exports){
+/* NOTE: This is a generated file, please do not modify, your changes will be lost */
+var m = require('mithril');
+var sugartags = require('../server/mithril.sugartags.node.js')(m);
+var bindings = require('../server/mithril.bindings.node.js')(m);
+var store = require('../server/store.js');
+var home = require('../mvc/home.js');
+var user = require('../mvc/user.js');
+var todo = require('../mvc/todo.js');
+
+if(typeof window !== 'undefined') {
+	window.m = m;
+}
+	
+m.route.mode = 'pathname';
+m.route(document.getElementById('misoAttachment'), '/', {
+'/': home.index,
+'/user/:user_id': user.edit,
+'/todo': todo.index,
+'/user': user.index
+});
+},{"../mvc/home.js":3,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../server/store.js":2,"mithril":7}],5:[function(require,module,exports){
+var m = require('mithril'),
+	miso = require('../server/miso.util.js'),
+	store = require('../server/store.js'),
+	bindings = require('../server/mithril.bindings.node.js')(m);
+
+//	Basic todo app
+module.exports.index = {
+	model: function() {
+		var self = this;
+		self.todos = m.p([
+			{ text: "learn mithril", done: m.p(true) },
+      		{ text: "build a mithril app", done: m.p(false) }
+      	]);
+      	self.input = m.p("");
+		self.left = function(){
+			var count = 0;
+			self.todos().map(function(todo) {
+				count += todo.done() ? 0 : 1;
+			});
+			return count;
+		};
+		self.archive = function(){
+			var list = [];
+			self.todos().map(function(todo) {
+				if(!todo.done()) { list.push(todo); }
+			});
+			self.todos(list);
+		};
+	},
+	controller: function(params) {
+		var ctrl = this;
+		ctrl.onReady = new miso.readyBinder();
+
+		var model = this.model = new function() {
+			var self = this;
+			self.todos = m.p([
+				{ text: "learn mithril", done: m.p(true) },
+	      		{ text: "build a mithril app", done: m.p(false) }
+	      	]);
+	      	self.input = m.p("");
+			self.left = function(){
+				var count = 0;
+				self.todos().map(function(todo) {
+					count += todo.done() ? 0 : 1;
+				});
+				return count;
+			};
+			self.archive = function(){
+				var list = [];
+				self.todos().map(function(todo) {
+					if(!todo.done()) { list.push(todo); }
+				});
+				self.todos(list);
+			};
+		}();
+
+		this.addTodo = function(){
+			var value = model.input();
+			if(value) {
+				console.log('add', value);
+				//	Using bindings model push for arrays
+				model.todos.push({text: model.input(), done: m.p(false)});
+				model.input("");
+				store.save('user', model);
+			}
+			return false;
+		};
+
+
+		store.load('todo', 1).then(function(loadedTodos) {
+			ctrl.onReady.ready();
+		});
+
+		return this;
+	},
+	view: function(ctrl) {
+		var t = ctrl.model;
+		return [
+			m.e("style", ".done{text-decoration: line-through;}"),
+			m.e("h1", "Mithril bindings Todos - " + t.left() + " of " + t.todos().length + " remaining"),
+			m.e("button", { onclick: t.archive }, "Archive"),
+			m.e("ul", [
+				t.todos().map(function(todo, idx){
+					return m.e("li", { class: todo.done()? "done": "", toggle: todo.done }, todo.text);
+				})
+			]),
+			m.e("form", { onsubmit: ctrl.addTodo }, [
+				m.e("input", { type: "text", value: t.input, placeholder: "Add todo"}),
+				m.e("button", { type: "submit"}, "Add")
+			])
+		];
+	}
+};
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/store.js":2,"mithril":7}],6:[function(require,module,exports){
+var store = require('../server/store.js'),
+	miso = require('../server/miso.util.js'),
+	m = require('mithril'),
+	sugartags = require('../server/mithril.sugartags.node.js')(m);
+
+//	Index user
+module.exports.index = {
+	controller: function(params) {
+		var self = this;
+		this.users = [];
+		this.onReady = new miso.readyBinder();
+
+		store.load('user').then(function(loadedUsers) {
+			self.users = loadedUsers;
+			self.onReady.ready();
+		});
+
+		return self;
+	},
+	view: function(ctrl){
+		with(sugartags) {
+			return DIV('All the users would be listed here');
+		}
+	}
+};
+
+//	Edit user
+module.exports.edit = {
+	controller: function(params) {
+		var self = this,
+			userId = miso.getParam('user_id', params);
+
+		console.log('user id', userId);
+
+		self.user = null;
+		self.isServer = miso.isServer();
+		self.onReady = new miso.readyBinder();
+
+		store.load('user', userId).then(function(loadedUser) {
+			self.user = loadedUser;
+			self.onReady.ready();
+		});
+
+		return self;
+	},
+	view: function(ctrl){
+		with(sugartags) {
+			return DIV('Hello ' + ctrl.user.name + '!');
+		}
+	}
+};
+},{"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":9,"../server/store.js":2,"mithril":7}],7:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1456,4 +1505,4 @@ module.exports = function(m, lower){
 	}}
 	return scope;
 };
-},{}]},{},[2]);
+},{}]},{},[4]);
