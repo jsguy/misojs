@@ -1,7 +1,9 @@
 /*
 	Main Miso MVC generator - this is a singleton to load all controllers
-	and map their routes on startup of app. If a route is unmapped, we throw an
-	error
+	and map their routes on startup of app. If a route is unmapped, we 
+	(optionally) throw an error.
+
+	TODO: This is a little large, split various things out a bit, including the "skin" view...
 */
 var fs			= require('fs'),
 	path		= require('path'),
@@ -161,6 +163,9 @@ module.exports = function(app, options) {
 							method = 'post';
 							routePath = '/' + routeName + '/:' + routeName + idPostfix;
 							break;
+						case '_misoReadyBinding':
+							//	For ensuring future bound events have been resolved
+							break;
 						default:
 							var message = 'ERROR: unmapped action: "' + routeName + '.' + action + '" - please map it or make it a private function';
 							if(options.throwUnmappedActions) {
@@ -187,24 +192,24 @@ module.exports = function(app, options) {
 		//	route, name, path, method, action
 		createRoute = function(args) {
 			//	Setup the route on the app
-			app[args.method](args.path, function(req, res) {
+			app[args.method](args.path, function(req, res, next) {
 				try{
-					var scope = _.isFunction(args.route[args.action].controller)?
-							args.route[args.action].controller(req.params):
-							args.route[args.action].controller,
+					var scope = args.route[args.action].controller(req.params),
 						mvc = args.route[args.action];
-					if (!scope || !scope.onReady) {
+
+					//	Check for ready binder
+					if (!args.route._misoReadyBinding) {
 						var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
 						res.end(skin(result));
 					} else {
-						scope.onReady.bind(function() {
+						//	Add "last" binding
+						args.route._misoReadyBinding.bindLast(function() {
 							var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
 							res.end(skin(result));
 						});
 					}
 				} catch(ex){
-					//	TODO: Soemthing with this
-					throw ex;
+					next(ex);
 				}
 			});
 

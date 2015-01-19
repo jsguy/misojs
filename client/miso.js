@@ -30,25 +30,26 @@ module.exports = {
 },{"mithril":7}],2:[function(require,module,exports){
 var m = require('mithril');
 
-module.exports = {
-	load: function load(type, id) {
-		if (!type) {
-			throw new Error('no type provided to load model');
+module.exports = function(scope) {
+	return {
+		load: function load(type, id) {
+			if (!type) {
+				throw new Error('no type provided to load model');
+			}
+			if (!id) {
+				throw new Error('no id provided to load model');
+			}
+			return m.request({
+				method: 'GET',
+				//url: 'api/' + type + '/' + id),
+				url: '/user.json'
+			});
+		},
+		save: function(type, args){
+			console.log('Save', type, args);
 		}
-		if (!id) {
-			throw new Error('no id provided to load model');
-		}
-		return m.request({
-			method: 'GET',
-			//url: 'api/' + type + '/' + id),
-			url: '/user.json'
-		});
-	},
-	save: function(type, args){
-		console.log('Save', type, args);
-	}
+	};
 };
-
 },{"mithril":7}],3:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
@@ -88,6 +89,8 @@ var home = require('../mvc/home.js');
 var user = require('../mvc/user.js');
 var todo = require('../mvc/todo.js');
 
+
+
 if(typeof window !== 'undefined') {
 	window.m = m;
 }
@@ -96,13 +99,15 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/': home.index,
 '/user/:user_id': user.edit,
+'/todo': todo._misoReadyBinding,
 '/todos': todo.index,
+'/user': user._misoReadyBinding,
 '/users': user.index
 });
 },{"../mvc/home.js":3,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../server/store.js":2,"mithril":7}],5:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
-	store = require('../server/store.js'),
+	store = require('../server/store.js')(this),
 	bindings = require('../server/mithril.bindings.node.js')(m);
 
 //	Basic todo app
@@ -131,7 +136,6 @@ module.exports.index = {
 	},
 	controller: function(params) {
 		var ctrl = this;
-		ctrl.onReady = new miso.readyBinder();
 
 		var model = this.model = new function() {
 			var self = this;
@@ -168,9 +172,8 @@ module.exports.index = {
 			return false;
 		};
 
-
 		store.load('todo', 1).then(function(loadedTodos) {
-			ctrl.onReady.ready();
+			console.log('loadedTodos', loadedTodos);
 		});
 
 		return this;
@@ -194,7 +197,7 @@ module.exports.index = {
 	}
 };
 },{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/store.js":2,"mithril":7}],6:[function(require,module,exports){
-var store = require('../server/store.js'),
+var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
@@ -204,11 +207,9 @@ module.exports.index = {
 	controller: function(params) {
 		var self = this;
 		this.users = [];
-		this.onReady = new miso.readyBinder();
 
-		store.load('user').then(function(loadedUsers) {
+		store.load('user', 1).then(function(loadedUsers) {
 			self.users = loadedUsers;
-			self.onReady.ready();
 		});
 
 		return self;
@@ -226,15 +227,11 @@ module.exports.edit = {
 		var self = this,
 			userId = miso.getParam('user_id', params);
 
-		console.log('user id', userId);
-
 		self.user = null;
 		self.isServer = miso.isServer();
-		self.onReady = new miso.readyBinder();
 
 		store.load('user', userId).then(function(loadedUser) {
 			self.user = loadedUser;
-			self.onReady.ready();
 		});
 
 		return self;

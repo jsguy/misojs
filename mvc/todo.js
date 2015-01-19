@@ -1,6 +1,6 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
-	store = require('../server/store.js'),
+	store = require('../server/store.js')(this),
 	bindings = require('../server/mithril.bindings.node.js')(m);
 
 //	Basic todo app
@@ -29,7 +29,6 @@ module.exports.index = {
 	},
 	controller: function(params) {
 		var ctrl = this;
-		ctrl.onReady = new miso.readyBinder();
 
 		var model = this.model = new function() {
 			var self = this;
@@ -66,9 +65,8 @@ module.exports.index = {
 			return false;
 		};
 
-
 		store.load('todo', 1).then(function(loadedTodos) {
-			ctrl.onReady.ready();
+			console.log('loadedTodos', loadedTodos);
 		});
 
 		return this;

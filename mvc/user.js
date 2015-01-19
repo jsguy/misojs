@@ -1,4 +1,4 @@
-var store = require('../server/store.js'),
+var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
@@ -8,11 +8,9 @@ module.exports.index = {
 	controller: function(params) {
 		var self = this;
 		this.users = [];
-		this.onReady = new miso.readyBinder();
 
-		store.load('user').then(function(loadedUsers) {
+		store.load('user', 1).then(function(loadedUsers) {
 			self.users = loadedUsers;
-			self.onReady.ready();
 		});
 
 		return self;
@@ -30,15 +28,11 @@ module.exports.edit = {
 		var self = this,
 			userId = miso.getParam('user_id', params);
 
-		console.log('user id', userId);
-
 		self.user = null;
 		self.isServer = miso.isServer();
-		self.onReady = new miso.readyBinder();
 
 		store.load('user', userId).then(function(loadedUser) {
 			self.user = loadedUser;
-			self.onReady.ready();
 		});
 
 		return self;
