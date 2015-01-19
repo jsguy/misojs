@@ -165,7 +165,7 @@ module.exports = function(app, options) {
 							break;
 						case '_misoReadyBinding':
 							//	For ensuring future bound events have been resolved
-							break;
+							return;
 						default:
 							var message = 'ERROR: unmapped action: "' + routeName + '.' + action + '" - please map it or make it a private function';
 							if(options.throwUnmappedActions) {

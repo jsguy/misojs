@@ -7,8 +7,6 @@ var home = require('../mvc/home.js');
 var user = require('../mvc/user.js');
 var todo = require('../mvc/todo.js');
 
-
-
 if(typeof window !== 'undefined') {
 	window.m = m;
 }
@@ -17,8 +15,6 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/': home.index,
 '/user/:user_id': user.edit,
-'/todo': todo._misoReadyBinding,
 '/todos': todo.index,
-'/user': user._misoReadyBinding,
 '/users': user.index
 });
