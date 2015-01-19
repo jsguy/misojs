@@ -178,7 +178,7 @@ module.exports.index = {
 		var t = ctrl.model;
 		return [
 			m.e("style", ".done{text-decoration: line-through;}"),
-			m.e("h1", "Mithril bindings Todos - " + t.left() + " of " + t.todos().length + " remaining"),
+			m.e("h1", "Todos - " + t.left() + " of " + t.todos().length + " remaining"),
 			m.e("button", { onclick: t.archive }, "Archive"),
 			m.e("ul", [
 				t.todos().map(function(todo, idx){

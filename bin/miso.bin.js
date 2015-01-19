@@ -68,7 +68,7 @@ try {
 			});
 		});
 
-	} else if(argv.n) {
+	} else if(argv.n || argv.s) {
 		//	Check for absolute path
 		if(argv.n.indexOf("/") !== 0) {
 			projectPath = userPath + "/" + argv.n;
@@ -79,11 +79,25 @@ try {
 		if(!fs.existsSync(projectPath)) {
 			console.log("Create new project: '" +argv.n + "'...");
 			fs.mkdirSync(projectPath);
+			
+			//	TODO: We want to exclude ["bin", "skeletons"]
 			fs.copySync(misoPath, projectPath);
+
 			console.log("Project successfully created.");
 		} else {
 			console.log("Project already exists:", argv.n, "use -u to update");
 		}
+
+
+		//	We can also apply a skeleton when creating a new project
+		if(argv.s) {
+
+		}
+
+
+
+
+
 	} else {
 		//	Show the help screen
 		var helpText = [
@@ -93,7 +107,7 @@ try {
 			"Commands:",
 			"  -?                  Shows help for a particular command, eg: '"+name+" -? n' shows help for creating a new project",
 			"  -n                  Create a new project",
-			//"  -u                  Update a project to the current version",
+			"  -s                  Create a skeleton app, valid skeletons: 'todo'",
 			"  run                 Runs the project in the current directory"
 		];
 		_.each(helpText, function(txt){
