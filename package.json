@@ -23,7 +23,8 @@
     "model": "^6.0.1",
     "nodemon": "^1.2.1",
     "npm": "~2.1.16",
-    "restify": "^2.8.4"
+    "restify": "^2.8.4",
+    "validator": "^3.27.0"
   },
   "description": "MISOJS (Mithril ISOmorphic JavaScript) is a node.js and mithril based MVC implementation that provides an isomorphic environment to create apps quickly.",
   "main": "app.js",
