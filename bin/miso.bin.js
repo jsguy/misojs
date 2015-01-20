@@ -73,6 +73,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 		delete myJSON.private;
 		delete myJSON.repository;
 		delete myJSON.author;
+		delete myJSON.homepage;
 		delete myJSON.bugs;
 
 		return JSON.stringify(myJSON, undefined, 2);
