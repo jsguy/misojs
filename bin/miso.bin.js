@@ -22,12 +22,16 @@ var argv = require('minimist')(process.argv.slice(2)),
 	version = pjson.version,
 	misoPath = __dirname + "/../",
 	userPath = process.cwd(),
+	print = function(){
+		console.log.apply(console, arguments);
+	},
+	createdProject = false,
 	projectPath,
 	excludeFiles = ['skeletons', 'bin', 'README.md', ''],
-	createProject = function(projectPath, nParam){
+	//	Creates a new project folder and copies all required files
+	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {
-			console.log("Create new project: '" +nParam + "'...");
-
+			print("Create new project: '" +projectName + "'...");
 			//	Create the new directory
 			fs.mkdirSync(projectPath);
 
@@ -49,29 +53,47 @@ var argv = require('minimist')(process.argv.slice(2)),
 
 					fs.copySync(file, toPath);
 				});
-			console.log("Project successfully created.");
+
+			//	Create package
+			fs.writeFileSync(projectPath +"/package.json", createPackage(projectName));
+
+			print("Project successfully created.");
+			createdProject = true;
 		} else {
-			console.log("Project already exists:", nParam, "use -u to update");
+			print("Project already exists:", projectName, "use -u to update");
 		}
 		return true;
 	},
+	//	Creates the required package JSON for a new project
+	createPackage = function(projectName){
+		var myJSON = pjson;
+		myJSON.name = projectName;
+		myJSON.description = projectName + " - an awesome project based on miso";
+		delete myJSON.bin;
+		delete myJSON.private;
+		delete myJSON.repository;
+		delete myJSON.author;
+		delete myJSON.bugs;
+
+		return JSON.stringify(myJSON, undefined, 2);
+	},
+	//	Adds a skeleton onto a project
 	addSkeleton = function(type, projectPath, projectName){
 		var skeletonPath = fs.realpathSync(misoPath+"/skeletons/" + type);
 
 		if(fs.existsSync(skeletonPath)) {
 			if(fs.existsSync(projectPath)) {
 				fs.copySync(skeletonPath, projectPath);
-				console.log("Added '" + type + "' skeleton to " + projectName);
+				print("Added '" + type + "' skeleton to " + projectName);
 			} else {
-				console.log("Project not found: " + projectPath);
+				print("Project not found: " + projectPath);
 			}
 		} else {
-			console.log("Skeleton not found: " + type);
+			print("Skeleton not found: " + type);
 		}
-
 	};
 
-console.log("Miso version " + version);
+print("Miso version " + version);
 
 try {
 	if(argv["?"]) {
@@ -95,23 +117,23 @@ try {
 			item = item.substr(1);
 		}
 
-		console.log("Help for:", argv["?"]);
-		console.log("");
+		print("Help for:", argv["?"]);
+		print("");
 
 		if(helpObjects[item]) {
 			_.each(helpObjects[item], function(txt){
-				console.log(txt);
+				print(txt);
 			})
 		} else {
-			console.log("Help for " + item + " not found.");
+			print("Help for " + item + " not found.");
 		}
 	} else if(argv._.indexOf('run') !== -1){
 
 		//	TODO: check this is a miso project.
-		console.log("Running project...");
+		print("Running project...");
 		npm.load(pjson, function (err) {
 			npm.commands.run(["rundev"], function(){
-				console.log("Miso run completed");
+				print("Miso run completed");
 			});
 		});
 
@@ -148,11 +170,18 @@ try {
 			"  run                 Runs the project in the current directory"
 		];
 		_.each(helpText, function(txt){
-			console.log(txt);
+			print(txt);
 		});
 	}
 } catch(ex) {
-	console.log("Error:", ex);
+	print("Error:", ex);
 }
+
+if(createdProject) {
+	print("To run your new project:");
+	print("");
+	print("cd " + argv.n + " && miso run");
+}
+
 //	Add a new line at the end...
-console.log("");
+print("");
