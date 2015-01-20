@@ -22,7 +22,54 @@ var argv = require('minimist')(process.argv.slice(2)),
 	version = pjson.version,
 	misoPath = __dirname + "/../",
 	userPath = process.cwd(),
-	projectPath;
+	projectPath,
+	excludeFiles = ['skeletons', 'bin', 'README.md', ''],
+	createProject = function(projectPath, nParam){
+		if(!fs.existsSync(projectPath)) {
+			console.log("Create new project: '" +nParam + "'...");
+
+			//	Create the new directory
+			fs.mkdirSync(projectPath);
+
+			//	Loop on our files
+			fs.readdirSync(misoPath)
+				.filter(function(file) {
+					//	All files that don't start with '.' and are not in the exclude list
+					return (file.indexOf('.') !== 0) && (excludeFiles.indexOf(file) == -1);
+				})
+				.forEach(function(fileName) {
+					//	Copy files and directories, using real paths
+					file = fs.realpathSync(misoPath + fileName);
+					var stat = fs.statSync(file),
+						toPath = projectPath + "/" + fileName;
+
+					if(stat.isDirectory()) {
+						file = fs.realpathSync(file + "/../" + fileName);
+					}
+
+					fs.copySync(file, toPath);
+				});
+			console.log("Project successfully created.");
+		} else {
+			console.log("Project already exists:", nParam, "use -u to update");
+		}
+		return true;
+	},
+	addSkeleton = function(type, projectPath, projectName){
+		var skeletonPath = fs.realpathSync(misoPath+"/skeletons/" + type);
+
+		if(fs.existsSync(skeletonPath)) {
+			if(fs.existsSync(projectPath)) {
+				fs.copySync(skeletonPath, projectPath);
+				console.log("Added '" + type + "' skeleton to " + projectName);
+			} else {
+				console.log("Project not found: " + projectPath);
+			}
+		} else {
+			console.log("Skeleton not found: " + type);
+		}
+
+	};
 
 console.log("Miso version " + version);
 
@@ -68,33 +115,23 @@ try {
 			});
 		});
 
-	} else if(argv.n || argv.s) {
+	} else if(argv.n) {
 		//	Check for absolute path
 		if(argv.n.indexOf("/") !== 0) {
 			projectPath = userPath + "/" + argv.n;
 		} else {
 			projectPath = argv.n;
 		}
-		//	
-		if(!fs.existsSync(projectPath)) {
-			console.log("Create new project: '" +argv.n + "'...");
-			fs.mkdirSync(projectPath);
-			
-			//	TODO: We want to exclude ["bin", "skeletons"]
-			fs.copySync(misoPath, projectPath);
 
-			console.log("Project successfully created.");
-		} else {
-			console.log("Project already exists:", argv.n, "use -u to update");
-		}
+		//	See if it worked, then check if we're also creating a skeleton.
+		if(createProject(projectPath, argv.n)) {
 
-
-		//	We can also apply a skeleton when creating a new project
-		if(argv.s) {
+			//	We can also apply a skeleton when creating a new project
+			if(argv.s) {
+				addSkeleton(argv.s, projectPath, argv.n);
+			}
 
 		}
-
-
 
 
 
