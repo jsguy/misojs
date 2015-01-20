@@ -15,6 +15,31 @@ _NOTE:_ Not for public consumption just yet!
 
 You can now click the link to get to the user edit page - click it, then re-load that url, and you'll see that it can load that URL in the browser, and render it on the backend, whilst initalizing the app on the frontend, ie: isomorphic!
 
+
+## Future install
+
+```javascript
+npm install misojs -g
+```
+
+Then to create and run a project:
+
+```javascript
+miso -n myProject -s todo
+cd myProject
+miso run
+```
+
+This creates a new project with the 'todo' skeleton applied, and runs it on http://localhost:6476
+
+Note: right now you can acheive the same by goin to the directory you installed miso in, and doing:
+
+```javascript
+npm install . -g
+```
+
+This will make `miso` available globally.
+
 ## How it works in general
 
 * Convention over configuration is used when possible
