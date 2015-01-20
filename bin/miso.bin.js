@@ -152,10 +152,7 @@ try {
 			if(argv.s) {
 				addSkeleton(argv.s, projectPath, argv.n);
 			}
-
 		}
-
-
 
 	} else {
 		//	Show the help screen
@@ -166,7 +163,7 @@ try {
 			"Commands:",
 			"  -?                  Shows help for a particular command, eg: '"+name+" -? n' shows help for creating a new project",
 			"  -n                  Create a new project",
-			"  -s                  Create a skeleton app, valid skeletons: 'todo'",
+			"  -s                  Add a skeleton to a new app",
 			"  run                 Runs the project in the current directory"
 		];
 		_.each(helpText, function(txt){
