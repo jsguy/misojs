@@ -24,22 +24,24 @@ module.exports.index = {
 
 //	Edit user
 module.exports.edit = {
+	model: function(data){
+		this.name = m.p(data.name);
+		this.id = m.p(data.id);
+		return this;
+	},
 	controller: function(params) {
 		var self = this,
 			userId = miso.getParam('user_id', params);
 
-		self.user = null;
-		self.isServer = miso.isServer();
-
-		store.load('user', userId).then(function(loadedUser) {
-			self.user = loadedUser;
+		store.load('user', userId).then(function(user) {
+			self.user = new module.exports.edit.model(user);
 		});
 
 		return self;
 	},
 	view: function(ctrl){
 		with(sugartags) {
-			return DIV('Hello ' + ctrl.user.name + '!');
+			return DIV('Hello ' + ctrl.user.name() + '!');
 		}
 	}
 };
