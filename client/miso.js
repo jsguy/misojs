@@ -238,7 +238,7 @@ module.exports.edit = {
 					LABEL("Name"), INPUT({value: ctrl.user.name()})
 				]),
 				DIV({class: ctrl.user.isValid('email') == true? "valid": "invalid"}, [
-					LABEL("Email"), INPUT({value: ctrl.user.email(), onchange: m.withAttr("value", ctrl.user.isValid("email"))})
+					LABEL("Email"), INPUT({value: ctrl.user.email()})
 				])
 			];
 		}
@@ -1595,8 +1595,6 @@ module.exports = {
 					result[name] = validate(name, getValue(name), vObj[name]);
 				}
 			}
-
-			console.log('validate', name, result);
 
 			return result;
 		}
