@@ -1,7 +1,6 @@
 var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
-	//validate = require('../server/miso.validate.js'),
-	validate = require('../../validator.modelbinder'),
+	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m);
@@ -31,9 +30,8 @@ module.exports.edit = {
 		this.name = m.p(data.name);
 		this.email = m.p(data.email);
 		this.id = m.p(data.id);
-		
-		//	Returns object with each field, with true for each valid field,
-		//	or a list of error messages for each invalid field.
+
+		//	Validate the model		
 		this.isValid = validate.bind(this, {
 			name: {
 				'isRequired': "You must enter a name"
@@ -53,19 +51,32 @@ module.exports.edit = {
 		store.load('user', userId).then(function(user) {
 			user.email = "is_email.com";
 			self.user = new module.exports.edit.model(user);
-			console.log("self.user.isValid()", self.user.isValid());
 		});
+
+		self.save = function(){
+			console.log('SAVE', self.user);
+		};
 
 		return self;
 	},
 	view: function(ctrl){
 		with(sugartags) {
 			return [
+				H2({class: "pageHeader"}, "Edit user"),
 				DIV([
-					LABEL("Name"), INPUT({value: ctrl.user.name()})
+					LABEL("Name"), INPUT({value: ctrl.user.name}),
+					DIV({class: ctrl.user.isValid('name') == true? "valid": "invalid"}, [
+						ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
+					])
 				]),
-				DIV({class: ctrl.user.isValid('email') == true? "valid": "invalid"}, [
-					LABEL("Email"), INPUT({value: ctrl.user.email()})
+				DIV([
+					LABEL("Email"), INPUT({value: ctrl.user.email}),
+					DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
+						ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
+					])
+				]),
+				DIV({class: "indented"},[
+					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
 				])
 			];
 		}

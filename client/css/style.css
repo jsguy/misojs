@@ -28,3 +28,12 @@ header 	{ padding: 1.25em 0; box-shadow: 0 0 0.25em #999; margin-bottom: 1em; ba
 #content { background: #f3f3f3; }
 #content .cw { background: #fff; padding: 1.2em 1em; }
 #footer { background: #ccc; padding: 1.2em 0; }
+
+/* Arbritary default styles. TODO: please make these better */
+h2 { margin-bottom: 1em }
+label { width: 8em; display: inline-block; text-align: right; padding-right: 0.5em; line-height: 2em }
+input { line-height: 1.2em; padding: 0.1em 0.5em; border-radius: 4px; border: 1px solid #eee;}
+button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #eee; cursor: pointer; }
+button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
+.indented { margin-left: 8em; }
+.invalid { color: #f00; }
