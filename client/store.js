@@ -15,8 +15,18 @@ module.exports = function(scope) {
 				url: '/user.json'
 			});
 		},
-		save: function(type, args){
-			console.log('Save', type, args);
+		save: function(type, model){
+			var v = model.isValid();
+			if(v === true) {
+				console.log('Save', type, model);
+				return m.request({
+					method: 'GET',
+					//url: 'api/' + type + '/' + id),
+					url: '/user.json'
+				});
+			} else {
+				console.log('Model invalid', v);
+			}
 		}
 	};
 };

@@ -55,6 +55,7 @@ module.exports.edit = {
 
 		self.save = function(){
 			console.log('SAVE', self.user);
+			store.save('user', self.user);
 		};
 
 		return self;
