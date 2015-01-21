@@ -18,7 +18,7 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run? (Note: this usually makes it loop a couple of times)
-	forceBrowserify = false,
+	forceBrowserify = true,
 	attachmentNode = "document.getElementById('misoAttachmentNode')",
 
 	//	TODO: below belongs in layout templates

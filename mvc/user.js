@@ -1,8 +1,10 @@
 var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
-	validate = require('../common/miso.validate.js'),
+	//validate = require('../server/miso.validate.js'),
+	validate = require('../../validator.modelbinder'),
 	m = require('mithril'),
-	sugartags = require('../server/mithril.sugartags.node.js')(m);
+	sugartags = require('../server/mithril.sugartags.node.js')(m),
+	bindings = require('../server/mithril.bindings.node.js')(m);
 
 //	Index user
 module.exports.index = {
@@ -30,9 +32,9 @@ module.exports.edit = {
 		this.email = m.p(data.email);
 		this.id = m.p(data.id);
 		
-		//	Returns object with each filed, with true for each valid field,
-		//	or an error messages for each invalid field.
-		this.isValid = validate.validate(this, {
+		//	Returns object with each field, with true for each valid field,
+		//	or a list of error messages for each invalid field.
+		this.isValid = validate.bind(this, {
 			name: {
 				'isRequired': "You must enter a name"
 			},
@@ -49,14 +51,9 @@ module.exports.edit = {
 			userId = miso.getParam('user_id', params);
 
 		store.load('user', userId).then(function(user) {
-			user.email = "isNOTemail.com";
+			user.email = "is_email.com";
 			self.user = new module.exports.edit.model(user);
-
-			//	Testing...
-			console.log(self.user.isValid());
-			console.log(self.user.isValid('name'));
-			console.log(self.user.isValid('email'));
-
+			console.log("self.user.isValid()", self.user.isValid());
 		});
 
 		return self;
@@ -65,12 +62,10 @@ module.exports.edit = {
 		with(sugartags) {
 			return [
 				DIV([
-					LABEL("Name"),
-					INPUT({value: ctrl.user.name()})
+					LABEL("Name"), INPUT({value: ctrl.user.name()})
 				]),
-				DIV({class: ctrl.user.isValid('email')? "valid": "invalid"}, [
-					LABEL("Email"),
-					INPUT({value: ctrl.user.email()})
+				DIV({class: ctrl.user.isValid('email') == true? "valid": "invalid"}, [
+					LABEL("Email"), INPUT({value: ctrl.user.email(), onchange: m.withAttr("value", ctrl.user.isValid("email"))})
 				])
 			];
 		}
