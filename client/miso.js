@@ -27,7 +27,7 @@ module.exports = {
 		return m.route.param(key);
 	}
 };
-},{"mithril":7}],2:[function(require,module,exports){
+},{"mithril":8}],2:[function(require,module,exports){
 var m = require('mithril');
 
 module.exports = function(scope) {
@@ -50,7 +50,59 @@ module.exports = function(scope) {
 		}
 	};
 };
-},{"mithril":7}],3:[function(require,module,exports){
+},{"mithril":8}],3:[function(require,module,exports){
+var validator = require('validator');
+
+//	Various common utilities that work on bothe the client and server
+module.exports = {
+	validate: function(self, vObj){
+		return function(name){
+			var result = {},
+				//	For some reason node-validator doesn't have this...
+				isNotEmpty = function(value){
+					return typeof value !== "undefined" && value !== "" && value !== null;
+				},
+				//	Get value of property from 'self', which can be a function.
+				getValue = function(name){
+					return typeof self[name] == "function"? self[name](): self[name];
+				},
+				validateEntry = function(name, value, validations) {
+					var validation,
+						tmp,
+						result = {};
+					for(validation in validations) {
+						//	use our "isRequired"
+						if(validation == "isRequired") {
+							tmp = isNotEmpty(value)? true: validations[validation]; 
+						} else {
+							tmp = validator[validation](value)? true: validations[validation]; 
+						}
+
+						//	Handle multiple messages
+						if(tmp !== true) {
+							result[name] = (result[name] === true || result[name] == "undefined")? []: result[name];
+							result[name].push(tmp);
+						} else {
+							result[name] = true;
+						}
+					}
+					return result;
+				};
+
+			if(name) {
+				result[name] = validateEntry(name, getValue(name), vObj[name]);
+			} else {
+				//	Validate the whole model
+				for(name in vObj) {
+					result[name] = validateEntry(name, getValue(name), vObj[name]);
+				}
+			}
+
+			return result;
+		}
+	}
+};
+},{"validator":9}],4:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
@@ -79,7 +131,7 @@ module.exports.index = {
 		}
 	}
 };
-},{"../server/mithril.sugartags.node.js":10,"mithril":7}],4:[function(require,module,exports){
+},{"../server/mithril.sugartags.node.js":11,"mithril":8}],5:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
@@ -100,7 +152,7 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/todos': todo.index,
 '/users': user.index
 });
-},{"../mvc/home.js":3,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":7}],5:[function(require,module,exports){
+},{"../mvc/home.js":4,"../mvc/todo.js":6,"../mvc/user.js":7,"../server/mithril.bindings.node.js":10,"../server/mithril.sugartags.node.js":11,"../server/store.js":2,"mithril":8}],6:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	store = require('../server/store.js')(this),
@@ -170,10 +222,10 @@ module.exports.index = {
 		];
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/store.js":2,"mithril":7}],6:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":10,"../server/store.js":2,"mithril":8}],7:[function(require,module,exports){
 var store = require('../server/store.js')(this),
-	validator = require('validator'),
 	miso = require('../server/miso.util.js'),
+	validate = require('../common/miso.validate.js'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
@@ -196,34 +248,24 @@ module.exports.index = {
 	}
 };
 
-var isNotEmpty = function(value){
-	return typeof value !== "undefined" && value !== "" && value !== null;
-}
-
 //	Edit user
 module.exports.edit = {
 	model: function(data){
-		var self = this;
-		self.name = m.p(data.name);
-		self.email = m.p(data.email);
-		self.id = m.p(data.id);
+		this.name = m.p(data.name);
+		this.email = m.p(data.email);
+		this.id = m.p(data.id);
 		
 		//	Returns object with each filed, with true for each valid field,
 		//	or an error messages for each invalid field.
-		this.validateModel = function(){
-			// return {
-			// 	email: isNotEmpty() && validator.isEmail(self.email())? true: "Must be a valid email address",
-			// }
-			return {
-				name: {
-					'required': "You must enter a name"
-				},
-				email: {
-					'required': "You must enter an email address",
-					'email': "Must be a valid email address"
-				}
+		this.isValid = validate.validate(this, {
+			name: {
+				'isRequired': "You must enter a name"
+			},
+			email: {
+				'isRequired': "You must enter an email address",
+				'isEmail': "Must be a valid email address"
 			}
-		};
+		});
 
 		return this;
 	},
@@ -232,18 +274,34 @@ module.exports.edit = {
 			userId = miso.getParam('user_id', params);
 
 		store.load('user', userId).then(function(user) {
+			user.email = "isNOTemail.com";
 			self.user = new module.exports.edit.model(user);
+
+			//	Testing...
+			console.log(self.user.isValid());
+			console.log(self.user.isValid('name'));
+			console.log(self.user.isValid('email'));
+
 		});
 
 		return self;
 	},
 	view: function(ctrl){
 		with(sugartags) {
-			return DIV('Hello ' + ctrl.user.name() + '!');
+			return [
+				DIV([
+					LABEL("Name"),
+					INPUT({value: ctrl.user.name()})
+				]),
+				DIV({class: ctrl.user.isValid('email')? "valid": "invalid"}, [
+					LABEL("Email"),
+					INPUT({value: ctrl.user.email()})
+				])
+			];
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":7,"validator":8}],7:[function(require,module,exports){
+},{"../common/miso.validate.js":3,"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":11,"../server/store.js":2,"mithril":8}],8:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1257,7 +1315,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -1826,7 +1884,7 @@ else if (typeof define === "function" && define.amd) define(function() {return m
 
 });
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2044,7 +2102,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2072,4 +2130,4 @@ module.exports = function(m, lower){
 	}}
 	return scope;
 };
-},{}]},{},[4]);
+},{}]},{},[5]);
