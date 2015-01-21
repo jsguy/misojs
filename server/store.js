@@ -22,8 +22,13 @@ module.exports = function(scope) {
 				}
 			};
 		},
-		save: function(type, args){
-			console.log('Save', type, args);
+		save: function(type, model){
+			var v = model.isValid();
+			if(v === true) {
+				console.log('Save', type, model);
+			} else {
+				console.log('Model invalid', v);
+			}
 		}
 	};
 };
