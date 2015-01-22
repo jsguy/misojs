@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "rundev": "nodemon --watch package.json --watch cfg/ --watch mvc/ --ignore mvc/mvcmain.js --watch client/ --ignore client/miso.js --watch server/ --watch app.js app.js",
+    "rundev": "nodemon -V --watch package.json --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
     "start": "node app.js"
   },
   "bin": {
@@ -21,7 +21,8 @@
     "mithril": "*",
     "mithril-node-render": "*",
     "model": "^6.0.1",
-    "nodemon": "^1.2.1",
+    "mongoose": "^3.8.21",
+    "nodemon": "^1.3.2",
     "npm": "~2.1.16",
     "restify": "^2.8.4",
     "validator": "^3.27.0",

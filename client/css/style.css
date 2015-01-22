@@ -37,3 +37,4 @@ button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius:
 button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
 .indented { margin-left: 8em; }
 .invalid { color: #f00; }
+.pageHeader { margin-left: 5.3em; }
