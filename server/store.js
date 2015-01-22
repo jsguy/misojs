@@ -14,11 +14,22 @@ kitty.save(function (err) {
 */
 
 
-//	Simulated store
+//	Simulated store - thennable
 //	TODO: This should interact with the API once we have it.
 module.exports = function(scope) {
 	//	Add a binding object, so we can block till ready
 	scope._misoReadyBinding = miso.readyBinderFactory();
+
+	//	Remove any unrequired model data, and get actual values
+	var getModelData = function(model){
+		var i, result = {};
+		for(i in model) {if(model.hasOwnProperty(i)) {
+			if(i !== "isValid") {
+				result[i] = (typeof model[i] == "function")? model[i](): model[i];
+			}
+		}}
+		return result;
+	};
 
 	return {
 		load: function(type, args){
@@ -36,11 +47,30 @@ module.exports = function(scope) {
 			};
 		},
 		save: function(type, model){
-			var v = model.isValid();
-			if(v === true) {
-				console.log('Save', type, model);
-			} else {
-				console.log('Model invalid', v);
+			var subType = type.split("."),
+				saveDone = function(){
+					throw "No callback set... now what?";
+				}, data, v = model.isValid();
+
+			//	Simulate async
+			setTimeout(function(){
+				if(v === true) {
+					data = getModelData(model);
+					console.log('Save', type, data);
+					saveDone(null, "Saved " + subType[0]);
+				} else {
+					console.log('Model invalid', v);
+					saveDone(v);
+				}
+			}, 10);
+
+
+			return {
+				then: function(cb){
+					saveDone = function(){
+						cb.apply(cb, arguments);
+					};
+				}
 			}
 		}
 	};

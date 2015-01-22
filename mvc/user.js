@@ -55,6 +55,7 @@ module.exports.edit = {
 
 		self.save = function(){
 			console.log('SAVE', self.user);
+			//	Type of model, and the data
 			store.save('user.edit.model', self.user);
 		};
 

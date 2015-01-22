@@ -1,5 +1,5 @@
 var _ = require('lodash'),
-	store = require('../server/store.js'),
+	store = require('../server/store.js')(this),
 	jsonResponse = function(obj){
 		var result = {
 			jsonrpc: "2.0",
@@ -28,15 +28,11 @@ var _ = require('lodash'),
 	* Probably more things...
 
 
-	TODO: Should this call store.save, if we have a valid model?
-
-
  */
 module.exports = function(app){
 	//	API setup
 	app.use("/api/:type", function(req, res, next){
 		var type = req.params.type,
-			subType = type.split("."),
 			data = req.body,
 			model = app.get(type);
 
@@ -44,12 +40,18 @@ module.exports = function(app){
 			//	Create the model
 			var model = new model(data);
 
-			console.log(model.isValid() === true);
-
-			//	TODO: This should be JSON RPC 2.0 response.
-			res.json(jsonResponse({
-				result: "Saved " + subType[0]
-			}));
+			//	Call the store save method, and send a response
+			store.save(type, model).then(function(error, result){
+				if(!error) {
+					res.json(jsonResponse({
+						result: result
+					}));
+				} else {
+					res.json(jsonResponse({
+						error: error
+					}));
+				}
+			});
 		} else {
 			res.json(jsonResponse({
 				error: "Unknown type: " + type
