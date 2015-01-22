@@ -30,7 +30,7 @@ var fs			= require('fs'),
 			'<head>',
 			'<link rel="stylesheet" href="/css/style.css"/>',
 			
-			//	Dev only
+			//	NOTE: Dev only
 			'<script src="/reload.js"></script>',
 
 			'</head>',
