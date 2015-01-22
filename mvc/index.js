@@ -18,7 +18,7 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run? (Note: this usually makes it loop a couple of times)
-	forceBrowserify = true,
+	forceBrowserify = false,
 	attachmentNode = "document.getElementById('misoAttachmentNode')",
 
 	//	TODO: below belongs in layout templates
@@ -29,6 +29,10 @@ var fs			= require('fs'),
 			'<html>',
 			'<head>',
 			'<link rel="stylesheet" href="/css/style.css"/>',
+			
+			//	Dev only
+			'<script src="/reload.js"></script>',
+
 			'</head>',
 			'<body>',
 			'<header>',
@@ -295,12 +299,15 @@ module.exports = function(app, options) {
 
 	//	Run browserify when either a controller or view has changed.
 	//	We use exec to run it - this gives us a little more flexibility
-
+	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
 		exec(browserifyCmd, function (error, stdout, stderr) {
 			if(error) {
 				throw error
 			}
+			app.set("MISOREADY", true);
 		});
+	} else {
+		app.set("MISOREADY", true);
 	}
 };
