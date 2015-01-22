@@ -31,6 +31,20 @@ module.exports = {
 var m = require('mithril');
 
 module.exports = function(scope) {
+
+	//	Remove any unrequired model data
+	var getModelData = function(model){
+		var i, result = {};
+		for(i in model) {if(model.hasOwnProperty(i)) {
+			if(i !== "isValid") {
+				result[i] = (typeof model[i] == "function")? model[i](): model[i];
+			}
+		}}
+		return result;
+	};
+
+
+
 	return {
 		load: function load(type, id) {
 			if (!type) {
@@ -46,13 +60,17 @@ module.exports = function(scope) {
 			});
 		},
 		save: function(type, model){
-			var v = model.isValid();
-			if(v === true) {
-				console.log('Save', type, model);
+			var v = model.isValid(),
+				data;
+			if(1==1 || v === true) {
+				data = getModelData(model);
+				console.log('Save', type, data);
 				return m.request({
-					method: 'GET',
-					//url: 'api/' + type + '/' + id),
-					url: '/user.json'
+					method: 'POST',
+					//	Hard coded to different port for now...
+					url: '/api/' + type,
+					data: data
+					//url: '/user.json'
 				});
 			} else {
 				console.log('Model invalid', v);
@@ -90,7 +108,7 @@ module.exports.index = {
 	}
 };
 },{"../server/mithril.sugartags.node.js":11,"mithril":7}],4:[function(require,module,exports){
-/* NOTE: This is a generated file, please do not modify, your changes will be lost */
+/* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
@@ -238,7 +256,7 @@ module.exports.edit = {
 
 		self.save = function(){
 			console.log('SAVE', self.user);
-			store.save('user', self.user);
+			store.save('user.edit.model', self.user);
 		};
 
 		return self;

@@ -191,6 +191,11 @@ module.exports = function(app, options) {
 	var routeMap = {},
 		//	route, name, path, method, action
 		createRoute = function(args) {
+			//	Add pointer to model for use in store/save
+			if(args.route[args.action].model) {
+				app.set(args.name + "." + args.action + ".model", args.route[args.action].model);
+			}
+
 			//	Setup the route on the app
 			app[args.method](args.path, function(req, res, next) {
 				try{
@@ -226,7 +231,7 @@ module.exports = function(app, options) {
 	var view = function(ctrl) {
 		var usedRoute = {};
 		return [
-			"/* NOTE: This is a generated file, please do not modify, your changes will be lost */",
+			"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
 			"var m = require('mithril');",
 			
 			//	Required libs

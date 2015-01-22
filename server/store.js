@@ -1,7 +1,5 @@
 var fs = require('fs'),
 	miso = require('../server/miso.util.js');
-
-
 /*
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/test');
@@ -14,6 +12,7 @@ kitty.save(function (err) {
   console.log('meow');
 });
 */
+
 
 //	Simulated store
 //	TODO: This should interact with the API once we have it.

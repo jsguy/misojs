@@ -1,4 +1,4 @@
-/* NOTE: This is a generated file, please do not modify, your changes will be lost */
+/* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
