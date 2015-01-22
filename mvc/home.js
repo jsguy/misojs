@@ -28,7 +28,7 @@ module.exports.index = {
 					H2(A({name: "gettingstarted", class: "heading"},"Getting started") ),
 					P("To create and run a new app in the current directory:"),
 					PRE({ class: "javascript" },[
-						CODE("miso -n myApp\ncd myApp\nmiso run")
+						CODE("miso -n myApp\ncd myApp && npm install\nmiso run")
 					]),
 					P("Congratulations, you are now running your very own miso app!")
 				]),
