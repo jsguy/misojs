@@ -42,6 +42,7 @@ module.exports = function(scope) {
 					//url: '/user.json'
 				});
 			} else {
+				//	TODO: Show notification via notification framework
 				console.log('Model invalid', v);
 			}
 		}
