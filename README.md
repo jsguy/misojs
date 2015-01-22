@@ -31,4 +31,4 @@ miso run
 
 This creates a new project with the 'todo' skeleton applied, and runs it on http://localhost:6476
 
-Documentation is in [the wiki](wiki)
+Documentation is in [the wiki](../../wiki)
