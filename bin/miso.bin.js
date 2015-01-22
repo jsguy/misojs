@@ -60,7 +60,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 			print("Project successfully created.");
 			createdProject = true;
 		} else {
-			print("Project already exists:", projectName, "use -u to update");
+			print("Project directory already exists:", projectName, ", remove it before creating project");
 		}
 		return true;
 	},
@@ -103,9 +103,9 @@ try {
 				'n': [
 					"Creates a new project in the given directory, for example:",
 					"",
-					"  " + name + " -n myProject",
+					"  " + name + " -n myapp",
 					"",
-					"Will create a new project in the 'myProject' directory, (as long as it is empty)"
+					"Will create a new project in the 'myapp' directory, (as long as it is empty)"
 				],
 				'u': [
 					"Not yet ready..."
@@ -178,7 +178,8 @@ try {
 if(createdProject) {
 	print("To run your new project:");
 	print("");
-	print("cd " + argv.n + " && miso run");
+	print("cd " + argv.n + " && npm install");
+	print("miso run");
 }
 
 //	Add a new line at the end...

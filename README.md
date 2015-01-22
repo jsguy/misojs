@@ -3,7 +3,11 @@ misojs
 
 misojs: MIthril iSOmorphic JavaScript framework
 
-_NOTE:_ Not for public consumption just yet!
+
+
+_NOTE:_ Not ready for public consumption just yet!
+
+
 
 ## Install
 
