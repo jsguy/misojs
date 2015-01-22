@@ -87,7 +87,8 @@ module.exports.index = {
 	controller: function(){
 		this.installButton = "Install miso now";
 		this.installButtonLink = "#install";
-		this.introText = "Create apps faster than ever before";
+		//this.introText = "Create apps faster than ever before";
+		this.introText = "Create tiny efficient isomorphic JS apps in a snap!";
 		return this;
 	},
 	view: function(ctrl){
