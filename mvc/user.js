@@ -26,23 +26,25 @@ module.exports.index = {
 
 //	Edit user
 module.exports.edit = {
-	model: function(data){
-		this.name = m.p(data.name);
-		this.email = m.p(data.email);
-		this.id = m.p(data.id);
+	models: {
+		user: function(data){
+			this.name = m.p(data.name);
+			this.email = m.p(data.email);
+			this.id = m.p(data.id);
 
-		//	Validate the model		
-		this.isValid = validate.bind(this, {
-			name: {
-				'isRequired': "You must enter a name"
-			},
-			email: {
-				'isRequired': "You must enter an email address",
-				'isEmail': "Must be a valid email address"
-			}
-		});
+			//	Validate the model		
+			this.isValid = validate.bind(this, {
+				name: {
+					'isRequired': "You must enter a name"
+				},
+				email: {
+					'isRequired': "You must enter an email address",
+					'isEmail': "Must be a valid email address"
+				}
+			});
 
-		return this;
+			return this;
+		}
 	},
 	controller: function(params) {
 		var self = this,
@@ -50,13 +52,14 @@ module.exports.edit = {
 
 		store.load('user', userId).then(function(user) {
 			user.email = "is_email.com";
-			self.user = new module.exports.edit.model(user);
+			self.user = new module.exports.edit.models.user(user);
 		});
 
 		self.save = function(){
-			console.log('SAVE', self.user);
 			//	Type of model, and the data
-			store.save('user.edit.model', self.user);
+			store.save('user.edit.models.user', self.user).then(function(res){
+				console.log(res.result? res.result: res.error);
+			});
 		};
 
 		return self;

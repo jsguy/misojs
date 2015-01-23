@@ -29,12 +29,11 @@ module.exports = function(scope) {
 			});
 		},
 		save: function(type, model){
-			var v = model.isValid(),
+			var v = model.isValid? model.isValid(): true,
 				data;
 			//	Only try to save if model is valid
 			if(v === true) {
 				data = getModelData(model);
-				console.log('Save', type, data);
 				return m.request({
 					method: 'POST',
 					url: '/api/' + type,

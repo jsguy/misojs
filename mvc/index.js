@@ -9,6 +9,7 @@ var fs			= require('fs'),
 	path		= require('path'),
 	_			= require('lodash'),
 	routes		= {},
+	serverConfig = require('../cfg/server.json'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
@@ -17,8 +18,9 @@ var fs			= require('fs'),
 	exec = require('child_process').exec,
 	render = require('mithril-node-render'),
 
-	//	Force the browserify to run? (Note: this usually makes it loop a couple of times)
+	//	Force the browserify to run
 	forceBrowserify = false,
+	//	What node we attach our app to in the layout
 	attachmentNode = "document.getElementById('misoAttachmentNode')",
 
 	//	TODO: below belongs in layout templates
@@ -195,9 +197,12 @@ module.exports = function(app, options) {
 	var routeMap = {},
 		//	route, name, path, method, action
 		createRoute = function(args) {
-			//	Add pointer to model for use in store/save
-			if(args.route[args.action].model) {
-				app.set(args.name + "." + args.action + ".model", args.route[args.action].model);
+
+			//	Add pointer to models for use in store/save
+			if(args.route[args.action].models) {
+				for(var m in args.route[args.action].models) {
+					app.set(args.name + "." + args.action + ".models." + m, args.route[args.action].models[m]);
+				}
 			}
 
 			//	Setup the route on the app
@@ -274,9 +279,11 @@ module.exports = function(app, options) {
 	var routeList = [],
 		mainFile = './mvc/mvcmain.js',
 		output = "./client/miso.js",
-		outputMap = "./client/miso.js.map.json",
-		browserifyCmd = "browserify " + mainFile + " >" + output,
-		//browserifyCmd = "browserify " + mainFile + " -d -p [minifyify --map /miso.js.map.json --output "+outputMap+"] >" + output,
+		outputMap = "./client/miso.map.json",
+		//	If the server config wants a minified miso.js
+		browserifyCmd = serverConfig.minify? 
+			"browserify " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
+			"browserify " + mainFile + " >" + output,
 
 		mainFileModified = fs.existsSync(mainFile)? fs.statSync(mainFile).mtime: new Date(1970,0,1),
 		lastRouteModified = new Date(1970,0,1);

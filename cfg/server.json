@@ -1,4 +1,5 @@
 {
 	"port": 6476,
-	"api": "/api"
+	"api": "/api",
+	"minify": false
 }

@@ -21,6 +21,7 @@ module.exports = function(scope) {
 	scope._misoReadyBinding = miso.readyBinderFactory();
 
 	//	Remove any unrequired model data, and get actual values
+	//	Excludes isValid method
 	var getModelData = function(model){
 		var i, result = {};
 		for(i in model) {if(model.hasOwnProperty(i)) {
@@ -28,6 +29,7 @@ module.exports = function(scope) {
 				result[i] = (typeof model[i] == "function")? model[i](): model[i];
 			}
 		}}
+
 		return result;
 	};
 
@@ -50,13 +52,15 @@ module.exports = function(scope) {
 			var subType = type.split("."),
 				saveDone = function(){
 					throw "No callback set... now what?";
-				}, data, v = model.isValid();
+				}, 
+				data, 
+				v = model.isValid? model.isValid(): true;
 
 			//	Simulate async
 			setTimeout(function(){
 				if(v === true) {
 					data = getModelData(model);
-					console.log('Save', type, data);
+					console.log('Saving', type, data);
 					saveDone(null, "Saved " + subType[0]);
 				} else {
 					console.log('Model invalid', v);
