@@ -22,12 +22,12 @@ var fs			= require('fs'),
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
-	//	Grab out layout
-	layout = require('../mvc/layout.js').index,
+	layoutView = require('../mvc/layout.js').index,
+	mainView = require('../system/main.view.js').index,
 
 	//  Puts the lotion on its...
 	skin = function(content) {
-		return render(layout({
+		return render(layoutView({
 			environment: serverConfig.environment,
 			misoAttachmentNode: misoAttachmentNode,
 			content: content
@@ -198,20 +198,17 @@ module.exports = function(app, options) {
 
 					//	Check for ready binder
 					if (!args.route._misoReadyBinding) {
-						// var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
-						// res.end(skin(result));
-
-						res.end(skin(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope));
-
+						res.end(skin(_.isFunction(mvc.view)? 
+							mvc.view(scope): 
+							mvc.view, 
+						scope));
 					} else {
-						//	Add "last" binding
+						//	Add "last" binding for miso ready event
 						args.route._misoReadyBinding.bindLast(function() {
-
-							// var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
-							// res.end(skin(result));
-							res.end(skin(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope));
-
-
+							res.end(skin(_.isFunction(mvc.view)? 
+								mvc.view(scope): 
+								mvc.view, 
+							scope));
 						});
 					}
 				} catch(ex){
@@ -220,56 +217,12 @@ module.exports = function(app, options) {
 			});
 
 			options.verbose && console.log('     %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
-
 			routeMap[args.path] = args;
 		};
 
-	//	TODO: 
-	//	
-	//	* Might want to externalise this?
-	//	* Add ability to configure things, add/remove required libs, etc.
-	//	
-	var view = function(ctrl) {
-		var usedRoute = {};
-		return [
-			"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
-			"var m = require('mithril');",
-			
-			//	Required libs
-			"var sugartags = require('../server/mithril.sugartags.node.js')(m);",
-			"var bindings = require('../server/mithril.bindings.node.js')(m);",
-			"var store = require('../server/store.js');",
-			
-			//	All our route files
-			(ctrl.routes.map(function(route, idx) {
-				var result = usedRoute[route.name]? "" :
-					"var " + route.name + " = require('../mvc/" + route.name + ".js');";
-				usedRoute[route.name] = route;
-				return result;
-			})).join("\n"),
-
-			//	Expose mithril - might be good for debugging...
-			"if(typeof window !== 'undefined') {",
-			"	window.m = m;",
-			"}",
-
-			"	",
-			"m.route.mode = 'pathname';",
-			"m.route("+attachmentNodeSelector+", '/', {",
-
-			//	Add the route map for mithril here
-			(ctrl.routes.map(function(route, idx) {
-				return [
-					"'" + route.path + "': " + route.name + "." + route.action
-				].join("\n");
-			})).join(",\n"),
-			"});"
-		].join("\n");
-	};
-
 	//	Grab our controller file names
 	var routeList = [],
-		mainFile = './system/mvcmain.js',
+		mainFile = './system/main.js',
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
 		//	If the server config wants a minified miso.js
@@ -286,14 +239,14 @@ module.exports = function(app, options) {
 		lastRouteModified = (lastRouteModified > route.stats.mtime)?
 			lastRouteModified: 
 		 	route.stats.mtime;
-
 		routeList.push(route);
 		createRoute(route);
 	});
 
 	//	Output our main JS file for browserify
-	fs.writeFileSync(mainFile, render(view({
-		routes: routeList
+	fs.writeFileSync(mainFile, render(mainView({
+		routes: routeList,
+		attachmentNodeSelector: attachmentNodeSelector
 	})));
 
 	//	Run browserify when either a controller or view has changed.
