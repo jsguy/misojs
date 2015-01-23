@@ -75,8 +75,8 @@ module.exports = function(app, options) {
 	//	Import non configured routes
 	fs.readdirSync(routesPath)
 		.filter(function(file) {
-			//	All js files that don't start with '.' and are not index.js or main.js
-			return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'layout.js') && (file !== 'mvcmain.js') && (file !== 'miso.js') && getExtension(file) == "js";
+			//	All js files that don't start with '.' and are not layout.js
+			return (file.indexOf('.') !== 0) && (file !== 'layout.js') && getExtension(file) == "js";
 		})
 		.forEach(function(file) {
 			var routeFile = path.join(routesPath, file),
