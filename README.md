@@ -21,6 +21,8 @@ miso run
 
 This creates a new project with the 'todo' skeleton applied, and runs it on http://localhost:6476
 
+PS: 6476 = miso if you typed it on a keypad
+
 Documentation is in [the wiki](../../wiki)
 
 ## miso development install
@@ -31,5 +33,5 @@ Use this method, if you want to work on improving miso the framework, instead of
 * `npm install`
 * chmod +x bin/miso.bin.js
 * bin/miso.bin.js
-* http://localhost:6476/ (6476 = miso if you typed it on a keypad)
+* http://localhost:6476
 
