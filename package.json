@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "private": false,
   "scripts": {
-    "rundev": "nodemon -e js,css,json --watch package.json --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
+    "rundev": "nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
     "start": "node app.js"
   },
   "bin": {

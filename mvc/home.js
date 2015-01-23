@@ -15,7 +15,7 @@ module.exports.index = {
 			return DIV([
 				DIV({ class: "intro" }, [
 					DIV({ class: "introText" }, ctrl.introText ),
-					BUTTON({ class: "installButton" }, ctrl.installButton ),
+					BUTTON({ class: "installButton" }, ctrl.installButton )
 				]),
 				DIV({ class: "box" }, [
 					H2(A({name: "installation", class: "heading"},"Installation") ),

@@ -8,7 +8,7 @@ var express = require('express'),
 	app = express(),
 	serverConfig = require('./cfg/server.json'),
 	routeConfig	= require('./cfg/routes.json'),
-	mvc = require('./mvc');
+	mvc = require('./system');
 
 // parse application/x-www-form-urlencoded and  application/json
 app.use(bodyParser.urlencoded({ extended: false }));

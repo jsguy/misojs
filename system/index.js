@@ -2,8 +2,6 @@
 	Main Miso MVC generator - this is a singleton to load all controllers
 	and map their routes on startup of app. If a route is unmapped, we 
 	(optionally) throw an error.
-
-	TODO: This is a little large, split various things out a bit, including the "skin" view...
 */
 var fs			= require('fs'),
 	path		= require('path'),
@@ -21,35 +19,19 @@ var fs			= require('fs'),
 	//	Force the browserify to run
 	forceBrowserify = false,
 	//	What node we attach our app to in the layout
-	attachmentNode = "document.getElementById('misoAttachmentNode')",
+	misoAttachmentNode = "misoAttachmentNode",
+	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
-	//	TODO: below belongs in layout templates
+	//	Grab out layout
+	layout = require('../mvc/layout.js').index,
+
 	//  Puts the lotion on its...
 	skin = function(content) {
-		return [
-			'<!doctype html>',
-			'<html>',
-			'<head>',
-			'<link rel="stylesheet" href="/css/style.css"/>',
-			
-			//	NOTE: Dev only
-			'<script src="/reload.js"></script>',
-
-			'</head>',
-			'<body>',
-			'<header>',
-			'<div class="cw cf">',
-			'<a href="/" alt="MISO"><img src="/img/miso_logo.png"/></a>',
-			'</div>',
-			'</header>',
-			'<section id="misoAttachmentNode" class="cw">',
-			content,
-			'</section>',
-			//	The generated client script
-			'<script src="/miso.js"></script>',
-			'</body>',
-			'</html>'
-		].join('');
+		return render(layout({
+			environment: serverConfig.environment,
+			misoAttachmentNode: misoAttachmentNode,
+			content: content
+		}));
 	},
 	getExtension = function(filename) {
 		var ext = path.extname(filename||'').split('.');
@@ -61,11 +43,14 @@ var fs			= require('fs'),
 //	Map the routes for the controllers
 //	This generates the client side code from our routes/controller/views
 module.exports = function(app, options) {
+
+	var routesPath = __dirname + "/../mvc/"
+
 	//	Add configured routes
 	if(options.routeConfig) {
 		_.forOwn(options.routeConfig, function(routeObj, routePath){
 			var file = routeObj.name + ".js",
-				routeFile = path.join(__dirname, file),
+				routeFile = path.join(routesPath, file),
 				route = require(routeFile),
 				routeStats = fs.statSync(routeFile),
 				routeName = file.substr(0, file.lastIndexOf("."));
@@ -88,13 +73,13 @@ module.exports = function(app, options) {
 	}
 
 	//	Import non configured routes
-	fs.readdirSync(__dirname)
+	fs.readdirSync(routesPath)
 		.filter(function(file) {
 			//	All js files that don't start with '.' and are not index.js or main.js
-			return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'mvcmain.js') && (file !== 'miso.js') && getExtension(file) == "js";
+			return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file !== 'layout.js') && (file !== 'mvcmain.js') && (file !== 'miso.js') && getExtension(file) == "js";
 		})
 		.forEach(function(file) {
-			var routeFile = path.join(__dirname, file),
+			var routeFile = path.join(routesPath, file),
 				route = require(routeFile),
 				routeStats = fs.statSync(routeFile),
 				routeName = file.substr(0, file.lastIndexOf(".")),
@@ -213,13 +198,20 @@ module.exports = function(app, options) {
 
 					//	Check for ready binder
 					if (!args.route._misoReadyBinding) {
-						var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
-						res.end(skin(result));
+						// var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
+						// res.end(skin(result));
+
+						res.end(skin(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope));
+
 					} else {
 						//	Add "last" binding
 						args.route._misoReadyBinding.bindLast(function() {
-							var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
-							res.end(skin(result));
+
+							// var result = render(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope);
+							// res.end(skin(result));
+							res.end(skin(_.isFunction(mvc.view)? mvc.view(scope): mvc.view, scope));
+
+
 						});
 					}
 				} catch(ex){
@@ -263,7 +255,7 @@ module.exports = function(app, options) {
 
 			"	",
 			"m.route.mode = 'pathname';",
-			"m.route("+attachmentNode+", '/', {",
+			"m.route("+attachmentNodeSelector+", '/', {",
 
 			//	Add the route map for mithril here
 			(ctrl.routes.map(function(route, idx) {
@@ -275,9 +267,11 @@ module.exports = function(app, options) {
 		].join("\n");
 	};
 
+	console.log('server.minify', serverConfig.minify);
+
 	//	Grab our controller file names
 	var routeList = [],
-		mainFile = './mvc/mvcmain.js',
+		mainFile = './system/mvcmain.js',
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
 		//	If the server config wants a minified miso.js
