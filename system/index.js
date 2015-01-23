@@ -267,8 +267,6 @@ module.exports = function(app, options) {
 		].join("\n");
 	};
 
-	console.log('server.minify', serverConfig.minify);
-
 	//	Grab our controller file names
 	var routeList = [],
 		mainFile = './system/mvcmain.js',
