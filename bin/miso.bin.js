@@ -178,7 +178,7 @@ try {
 if(createdProject) {
 	print("To run your new project:");
 	print("");
-	print("cd " + argv.n + " && npm install");
+	print("cd " + argv.n);
 	print("miso run");
 }
 

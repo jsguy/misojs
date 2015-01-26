@@ -3,6 +3,9 @@
 	This layout determines the HTML surround for each of your mvc routes.
 	Feel free to modify as you see fit - as long as the attachemnt node is 
 	present, it should work.
+
+	Note: this is the only mvc that does not require a controller.
+
 */
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);

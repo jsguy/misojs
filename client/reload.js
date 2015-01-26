@@ -30,7 +30,9 @@ SockJS=function(){var a=document,b=window,c={},d=function(){};d.prototype.addEve
 
 //	Reload when we can get a connection again
 (function () {
-	var sock = new SockJS(window.location.origin + '/misoreload');
+	var sock = new SockJS(window.location.origin + '/misoreload'),
+		timeDelay = 100;
+		
 	sock.onclose = function() {
 		var inter = setInterval(function() {
 			var newSock = new SockJS(window.location.origin + '/misoreload');
@@ -38,6 +40,6 @@ SockJS=function(){var a=document,b=window,c={},d=function(){};d.prototype.addEve
 				clearInterval(inter);
 				window.location.reload();
 			};
-		}, 100);
+		}, timeDelay);
 	};
 })();

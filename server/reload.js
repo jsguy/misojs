@@ -2,7 +2,7 @@ var sockjs = require('sockjs');
 
 module.exports = function reload (server, app) {
 	//	Watch for misoready, init after 10s, if we somehow fail to get ready.
-	var maxWait = 10000,
+	var maxWait = 30000,
 		interTime = 50,
 		count = 0,
 		inter = setInterval(function(){

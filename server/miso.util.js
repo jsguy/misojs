@@ -21,8 +21,8 @@ module.exports = {
 		};
 	},
 	//	Get parameters for an action
-	getParam: function(key, params){
-		return params[key];
+	getParam: function(key, params, def){
+		return typeof params[key] !== "undefined"? params[key]: def;
 	},
 
 	//	Testing ready binder

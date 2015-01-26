@@ -22,7 +22,7 @@ module.exports = {
 		};
 	},
 	//	Get parameters for an action
-	getParam: function(key, params){
-		return m.route.param(key);
+	getParam: function(key, params, def){
+		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };

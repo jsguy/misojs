@@ -1,7 +1,8 @@
 var m = require('mithril'),
+	sugartags = require('../server/mithril.sugartags.node.js')(m),
+	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	store = require('../server/store.js')(this),
-	bindings = require('../server/mithril.bindings.node.js')(m);
+	store = require('../server/store.js')(this);
 
 //	Basic todo app
 module.exports.index = {
@@ -66,19 +67,21 @@ module.exports.index = {
 	view: function(ctrl) {
 		var c = ctrl,
 			t = c.model;
-		return [
-			m.e("style", ".done{text-decoration: line-through;}"),
-			m.e("h1", "Todos - " + c.vm.left() + " of " + t.todos().length + " remaining"),
-			m.e("button", { onclick: c.archive }, "Archive"),
-			m.e("ul", [
-				t.todos().map(function(todo, idx){
-					return m.e("li", { class: todo.done()? "done": "", toggle: todo.done }, todo.text);
-				})
-			]),
-			m.e("form", { onsubmit: c.addTodo }, [
-				m.e("input", { type: "text", value: c.vm.input, placeholder: "Add todo"}),
-				m.e("button", { type: "submit"}, "Add")
-			])
-		];
+		with(sugartags) {
+			return [
+				STYLE(".done{text-decoration: line-through;}"),
+				H1("Todos - " + c.vm.left() + " of " + t.todos().length + " remaining"),
+				BUTTON({ onclick: c.archive }, "Archive"),
+				UL([
+					t.todos().map(function(todo, idx){
+						return LI({ class: todo.done()? "done": "", toggle: todo.done }, todo.text);
+					})
+				]),
+				FORM({ onsubmit: c.addTodo }, [
+					INPUT({ type: "text", value: c.vm.input, placeholder: "Add todo"}),
+					BUTTON({ type: "submit"}, "Add")
+				])
+			];
+		}
 	}
 };

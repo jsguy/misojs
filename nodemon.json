@@ -1,6 +1,6 @@
 {
 	"ignore": [
-		"mvc/mvcmain.js",
+		"system/main.js",
 		"client/miso.js"
 	]
 }
