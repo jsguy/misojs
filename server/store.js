@@ -5,13 +5,40 @@
 	mapping service" that can serialise / deserialise model data between the 
 	client and server.
 
+	Note: it is NOT an abstraction layer. Instead the concept is that the adaptor 
+	will provide the correct level of functionality for anything beyond the 
+	following basic methods:
+
+	isValid - validates that the model is valid
+
+	//	TODO: Do we wwant the following???
+
+	save
+	load
+	update
+	delete
+
+	In order to support other functionality, an RPC method is available:
+
+
+
+	For example, 
+
 	See: system/adaptor/adaptor.readme.md for details
 */
 
 var fs = require('fs'),
 	miso = require('../server/miso.util.js'),
 	model = require('model');
-/*
+
+
+
+
+
+
+//	--- BEGIN TEST CODE FOR ADAPTOR
+
+
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/test');
 
@@ -19,16 +46,17 @@ var Cat = mongoose.model('Cat', { name: String });
 
 var kitty = new Cat({ name: 'Zildjian' });
 kitty.save(function (err) {
-  if (err) // ...
+  if (err) {
+  	console.log(err);
+  }// ...
   console.log('meow');
 });
-*/
 
 
 
 
 
-
+/*
 
 
 // Setup the blueprint of the model. This is where you can
@@ -55,25 +83,6 @@ var Foo = function () {
 // This registers the model with the model package so
 // things like associations can work
 Foo = model.register('Foo', Foo);
-/*
-Foo.first(1, function (err, model) {
-  // Check if there was an error with the DB
-  if (err) throw new Error('Uh oh, something broke' + err);
-
-  // If there was no error, but no model was found it must be missing
-  if (!err && !model) throw new Error('Foo not found');
-
-  // Update the model's name property
-  model.name = "New name!";
-
-  // Once we're done updating properties we can call save on the model.
-  // Save will send the current model data to the DB you specified
-  model.save(function (err, updatedModel) {
-    if (err) throw new Error('Could not save the model');
-    console.log("The model was updated!");
-  });
-});
-*/
 
 var foo = Foo.create();
 
@@ -95,6 +104,16 @@ if (foo.isValid()) {
 		console.log('New item saved!');
 	});
 }
+*/
+
+
+//	--- END TEST CODE FOR ADAPTOR
+
+
+
+
+
+
 
 
 
