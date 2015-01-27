@@ -243,6 +243,9 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
+	//	Create API for chosen adaptor
+	//	serverConfig.adaptor
+
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({
 		routes: routeList,

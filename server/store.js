@@ -38,7 +38,7 @@ var fs = require('fs'),
 
 //	--- BEGIN TEST CODE FOR ADAPTOR
 
-
+/*
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/test');
 
@@ -51,7 +51,7 @@ kitty.save(function (err) {
   }// ...
   console.log('meow');
 });
-
+*/
 
 
 
