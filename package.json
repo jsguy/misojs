@@ -26,6 +26,7 @@
     "mongoose": "^3.8.21",
     "nodemon": "^1.3.2",
     "npm": "~2.1.16",
+    "promiz": "^1.0.3",
     "sockjs": "^0.3.12",
     "validator": "^3.27.0",
     "validator.modelbinder": "0.0.2"
