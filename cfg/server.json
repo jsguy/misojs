@@ -1,7 +1,7 @@
 {
 	"environment": "development",
 	"port": 6476,
-	"api": "/api",
-	"minify": false,
-	"adaptor": "mongoose"
+	"apiPath": "/api",
+	"adaptor": "mongoose",
+	"minify": false
 }

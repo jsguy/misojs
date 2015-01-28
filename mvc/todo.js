@@ -62,6 +62,23 @@ module.exports.index = {
 			]);
 		});
 
+		//, SCRIPT("m.request({method:'post', url: '/api/save', type: 'user.edit.user', data: {type: 'user.edit.user', model: {id: 12, name: 'bob'}}}).then(function(result){console.log('SAVE', result);});")
+
+		//	Test save
+		/*
+		var x = m.request({
+			method:'post', 
+			url: '/api/save', 
+			//type: module.exports.index.models.todo,
+			data: {
+				type: 'user.edit.user', 
+				model: {id: 12, name: 'bob'}
+			}
+		}).then(function(result){
+			console.log('SAVE', result, x);
+		});
+*/
+
 		return ctrl;
 	},
 	view: function(ctrl) {

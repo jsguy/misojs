@@ -17,13 +17,14 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run
-	forceBrowserify = false,
+	forceBrowserify = true,
 	//	What node we attach our app to in the layout
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
 	layoutView = require('../mvc/layout.js').index,
 	mainView = require('../system/main.view.js').index,
+	apiView = require('../system/api.view.js').index,
 
 	//  Puts the lotion on its...
 	skin = function(content) {
@@ -186,10 +187,6 @@ module.exports = function(app, options) {
 			//	Add pointer to models for use in store/save
 			if(args.route[args.action].models) {
 				for(var m in args.route[args.action].models) {
-
-					console.log("model." + args.name + "." + args.action + "." + m);
-
-					//app.set(args.name + "." + args.action + ".models." + m, args.route[args.action].models[m]);
 					app.set("model." + args.name + "." + args.action + "." + m, args.route[args.action].models[m]);
 				}
 			}
@@ -220,13 +217,14 @@ module.exports = function(app, options) {
 				}
 			});
 
-			options.verbose && console.log('     %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
+			options.verbose && console.log('    %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
 			routeMap[args.path] = args;
 		};
 
 	//	Grab our controller file names
 	var routeList = [],
 		mainFile = './system/main.js',
+		apiFile = './system/apiImpl.js',
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
 		//	If the server config wants a minified miso.js
@@ -247,8 +245,18 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
-	//	Create API for chosen adaptor
+	//	TODO: Create API for chosen adaptor
 	//	serverConfig.adaptor
+	//	Setup API using the selected adaptor
+	var clientApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
+
+	//console.log('clientApi', clientApi.api.save);
+	fs.writeFileSync(apiFile, render(apiView({
+		api: clientApi.api
+	})));
+
+
+
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({

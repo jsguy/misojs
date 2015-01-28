@@ -30,6 +30,7 @@ module.exports.index = function(ctrl){
 			})).join("\n"),
 
 			//	Expose mithril - might be good for debugging...
+			//	TODO: Can probably remove this...?
 			"if(typeof window !== 'undefined') {",
 			"	window.m = m;",
 			"}",

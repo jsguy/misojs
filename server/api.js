@@ -1,61 +1,39 @@
-var _ = require('lodash'),
-	store = require('../server/store.js')(this),
-	jsonResponse = function(obj){
-		var result = {
-			jsonrpc: "2.0",
-			id: null
-		};
+//	Adaptor api 
+//
+//	TODO: 
+//
+//	* Safeguard against abuse
+//	* Check role based access
+//	* Guard against XSS
+//	* Anything else?
+//
+module.exports = function(app, adaptorType, apiPath){
+	apiPath = apiPath || "/api";
+	var adaptorInstance = require('../system/adaptor/adaptor.js')(app),
+		myAdaptor = require('../system/adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
+		adaptor = adaptorInstance.create(myAdaptor),
+		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
+		responseType = 'json';
 
-		result = _.assign(result, obj);
-
-		//	Can't have both result and error
-		if(obj.error && obj.result) {
-			delete obj.result;
-		}
-
-		return result;
-	};
-
-//	API to store models passed from the front
-/*
-	WARNING: This is a proof of concept, and not safe yet - still a 
-	bunch of things to be done first.
-
-	TODO:
-
-	* Authentication, etc - this is totally open right now
-	* XSS value checking - should filter by default - need a way to let the user get to the raw value as well
-	* Probably more things...
-
-
- */
-module.exports = function(app){
 	//	API setup
-	app.use("/api/:type", function(req, res, next){
-		var type = req.params.type,
+	app.use(apiPath + "/:action", function(req, res, next){
+		var action = req.params.action,
 			data = req.body,
-			model = app.get(type);
+			respond = function(){
+				res[responseType](adaptorInstance.utils.response.apply(null, arguments));
+			};
 
-		if(model){
-			//	Create the model
-			var model = new model(data);
-
-			//	Call the store save method, and send a response
-			store.save(type, model).then(function(error, result){
-				if(!error) {
-					res.json(jsonResponse({
-						result: result
-					}));
-				} else {
-					res.json(jsonResponse({
-						error: error
-					}));
-				}
-			});
+		if(action){
+			//	TODO: Can we actually use the error response 
+			//	for something different?
+			adaptor
+				.api[action](data)
+				.then(respond, respond);
 		} else {
-			res.json(jsonResponse({
-				error: "Unknown type: " + type
-			}));
+			console.log("something else?");
+			res[responseType](adaptorInstance.utils.response.apply(null, [null,"No action specified"]));
 		}
 	});
+
+	return clientAdaptor;
 };
