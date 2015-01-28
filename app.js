@@ -18,7 +18,14 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/client')));
 
 
+
+
+
 //	START setup adaptor
+
+
+
+//	PROBLEM: I need to inject the ability to make server-side models for the adaptor
 
 
 
@@ -28,43 +35,20 @@ var adaptor = require('./system/adaptor/' + serverConfig.adaptor + '/' + serverC
 console.log(adaptor);
 
 //	API setup
-app.use("/api/:type", function(req, res, next){
-	var type = req.params.type,
-		data = req.body,
-		model = app.get(type);
+app.use("/api/:action", function(req, res, next){
+	var action = req.params.action,
+		data = req.body;
 
-	if(model){
-		//	Create the model
-		var model = new model(data);
-
-		//	Call the store save method, and send a response
-		store.save(type, model).then(function(error, result){
-			if(!error) {
-				res.json(jsonResponse({
-					result: result
-				}));
-			} else {
-				res.json(jsonResponse({
-					error: error
-				}));
-			}
+	//	TODO: Safeguard against abuse...
+	if(action){
+		adaptor.api[action](data).then(function(){
+			res[adaptor.utils.responseType](adaptor.utils.response.apply(null, arguments));
 		});
 	} else {
-		res.json(jsonResponse({
-			error: "Unknown type: " + type
-		}));
+		console.log("something else?");
+		res[adaptor.utils.responseType](adaptor.utils.response.apply(null, [null,"No action specified"]));
 	}
 });
-
-
-
-
-
-
-
-
-
-
 
 
 

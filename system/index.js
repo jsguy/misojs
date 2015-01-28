@@ -186,7 +186,11 @@ module.exports = function(app, options) {
 			//	Add pointer to models for use in store/save
 			if(args.route[args.action].models) {
 				for(var m in args.route[args.action].models) {
-					app.set(args.name + "." + args.action + ".models." + m, args.route[args.action].models[m]);
+
+					console.log("model." + args.name + "." + args.action + "." + m);
+
+					//app.set(args.name + "." + args.action + ".models." + m, args.route[args.action].models[m]);
+					app.set("model." + args.name + "." + args.action + "." + m, args.route[args.action].models[m]);
 				}
 			}
 

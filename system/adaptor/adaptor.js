@@ -20,6 +20,7 @@
 
 var fs = require('fs'),
 	miso = require('../../server/miso.util.js'),
+	_ = require('lodash'),
 	Promiz = require('promiz'),
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
@@ -61,40 +62,48 @@ var fs = require('fs'),
 	};
 
 
-//	Remove any unrequired model data, and get actual values
-module.exports.getModelData = function(model){
-	//	Excludes isValid method
-	var i, result = {};
-	for(i in model) {if(model.hasOwnProperty(i)) {
-		if(i !== "isValid") {
-			result[i] = (typeof model[i] == "function")? model[i](): model[i];
+module.exports.utils = {
+	//	Remove any unrequired model data, and get actual values
+	modelToDataObject: function(model){
+		//	Excludes isValid method
+		var i, result = {};
+		for(i in model) {if(model.hasOwnProperty(i)) {
+			if(i !== "isValid") {
+				result[i] = (typeof model[i] == "function")? model[i](): model[i];
+			}
+		}}
+
+		return result;
+	},
+	/*	Use a JSON RPC 2.0 response
+
+		* Either include a 'result' OR an 'error' attribute - if error, no result will be sent.
+		* 'id' is optional but might be useful in some circumstances, eg: if you use multiple simultaneous requests
+	*/
+	response: function(result, err, id){
+		var res = {
+			jsonrpc: "2.0",
+			id: null
+		};
+
+		//	Can't have both result and error
+		if(err) {
+			res.error = err;
+		} else {
+			res.result = result;
 		}
-	}}
 
-	return result;
+		console.log('RESPONSE result ', result);
+
+		return result;
+	},
+	//	Our response type
+	responseType: "json"
 };
-
-//	Use a proper json response
-module.exports.jsonResponse = function(obj){
-	var result = {
-		jsonrpc: "2.0",
-		id: null
-	};
-
-	result = _.assign(result, obj);
-
-	//	Can't have both result and error, so remove result
-	if(obj.error && obj.result) {
-		delete obj.result;
-	}
-
-	return result;
-};
-
 
 
 //	Server adaptor - makes calls to the actual adaptor
-module.exports.create = function(name, adaptor) {
+module.exports.create = function(name, adaptor, utils) {
 	//	TODO: Add a binding object, so we can block till ready!
 	//	TODO: This probably belongs in the api?
 	//scope._misoReadyBinding = miso.readyBinderFactory();
@@ -104,7 +113,10 @@ module.exports.create = function(name, adaptor) {
 		obj[i] = makeServerAction(i, adaptor);
 	}
 
-	return obj;
+	return {
+		api: obj,
+		utils: _.assign({}, module.exports.utils, utils || {})
+	};
 };
 
 //	Client adaptor - remote calls with a serialised model

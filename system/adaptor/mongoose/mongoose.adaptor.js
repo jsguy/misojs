@@ -1,5 +1,5 @@
 /*
-	Create a mongoose adaptor
+	WIP: Create a mongoose adaptor
 */
 
 //	Use miso adaptor
@@ -23,40 +23,46 @@ kitty.save(function (err) {
 
 */
 
-//	Creates a model from an object
-var objectToModel = function(){
-	//	TODO: do we need this for mongoose?
-};
-
 //	Test for now...
 module.exports = adaptor.create('mongoose', {
-	save: function(cb, err, model){
+	save: function(cb, err, args){
+
+		console.log(module.exports);
+
+		console.log('SAVE', args);
+
+
 		setTimeout(function(){
-			cb("saved model" + JSON.stringify(model));
-		}, 10);
+			cb("saved model" + JSON.stringify(args.model));
+		}, 100);
 	},
-	findById: function(cb, err, type, id){
+	findById: function(cb, err, args){
+		console.log('findbyid', args);
 		setTimeout(function(){
-			cb("found by id: " + id);
-		}, 10);
+			cb("found by id: " + args.id);
+		}, 200);
 	},
-	findByModel: function(cb, err, model, whatever){
-		console.log('findbymodel', model, whatever);
+	findByModel: function(cb, err, args){
+		console.log('findbymodel', args.model, args.whatever);
 		setTimeout(function(){
 			cb("found model!");
-		}, 10);
+		}, 300);
 	}
 });
 
+/*
+var model = {id: 12};
 
-var model = {
-	id: 12
-};
-
-module.exports.findById(12).then(function(result){
+module.exports.api.findById({type: 'user', id: 12}).then(function(result){
 	console.log("CCCBBB", result);
 });
 
-module.exports.findByModel(model).then(function(result, model){
+module.exports.api.findByModel({model: model }).then(function(result, model){
 	console.log("CCCBBB", arguments);
 });
+*/
+
+//	Example usage in an mvc ?
+
+
+
