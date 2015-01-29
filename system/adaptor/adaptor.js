@@ -22,6 +22,8 @@ var fs = require('fs'),
 	miso = require('../../server/miso.util.js'),
 	_ = require('lodash'),
 	Promiz = require('promiz'),
+
+
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
 		return function(){
@@ -37,46 +39,41 @@ var fs = require('fs'),
 			});
 		};
 	},
+
+
+	//	Creates actions for use in the server generated code
+	makeServerGenerateAction = function(action, adaptor){
+		return ["function(){",
+			"	var args = Array.prototype.slice.call(arguments, 0),",
+			"		method = "+adaptor[action].toString()+";",
+			"	return new Promiz(function(cb, err){",
+			"		args.unshift(cb, err);",
+			"		method.apply(this, args);",
+			"	});",
+			"}"].join("\n");
+	},
+
+
 	//	Creates client action method
 	//	TODO: export these to a frontend file.
 	//	It should be named [name].client.adaptor.js
 	makeClientAction = function(action, adaptor, apiPath){
-		return function(){
-			//	Create an array for the arguments
-			var args = Array.prototype.slice.call(arguments, 0),
-				method = function(){
-					//	Sooo... this hits the API, which calls the 
-					//	adaptor on the server?
-					//	TODO: we need to expose the adaptor methods
-					//	AS an API...
-					//return m.request();
-					/*
-						m.request({
-							method:'post', 
-							url: '/api/save', 
-							data: {
-								type: 'user.edit.user'
-							}
-						}).then(function(result){
-							console.log('SAVE', result);
-						});
-					*/
-					m.request({
-						method:'post', 
-						url: apiPath + '/' + action, 
-						data: arguments
-					}).then(function(result){
-						console.log('ACTION', action, result);
-					});
-				};
+		// return function(){
+		// 	return m.request({
+		// 		method:'post', 
+		// 		url: apiPath + '/' + action, 
+		// 		data: arguments
+		// 	});
+		// };
 
-			return new Promiz(function(cb, err){
-				//	Add model, cb, err at the front of the 
-				args.unshift(cb, err);
-				//	Run the method
-				method.apply(adaptor, args);
-			});
-		};
+		return ["function(args){",
+			"	return m.request({",
+			"		method:'post', ",
+			"		url: '"+apiPath + "/" + action + "',",
+			"		data: args",
+			"	});",
+			"}"].join("\n");
+		
 	};
 
 
@@ -143,6 +140,23 @@ module.exports = function(app) {
 			};
 		},
 
+
+		//	Server adaptor - makes calls to the actual adaptor
+		createServer: function(adaptor, utils) {
+			//	TODO: Add a binding object, so we can block till ready!
+			//	TODO: This probably belongs in the api?
+			//scope._misoReadyBinding = miso.readyBinderFactory();
+			var obj = {}
+
+			for(var i in adaptor) {
+				obj[i] = makeServerGenerateAction(i, adaptor);
+			}
+
+			return {
+				api: obj,
+				utils: _.assign({}, module.exports.utils, utils || {})
+			};
+		},
 
 
 		//	Client adaptor - remote calls with a serialised model

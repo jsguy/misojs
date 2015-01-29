@@ -4,6 +4,9 @@ var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	store = require('../server/store.js')(this);
 
+//	Testing
+var api = require('../system/api.server.js')(m);
+
 //	Basic todo app
 module.exports.index = {
 	models: {
@@ -38,8 +41,8 @@ module.exports.index = {
 				var newTodo = new module.exports.index.models.todo({text: ctrl.vm.input(), done: false});
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
-				store.save('todo.index.models.todo', newTodo).then(function(res){
-					console.log(res.result? res.result: res.error);
+				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
+					console.log("Saved", arguments);
 				});
 			}
 			e.preventDefault();
@@ -78,6 +81,16 @@ module.exports.index = {
 			console.log('SAVE', result, x);
 		});
 */
+
+		var theTodo = new module.exports.index.models.todo({
+			text: "Something", 
+			done: false
+		});
+
+		api.save({ type: 'todo.index.todo', model: theTodo } ).then(function(){
+			console.log("Saved", arguments);
+		});
+
 
 		return ctrl;
 	},

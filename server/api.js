@@ -12,6 +12,7 @@ module.exports = function(app, adaptorType, apiPath){
 	var adaptorInstance = require('../system/adaptor/adaptor.js')(app),
 		myAdaptor = require('../system/adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
 		adaptor = adaptorInstance.create(myAdaptor),
+		serverAdaptor = adaptorInstance.createServer(myAdaptor),
 		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
 		responseType = 'json';
 
@@ -30,10 +31,12 @@ module.exports = function(app, adaptorType, apiPath){
 				.api[action](data)
 				.then(respond, respond);
 		} else {
-			console.log("something else?");
 			res[responseType](adaptorInstance.utils.response.apply(null, [null,"No action specified"]));
 		}
 	});
 
-	return clientAdaptor;
+	return {
+		client: clientAdaptor,
+		server: serverAdaptor
+	};
 };

@@ -59,6 +59,7 @@
   },
   "browser": {
     "./server/store.js": "./client/store.js",
+    "./system/api.server.js": "./system/api.client.js",
     "./server/miso.util.js": "./client/miso.util.js"
   },
   "homepage": "https://github.com/jsguy/misojs"

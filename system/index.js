@@ -24,7 +24,8 @@ var fs			= require('fs'),
 
 	layoutView = require('../mvc/layout.js').index,
 	mainView = require('../system/main.view.js').index,
-	apiView = require('../system/api.view.js').index,
+	apiClientView = require('../system/api.client.view.js').index,
+	apiServerView = require('../system/api.server.view.js').index,
 
 	//  Puts the lotion on its...
 	skin = function(content) {
@@ -225,7 +226,9 @@ module.exports = function(app, options) {
 	var routeList = [],
 		mainFile = './system/main.js',
 		//	
-		apiFile = './system/apiImpl.js',
+		apiClientFile = './system/api.client.js',
+		apiServerFile = './system/api.server.js',
+
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
 		//	If the server config wants a minified miso.js
@@ -246,11 +249,27 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
+
+
+
+
 	//	Create API for configured adaptor (serverConfig.adaptor)
 	var clientApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
-	fs.writeFileSync(apiFile, render(apiView({
-		api: clientApi.api
+	fs.writeFileSync(apiClientFile, render(apiClientView({
+		api: clientApi.client.api
 	})));
+
+
+	//apiServerFile
+	var serverApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
+	fs.writeFileSync(apiServerFile, render(apiServerView({
+		api: serverApi.server.api
+	})));
+
+
+
+
+
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({

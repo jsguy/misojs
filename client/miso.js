@@ -129,6 +129,9 @@ var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	store = require('../server/store.js')(this);
 
+//	Testing
+var api = require('../system/api.server.js')(m);
+
 //	Basic todo app
 module.exports.index = {
 	models: {
@@ -163,8 +166,8 @@ module.exports.index = {
 				var newTodo = new module.exports.index.models.todo({text: ctrl.vm.input(), done: false});
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
-				store.save('todo.index.models.todo', newTodo).then(function(res){
-					console.log(res.result? res.result: res.error);
+				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
+					console.log("Saved", arguments);
 				});
 			}
 			e.preventDefault();
@@ -204,6 +207,16 @@ module.exports.index = {
 		});
 */
 
+		var theTodo = new module.exports.index.models.todo({
+			text: "Something", 
+			done: false
+		});
+
+		api.save({ type: 'todo.index.todo', model: theTodo } ).then(function(){
+			console.log("Saved", arguments);
+		});
+
+
 		return ctrl;
 	},
 	view: function(ctrl) {
@@ -227,7 +240,7 @@ module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":6}],5:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"../system/api.server.js":11,"mithril":6}],5:[function(require,module,exports){
 var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
@@ -2253,6 +2266,33 @@ module.exports = function(m, lower){
 };
 },{}],11:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
+module.exports = function(m){
+	return {
+'save': function(args){
+	return m.request({
+		method:'post', 
+		url: '/api/save',
+		data: args
+	});
+},
+'findById': function(args){
+	return m.request({
+		method:'post', 
+		url: '/api/findById',
+		data: args
+	});
+},
+'findByModel': function(args){
+	return m.request({
+		method:'post', 
+		url: '/api/findByModel',
+		data: args
+	});
+}
+	};
+};
+},{}],12:[function(require,module,exports){
+/* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
@@ -2272,4 +2312,4 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/todos': todo.index,
 '/users': user.index
 });
-},{"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":6}]},{},[11]);
+},{"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":6}]},{},[12]);

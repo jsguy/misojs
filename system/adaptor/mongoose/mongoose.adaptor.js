@@ -50,9 +50,47 @@ kitty.save(function (err) {
 	* The client API is a lightweight shim to use the API seamlessly
 
  */
+
+
+
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/testmiso');
+
+// var Cat = mongoose.model('Cat', { name: String });
+
+// var kitty = new Cat({ name: 'Zildjian' });
+// kitty.save(function (err) {
+//   if (err) {
+//   	console.log(err);
+//   }// ...
+//   console.log('meow');
+// });
+
+
+//	Creates a mongoose version of our model
+//	TODO: Ensure this is really cached in a singleton.
+var modelCache = {},
+	getMongooseModel = function(type, model){
+		if(modelCache[type]) {
+			return modelCache[type];
+		} else {
+			var newModel = {};
+			Object.keys(model).map(function(key) {
+				newModel[key] = String;
+			});
+			var myModel = mongoose.model(type, newModel);
+			modelCache[type] = myModel;
+
+			return myModel;
+		}
+	};
+
+
 module.exports = function(utils){
 	return {
 		save: function(cb, err, args){
+			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model, validation;
 
 			if(!Model) {
@@ -62,9 +100,18 @@ module.exports = function(utils){
 			model = new Model(args.model);
 			validation = model.isValid? model.isValid(): true;
 
+			//	Validate the model data
 			if(validation === true) {
-				//	Save the model here
-				return cb("saved model!");
+				//	Get an instance of a mongoose model
+				var MonModel = getMongooseModel(args.type, model);
+				var modelInstance = MonModel(model);
+
+				modelInstance.save(function (errorText) {
+					if (errorText) {
+						return err(errorText);
+					}
+					return cb("saved model!");
+				});
 			} else {
 				//	Send beack the validation errors
 				return err(validation);
