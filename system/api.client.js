@@ -1,6 +1,13 @@
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	return {
+'find': function(args){
+	return m.request({
+		method:'post', 
+		url: '/api/find',
+		data: args
+	});
+},
 'save': function(args){
 	return m.request({
 		method:'post', 

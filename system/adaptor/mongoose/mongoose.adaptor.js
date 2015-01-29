@@ -70,25 +70,65 @@ mongoose.connect('mongodb://localhost/testmiso');
 
 //	Creates a mongoose version of our model
 //	TODO: Ensure this is really cached in a singleton.
-var modelCache = {},
-	getMongooseModel = function(type, model){
-		if(modelCache[type]) {
-			return modelCache[type];
-		} else {
-			var newModel = {};
-			Object.keys(model).map(function(key) {
-				newModel[key] = String;
-			});
-			var myModel = mongoose.model(type, newModel);
-			modelCache[type] = myModel;
+var modelCache = {};
 
-			return myModel;
-		}
-	};
 
+//	PROBLEM: The model from utils.getmodel has m.prop, should be basic type
 
 module.exports = function(utils){
+	var getMongooseModel = function(type, model){
+		var monModel;
+		if(modelCache[type]) {
+			console.log('Mongoose model '+type+' cached');
+			monModel = modelCache[type];
+		} else {
+			// var newModel = {};
+			// Object.keys(model).map(function(key) {
+			// 	newModel[key] = String;
+			// });
+	
+			console.log('STRUCT', type, utils.getModel(type), utils.getModelStructure(utils.getModel(type)));
+
+			monModel = mongoose.model(type, utils.getModelStructure(utils.getModel(type)));
+			modelCache[type] = monModel;
+		}
+
+		return monModel;
+	};
 	return {
+		find: function(cb, err, args){
+			//	Get an instance of the model
+			var Model = utils.getModel(args.type), model,
+				conditions = args.conditions,
+				fields = args.fields || null,
+				options = args.options || {};
+
+			console.log('FIND!!!!!');
+
+			if(!Model) {
+				return err("Model not found " + args.type);
+			}
+
+
+			model = new Model(args.model || {});
+
+			console.log('FIND!!!!! 333');
+
+			//	Get an instance of a mongoose model
+			var MonModel = getMongooseModel(args.type, model);
+			var modelInstance = MonModel(model);
+
+			console.log('find', conditions, fields, options);
+
+			modelInstance.find(conditions, fields, options, function (errorText, docs) {
+				if (errorText) {
+					console.log('ERROR', errorText);
+					return err(errorText);
+				}
+				console.log('FOUND', docs);
+				return cb(docs);
+			});
+		},
 		save: function(cb, err, args){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model, validation;

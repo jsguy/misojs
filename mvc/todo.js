@@ -65,23 +65,17 @@ module.exports.index = {
 			]);
 		});
 
-		//, SCRIPT("m.request({method:'post', url: '/api/save', type: 'user.edit.user', data: {type: 'user.edit.user', model: {id: 12, name: 'bob'}}}).then(function(result){console.log('SAVE', result);});")
-
-		//	Test save
-		/*
-		var x = m.request({
-			method:'post', 
-			url: '/api/save', 
-			//type: module.exports.index.models.todo,
-			data: {
-				type: 'user.edit.user', 
-				model: {id: 12, name: 'bob'}
-			}
-		}).then(function(result){
-			console.log('SAVE', result, x);
+		//	Test load our todos
+		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
+			console.log('loaded todos', loadedTodos);
+			// ctrl.model = new ctrl.vm.todoList([
+			// 	new module.exports.index.models.todo({ text: "learn mithril", done: true}),
+   //    			new module.exports.index.models.todo({ text: "build a mithril app", done: false})
+			// ]);
 		});
-*/
 
+
+		//	Test saving
 		var theTodo = new module.exports.index.models.todo({
 			text: "Something", 
 			done: false

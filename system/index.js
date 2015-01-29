@@ -251,7 +251,17 @@ module.exports = function(app, options) {
 
 
 
-
+	//	TODO
+	//
+	//	* Movel api.client and api.server to their 
+	//		respective adaptor directories, and rename them.
+	//	* Make generating adaptors conditional, so that you can 
+	//		just declare the server / client version
+	//	* Make each adaptor a seperate module, and include
+	//		info in package.json for what to use in the browser, see:
+	//		https://gist.github.com/defunctzombie/4339901#replace-specific-files---advanced
+	//		Example: https://github.com/websockets/ws/blob/master/package.json
+	//
 
 	//	Create API for configured adaptor (serverConfig.adaptor)
 	var clientApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);

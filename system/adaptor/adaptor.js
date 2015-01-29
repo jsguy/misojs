@@ -78,7 +78,7 @@ var fs = require('fs'),
 
 
 module.exports = function(app) {
-	return {
+	return self = {
 		utils: {
 			//	Returns a model
 			getModel: function(type){
@@ -95,6 +95,10 @@ module.exports = function(app) {
 				}}
 
 				return result;
+			},
+			//	Returns structure of a model
+			getModelStructure: function(type){
+				return self.utils.modelToDataObject(app.get("model." + type));
 			},
 			/*	Use a JSON RPC 2.0 response
 
