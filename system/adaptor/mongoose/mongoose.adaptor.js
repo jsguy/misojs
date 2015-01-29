@@ -25,26 +25,49 @@ kitty.save(function (err) {
 
 //	Test for now...
 //module.exports = adaptor.create('mongoose', {
+//
+
+
+/*
+	To create an adaptor, create a function that can receive a set of utilities, 
+	and returns an object with action methods to expose to the api.
+
+	The methods must use the following signature:
+
+		function(cb, err, args)
+
+
+	Where:
+
+	* cb is a success callback
+	* err is an error callback
+	* args is an object with any parameters you might require
+
+	This is because we automatically generate:
+
+	* A RESTful API route for every action method
+	* A consistent server/client api
+	* The client API is a lightweight shim to use the API seamlessly
+
+ */
 module.exports = function(utils){
 	return {
 		save: function(cb, err, args){
-			var Model = utils.getModel(args.type),
-				model,
-				valid;
+			var Model = utils.getModel(args.type), model, validation;
 
 			if(!Model) {
 				return err("Model not found " + args.type);
 			}
 
 			model = new Model(args.model);
-			valid = model.isValid();
+			validation = model.isValid? model.isValid(): true;
 
-			if(valid === true) {
-				console.log('SAVE', args.type, model);
+			if(validation === true) {
+				//	Save the model here
 				return cb("saved model!");
 			} else {
-				console.log('NOT SAVED', valid);
-				return err(valid);
+				//	Send beack the validation errors
+				return err(validation);
 			}
 		},
 		findById: function(cb, err, args){

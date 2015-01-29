@@ -224,6 +224,7 @@ module.exports = function(app, options) {
 	//	Grab our controller file names
 	var routeList = [],
 		mainFile = './system/main.js',
+		//	
 		apiFile = './system/apiImpl.js',
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
@@ -245,18 +246,11 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
-	//	TODO: Create API for chosen adaptor
-	//	serverConfig.adaptor
-	//	Setup API using the selected adaptor
+	//	Create API for configured adaptor (serverConfig.adaptor)
 	var clientApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
-
-	//console.log('clientApi', clientApi.api.save);
 	fs.writeFileSync(apiFile, render(apiView({
 		api: clientApi.api
 	})));
-
-
-
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({
