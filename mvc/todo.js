@@ -5,10 +5,10 @@ var m = require('mithril'),
 	store = require('../server/store.js')(this);
 
 //	Testing
-var api = require('../system/api.server.js')(m);
+var api = require('../system/api.server.js')(m, this);
 
 //	Basic todo app
-module.exports.index = {
+var self = module.exports.index = {
 	models: {
 		//	Our todo model
 		todo: function(data){
@@ -38,7 +38,7 @@ module.exports.index = {
 		ctrl.addTodo = function(e){
 			var value = ctrl.vm.input();
 			if(value) {
-				var newTodo = new module.exports.index.models.todo({text: ctrl.vm.input(), done: false});
+				var newTodo = new self.models.todo({text: ctrl.vm.input(), done: false});
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
 				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
@@ -57,33 +57,39 @@ module.exports.index = {
 			ctrl.model.todos(list);
 		};
 
-		//	Fake call to store.load
+
+		//	WIP: Need to implement _misReadyBinding on the controller.
+
+		// //	Fake call to store.load
 		store.load('todo', 1).then(function(loadedTodos) {
 			ctrl.model = new ctrl.vm.todoList([
-				new module.exports.index.models.todo({ text: "learn mithril", done: true}),
-      			new module.exports.index.models.todo({ text: "build a mithril app", done: false})
+				new self.models.todo({ text: "learn mithril", done: true}),
+      			new self.models.todo({ text: "build a mithril app", done: false})
 			]);
 		});
 
 		//	Test load our todos
 		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
 			console.log('loaded todos', loadedTodos);
-			// ctrl.model = new ctrl.vm.todoList([
-			// 	new module.exports.index.models.todo({ text: "learn mithril", done: true}),
-   //    			new module.exports.index.models.todo({ text: "build a mithril app", done: false})
-			// ]);
+			loadedTodos.map(function(value, idx){
+				console.log(value);	
+			})
+			ctrl.model = new ctrl.vm.todoList([
+				new self.models.todo({ text: "learn mithril", done: true}),
+				new self.models.todo({ text: "build a mithril app", done: false})
+			]);
 		});
 
 
 		//	Test saving
-		var theTodo = new module.exports.index.models.todo({
-			text: "Something", 
-			done: false
-		});
+		// var theTodo = new self.models.todo({
+		// 	text: "Something", 
+		// 	done: false
+		// });
 
-		api.save({ type: 'todo.index.todo', model: theTodo } ).then(function(){
-			console.log("Saved", arguments);
-		});
+		// api.save({ type: 'todo.index.todo', model: theTodo } ).then(function(){
+		// 	console.log("Saved", arguments);
+		// });
 
 
 		return ctrl;

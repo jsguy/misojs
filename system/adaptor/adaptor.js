@@ -23,7 +23,6 @@ var fs = require('fs'),
 	_ = require('lodash'),
 	Promiz = require('promiz'),
 
-
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
 		return function(){
@@ -46,8 +45,16 @@ var fs = require('fs'),
 		return ["function(){",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
 			"		method = "+adaptor[action].toString()+";",
+			"	console.log('SCOPE', typeof scope._misoReadyBinding);",
+			"	",
 			"	return new Promiz(function(cb, err){",
-			"		args.unshift(cb, err);",
+//			"		args.unshift(cb, err);",
+//			
+			// "		args.unshift(scope._misoReadyBinding.bind(function(){",
+			// "			console.log('scope done!', arguments);",
+			// "			cb.apply(this, arguments);",
+			// "		}), err);",
+
 			"		method.apply(this, args);",
 			"	});",
 			"}"].join("\n");
@@ -85,7 +92,7 @@ module.exports = function(app) {
 				return app.get("model." + type);
 			},
 			//	Remove any unrequired model data, and get actual values
-			modelToDataObject: function(model){
+			getModelData: function(model){
 				//	Excludes isValid method
 				var i, result = {};
 				for(i in model) {if(model.hasOwnProperty(i)) {
@@ -98,7 +105,14 @@ module.exports = function(app) {
 			},
 			//	Returns structure of a model
 			getModelStructure: function(type){
-				return self.utils.modelToDataObject(app.get("model." + type));
+				var model = app.get("model." + type),
+					st = self.utils.getModelData(new model({}));
+
+				for(var s in st) {
+					st[s] = String;
+				}
+
+				return st;
 			},
 			/*	Use a JSON RPC 2.0 response
 
@@ -117,8 +131,6 @@ module.exports = function(app) {
 				} else {
 					res.result = result;
 				}
-
-				console.log('RESPONSE result ', result);
 
 				return result;
 			},
@@ -173,8 +185,6 @@ module.exports = function(app) {
 			for(var i in adaptor) {
 				obj[i] = makeClientAction(i, adaptor, apiPath);
 			}
-
-			//console.log('client api', obj);
 
 			return {
 				api: obj,

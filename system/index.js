@@ -9,6 +9,7 @@ var fs			= require('fs'),
 	routes		= {},
 	serverConfig = require('../cfg/server.json'),
 	m = require('mithril'),
+	miso = require('../server/miso.util.js');
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	//templates = require('../server/mithril.templates.node.js'),
@@ -198,7 +199,8 @@ module.exports = function(app, options) {
 					var scope = args.route[args.action].controller(req.params),
 						mvc = args.route[args.action];
 
-					//	Check for ready binder
+					//	Check for ready binder - we only use
+					//	it if there is asyc loading to be done.
 					if (!args.route._misoReadyBinding) {
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 

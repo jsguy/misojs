@@ -1,34 +1,8 @@
 /*
-	WIP: Create a mongoose adaptor
-*/
-
-//	Use miso adaptor
-//var adaptor = require('../adaptor.js');
-
-//	--- BEGIN TEST CODE FOR ADAPTOR
-
-/*
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
-
-var Cat = mongoose.model('Cat', { name: String });
-
-var kitty = new Cat({ name: 'Zildjian' });
-kitty.save(function (err) {
-  if (err) {
-  	console.log(err);
-  }// ...
-  console.log('meow');
-});
-
-*/
-
-//	Test for now...
-//module.exports = adaptor.create('mongoose', {
-//
+	Mongoose miso adaptor example
 
 
-/*
+
 	To create an adaptor, create a function that can receive a set of utilities, 
 	and returns an object with action methods to expose to the api.
 
@@ -53,46 +27,29 @@ kitty.save(function (err) {
 
 
 
-
+//	TODO: Move to /cfg
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/testmiso');
 
-// var Cat = mongoose.model('Cat', { name: String });
-
-// var kitty = new Cat({ name: 'Zildjian' });
-// kitty.save(function (err) {
-//   if (err) {
-//   	console.log(err);
-//   }// ...
-//   console.log('meow');
-// });
 
 
-//	Creates a mongoose version of our model
-//	TODO: Ensure this is really cached in a singleton.
+//	Creates a cache for the constructed models 
+//	so we're not creating new ones all the time
 var modelCache = {};
 
 
-//	PROBLEM: The model from utils.getmodel has m.prop, should be basic type
-
 module.exports = function(utils){
+
+	//	Gets a mongoose model
 	var getMongooseModel = function(type, model){
 		var monModel;
 		if(modelCache[type]) {
-			console.log('Mongoose model '+type+' cached');
 			monModel = modelCache[type];
 		} else {
-			// var newModel = {};
-			// Object.keys(model).map(function(key) {
-			// 	newModel[key] = String;
-			// });
-	
-			console.log('STRUCT', type, utils.getModel(type), utils.getModelStructure(utils.getModel(type)));
-
-			monModel = mongoose.model(type, utils.getModelStructure(utils.getModel(type)));
-			modelCache[type] = monModel;
+			monModel = mongoose.model(type, utils.getModelStructure(type));
 		}
-
+		
+		modelCache[type] = monModel;
 		return monModel;
 	};
 	return {
@@ -103,29 +60,19 @@ module.exports = function(utils){
 				fields = args.fields || null,
 				options = args.options || {};
 
-			console.log('FIND!!!!!');
-
 			if(!Model) {
 				return err("Model not found " + args.type);
+			} else {
+				model = new Model(args.model || {});
 			}
-
-
-			model = new Model(args.model || {});
-
-			console.log('FIND!!!!! 333');
 
 			//	Get an instance of a mongoose model
 			var MonModel = getMongooseModel(args.type, model);
-			var modelInstance = MonModel(model);
 
-			console.log('find', conditions, fields, options);
-
-			modelInstance.find(conditions, fields, options, function (errorText, docs) {
+			MonModel.find(conditions, fields, options, function (errorText, docs) {
 				if (errorText) {
-					console.log('ERROR', errorText);
 					return err(errorText);
 				}
-				console.log('FOUND', docs);
 				return cb(docs);
 			});
 		},
@@ -144,7 +91,7 @@ module.exports = function(utils){
 			if(validation === true) {
 				//	Get an instance of a mongoose model
 				var MonModel = getMongooseModel(args.type, model);
-				var modelInstance = MonModel(model);
+				var modelInstance = new MonModel(utils.getModelData(model));
 
 				modelInstance.save(function (errorText) {
 					if (errorText) {

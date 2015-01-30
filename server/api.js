@@ -7,6 +7,10 @@
 //	* Guard against XSS
 //	* Anything else?
 //
+//
+
+var miso = require('../server/miso.util.js');
+
 module.exports = function(app, adaptorType, apiPath){
 	apiPath = apiPath || "/api";
 	var adaptorInstance = require('../system/adaptor/adaptor.js')(app),

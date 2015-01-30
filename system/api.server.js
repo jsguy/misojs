@@ -1,6 +1,6 @@
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var Promiz = require('promiz');
-module.exports = function(m){
+module.exports = function(m, scope){
 	return {
 'find': function(){
 	var args = Array.prototype.slice.call(arguments, 0),
@@ -11,34 +11,25 @@ module.exports = function(m){
 				fields = args.fields || null,
 				options = args.options || {};
 
-			console.log('FIND!!!!!');
-
 			if(!Model) {
 				return err("Model not found " + args.type);
+			} else {
+				model = new Model(args.model || {});
 			}
-
-
-			model = new Model(args.model || {});
-
-			console.log('FIND!!!!! 333');
 
 			//	Get an instance of a mongoose model
 			var MonModel = getMongooseModel(args.type, model);
-			var modelInstance = MonModel(model);
 
-			console.log('find', conditions, fields, options);
-
-			modelInstance.find(conditions, fields, options, function (errorText, docs) {
+			MonModel.find(conditions, fields, options, function (errorText, docs) {
 				if (errorText) {
-					console.log('ERROR', errorText);
 					return err(errorText);
 				}
-				console.log('FOUND', docs);
 				return cb(docs);
 			});
 		};
+	console.log('SCOPE', typeof scope._misoReadyBinding);
+	
 	return new Promiz(function(cb, err){
-		args.unshift(cb, err);
 		method.apply(this, args);
 	});
 },
@@ -59,7 +50,7 @@ module.exports = function(m){
 			if(validation === true) {
 				//	Get an instance of a mongoose model
 				var MonModel = getMongooseModel(args.type, model);
-				var modelInstance = MonModel(model);
+				var modelInstance = new MonModel(utils.getModelData(model));
 
 				modelInstance.save(function (errorText) {
 					if (errorText) {
@@ -72,8 +63,9 @@ module.exports = function(m){
 				return err(validation);
 			}
 		};
+	console.log('SCOPE', typeof scope._misoReadyBinding);
+	
 	return new Promiz(function(cb, err){
-		args.unshift(cb, err);
 		method.apply(this, args);
 	});
 },
@@ -85,8 +77,9 @@ module.exports = function(m){
 				cb("found by id: " + args.id);
 			}, 200);
 		};
+	console.log('SCOPE', typeof scope._misoReadyBinding);
+	
 	return new Promiz(function(cb, err){
-		args.unshift(cb, err);
 		method.apply(this, args);
 	});
 },
@@ -98,8 +91,9 @@ module.exports = function(m){
 				cb("found model!");
 			}, 300);
 		};
+	console.log('SCOPE', typeof scope._misoReadyBinding);
+	
 	return new Promiz(function(cb, err){
-		args.unshift(cb, err);
 		method.apply(this, args);
 	});
 }

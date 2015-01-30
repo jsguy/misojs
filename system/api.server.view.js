@@ -20,7 +20,7 @@ module.exports.index = function(ctrl){
 			// "var sugartags = require('../server/mithril.sugartags.node.js')(m);",
 			// "var bindings = require('../server/mithril.bindings.node.js')(m);",
 			// "var store = require('../server/store.js');",
-			"module.exports = function(m){",
+			"module.exports = function(m, scope){",
 			"	return {",
 			//	Grab our api action methods
 			(Object.keys(ctrl.api).map(function(key) {
