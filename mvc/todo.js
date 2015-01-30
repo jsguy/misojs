@@ -2,10 +2,9 @@ var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	store = require('../server/store.js')(this);
-
-//	Testing
-var api = require('../system/api.server.js')(m, this);
+	store = require('../server/store.js')(this),
+	//	Testing
+	api = require('../system/api.server.js')(m, this);
 
 //	Basic todo app
 var self = module.exports.index = {

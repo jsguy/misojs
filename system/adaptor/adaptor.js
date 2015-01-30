@@ -49,7 +49,19 @@ var fs = require('fs'),
 			"	",
 			"	return new Promiz(function(cb, err){",
 //			"		args.unshift(cb, err);",
-//			
+
+			"		args.unshift(function(){",
+			"			console.log('scope done!', arguments);",
+			"			cb.apply(this, arguments);",
+			"		}, err);",
+
+
+			// "		console.log(scope._misoReadyBinding.bind(function(){",
+			// "			console.log('scope done!', arguments);",
+			// "			cb.apply(this, arguments);",
+			// "		}));",
+
+
 			// "		args.unshift(scope._misoReadyBinding.bind(function(){",
 			// "			console.log('scope done!', arguments);",
 			// "			cb.apply(this, arguments);",

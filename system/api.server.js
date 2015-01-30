@@ -30,6 +30,10 @@ module.exports = function(m, scope){
 	console.log('SCOPE', typeof scope._misoReadyBinding);
 	
 	return new Promiz(function(cb, err){
+		args.unshift(function(){
+			console.log('scope done!', arguments);
+			cb.apply(this, arguments);
+		}, err);
 		method.apply(this, args);
 	});
 },
@@ -66,6 +70,10 @@ module.exports = function(m, scope){
 	console.log('SCOPE', typeof scope._misoReadyBinding);
 	
 	return new Promiz(function(cb, err){
+		args.unshift(function(){
+			console.log('scope done!', arguments);
+			cb.apply(this, arguments);
+		}, err);
 		method.apply(this, args);
 	});
 },
@@ -80,6 +88,10 @@ module.exports = function(m, scope){
 	console.log('SCOPE', typeof scope._misoReadyBinding);
 	
 	return new Promiz(function(cb, err){
+		args.unshift(function(){
+			console.log('scope done!', arguments);
+			cb.apply(this, arguments);
+		}, err);
 		method.apply(this, args);
 	});
 },
@@ -94,6 +106,10 @@ module.exports = function(m, scope){
 	console.log('SCOPE', typeof scope._misoReadyBinding);
 	
 	return new Promiz(function(cb, err){
+		args.unshift(function(){
+			console.log('scope done!', arguments);
+			cb.apply(this, arguments);
+		}, err);
 		method.apply(this, args);
 	});
 }

@@ -207,6 +207,9 @@ module.exports = function(app, options) {
 							mvc.view, 
 						scope));
 					} else {
+
+						console.log('bind _misoReadyBinding');
+
 						//	Add "last" binding for miso ready event
 						args.route._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
