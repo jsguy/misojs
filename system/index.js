@@ -188,8 +188,16 @@ module.exports = function(app, options) {
 
 			//	Add pointer to models for use in store/save
 			if(args.route[args.action].models) {
+				GLOBAL.misoModels = GLOBAL.misoModels || {};
 				for(var m in args.route[args.action].models) {
-					app.set("model." + args.name + "." + args.action + "." + m, args.route[args.action].models[m]);
+					var key = "model." + args.name + "." + args.action + "." + m
+						value = args.route[args.action].models[m];
+
+					app.set(key, value);
+					GLOBAL.misoModels[key] = value;
+
+
+//					app.set("model." + args.name + "." + args.action + "." + m, args.route[args.action].models[m]);
 				}
 			}
 
@@ -202,6 +210,10 @@ module.exports = function(app, options) {
 					//	Check for ready binder - we only use
 					//	it if there is asyc loading to be done.
 					if (!args.route._misoReadyBinding) {
+
+
+						console.log('No _misoReadyBinding for ', args.action);
+
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 
 							mvc.view, 
@@ -212,6 +224,7 @@ module.exports = function(app, options) {
 
 						//	Add "last" binding for miso ready event
 						args.route._misoReadyBinding.bindLast(function() {
+							console.log('bound last fired!');
 							res.end(skin(_.isFunction(mvc.view)? 
 								mvc.view(scope): 
 								mvc.view, 
@@ -278,7 +291,8 @@ module.exports = function(app, options) {
 	//apiServerFile
 	var serverApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
 	fs.writeFileSync(apiServerFile, render(apiServerView({
-		api: serverApi.server.api
+		api: serverApi.server.api,
+		adaptor: serverConfig.adaptor
 	})));
 
 

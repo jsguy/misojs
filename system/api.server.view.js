@@ -15,12 +15,19 @@ module.exports.index = function(ctrl){
 		return [
 			"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
 			// //	Required libs
-			"var Promiz = require('promiz');",
+			"var Promiz = require('promiz/promiz.mithril.js');",
+			"var utils = require('../system/adaptor/adaptor.js')().utils;",
+			"var miso = require('../server/miso.util.js');",
+
+			"var myAdaptor = require('../system/adaptor/" + ctrl.adaptor + "/" + ctrl.adaptor + ".adaptor.js')(utils);",
 
 			// "var sugartags = require('../server/mithril.sugartags.node.js')(m);",
 			// "var bindings = require('../server/mithril.bindings.node.js')(m);",
 			// "var store = require('../server/store.js');",
 			"module.exports = function(m, scope){",
+			"	//	Add a binding object, so we can block till ready",
+			"	scope._misoReadyBinding = miso.readyBinderFactory();",
+
 			"	return {",
 			//	Grab our api action methods
 			(Object.keys(ctrl.api).map(function(key) {

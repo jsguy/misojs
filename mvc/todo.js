@@ -2,7 +2,7 @@ var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	store = require('../server/store.js')(this),
+//	store = require('../server/store.js')(this);
 	//	Testing
 	api = require('../system/api.server.js')(m, this);
 
@@ -60,23 +60,44 @@ var self = module.exports.index = {
 		//	WIP: Need to implement _misReadyBinding on the controller.
 
 		// //	Fake call to store.load
-		store.load('todo', 1).then(function(loadedTodos) {
-			ctrl.model = new ctrl.vm.todoList([
-				new self.models.todo({ text: "learn mithril", done: true}),
-      			new self.models.todo({ text: "build a mithril app", done: false})
-			]);
-		});
+		// store.load('todo', 1).then(function(loadedTodos) {
+		// 	ctrl.model = new ctrl.vm.todoList([
+		// 		new self.models.todo({ text: "learn mithril", done: true}),
+  //     			new self.models.todo({ text: "build a mithril app", done: false})
+		// 	]);
+		// });
+
+
+		// ctrl.model = new ctrl.vm.todoList([
+		// 	new self.models.todo({ text: "learn mithril", done: true}),
+		// 	new self.models.todo({ text: "build a mithril app", done: false})
+		// ]);
+
+
+		// ctrl.model = new ctrl.vm.todoList([
+		// 	new self.models.todo({ text: "1 learn mithril", done: true}),
+		// 	new self.models.todo({ text: "1 build a mithril app", done: false})
+		// ]);
+
+		//ctrl.model = new ctrl.vm.todoList([]);
 
 		//	Test load our todos
 		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
 			console.log('loaded todos', loadedTodos);
-			loadedTodos.map(function(value, idx){
+			// loadedTodos.map(function(value, idx){
+			// 	//console.log(value);	
+			// });
+			Object.keys(loadedTodos).map(function(key) {
+				var value = loadedTodos[key];
 				console.log(value);	
-			})
+			});
+			
 			ctrl.model = new ctrl.vm.todoList([
-				new self.models.todo({ text: "learn mithril", done: true}),
-				new self.models.todo({ text: "build a mithril app", done: false})
+				new self.models.todo({ text: "2 learn mithril", done: true}),
+				new self.models.todo({ text: "2 build a mithril app", done: false})
 			]);
+		}, function(){
+			console.log('ERRROROROROROROR!', arguments);
 		});
 
 

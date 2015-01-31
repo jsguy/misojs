@@ -1,117 +1,111 @@
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
-var Promiz = require('promiz');
+var Promiz = require('promiz/promiz.mithril.js');
+var utils = require('../system/adaptor/adaptor.js')().utils;
+var miso = require('../server/miso.util.js');
+var myAdaptor = require('../system/adaptor/mongoose/mongoose.adaptor.js')(utils);
 module.exports = function(m, scope){
+	//	Add a binding object, so we can block till ready
+	scope._misoReadyBinding = miso.readyBinderFactory();
 	return {
 'find': function(){
+	console.log('server generate action');
 	var args = Array.prototype.slice.call(arguments, 0),
-		method = function (cb, err, args){
-			//	Get an instance of the model
-			var Model = utils.getModel(args.type), model,
-				conditions = args.conditions,
-				fields = args.fields || null,
-				options = args.options || {};
-
-			if(!Model) {
-				return err("Model not found " + args.type);
-			} else {
-				model = new Model(args.model || {});
-			}
-
-			//	Get an instance of a mongoose model
-			var MonModel = getMongooseModel(args.type, model);
-
-			MonModel.find(conditions, fields, options, function (errorText, docs) {
-				if (errorText) {
-					return err(errorText);
-				}
-				return cb(docs);
-			});
-		};
-	console.log('SCOPE', typeof scope._misoReadyBinding);
+		methodName = 'find',
+		errResult,
+		errFunc = function(){errResult=arguments; doneFunc()},
+		successResult,
+		successFunc = function(){successResult=arguments; doneFunc()},
+		doneFunc = function(){console.log('doneFunc too soon...')};
 	
-	return new Promiz(function(cb, err){
-		args.unshift(function(){
-			console.log('scope done!', arguments);
-			cb.apply(this, arguments);
-		}, err);
-		method.apply(this, args);
-	});
+	args.unshift(successFunc, errFunc);
+	result = myAdaptor[methodName].apply(this, args);
+	
+	return { then: function(cb, err){
+		doneFunc = scope._misoReadyBinding.bind(function(){
+			if(errResult){
+				console.log('ERROR fired!');
+				err(errResult);
+ 			} else {
+				console.log('SUCCESS fired!');
+				cb(successResult);
+			}
+		});
+	}};
 },
 'save': function(){
+	console.log('server generate action');
 	var args = Array.prototype.slice.call(arguments, 0),
-		method = function (cb, err, args){
-			//	Get an instance of the model
-			var Model = utils.getModel(args.type), model, validation;
-
-			if(!Model) {
-				return err("Model not found " + args.type);
-			}
-
-			model = new Model(args.model);
-			validation = model.isValid? model.isValid(): true;
-
-			//	Validate the model data
-			if(validation === true) {
-				//	Get an instance of a mongoose model
-				var MonModel = getMongooseModel(args.type, model);
-				var modelInstance = new MonModel(utils.getModelData(model));
-
-				modelInstance.save(function (errorText) {
-					if (errorText) {
-						return err(errorText);
-					}
-					return cb("saved model!");
-				});
-			} else {
-				//	Send beack the validation errors
-				return err(validation);
-			}
-		};
-	console.log('SCOPE', typeof scope._misoReadyBinding);
+		methodName = 'save',
+		errResult,
+		errFunc = function(){errResult=arguments; doneFunc()},
+		successResult,
+		successFunc = function(){successResult=arguments; doneFunc()},
+		doneFunc = function(){console.log('doneFunc too soon...')};
 	
-	return new Promiz(function(cb, err){
-		args.unshift(function(){
-			console.log('scope done!', arguments);
-			cb.apply(this, arguments);
-		}, err);
-		method.apply(this, args);
-	});
+	args.unshift(successFunc, errFunc);
+	result = myAdaptor[methodName].apply(this, args);
+	
+	return { then: function(cb, err){
+		doneFunc = scope._misoReadyBinding.bind(function(){
+			if(errResult){
+				console.log('ERROR fired!');
+				err(errResult);
+ 			} else {
+				console.log('SUCCESS fired!');
+				cb(successResult);
+			}
+		});
+	}};
 },
 'findById': function(){
+	console.log('server generate action');
 	var args = Array.prototype.slice.call(arguments, 0),
-		method = function (cb, err, args){
-			console.log('findbyid', args);
-			setTimeout(function(){
-				cb("found by id: " + args.id);
-			}, 200);
-		};
-	console.log('SCOPE', typeof scope._misoReadyBinding);
+		methodName = 'findById',
+		errResult,
+		errFunc = function(){errResult=arguments; doneFunc()},
+		successResult,
+		successFunc = function(){successResult=arguments; doneFunc()},
+		doneFunc = function(){console.log('doneFunc too soon...')};
 	
-	return new Promiz(function(cb, err){
-		args.unshift(function(){
-			console.log('scope done!', arguments);
-			cb.apply(this, arguments);
-		}, err);
-		method.apply(this, args);
-	});
+	args.unshift(successFunc, errFunc);
+	result = myAdaptor[methodName].apply(this, args);
+	
+	return { then: function(cb, err){
+		doneFunc = scope._misoReadyBinding.bind(function(){
+			if(errResult){
+				console.log('ERROR fired!');
+				err(errResult);
+ 			} else {
+				console.log('SUCCESS fired!');
+				cb(successResult);
+			}
+		});
+	}};
 },
 'findByModel': function(){
+	console.log('server generate action');
 	var args = Array.prototype.slice.call(arguments, 0),
-		method = function (cb, err, args){
-			console.log('findbymodel', args.model, args.whatever);
-			setTimeout(function(){
-				cb("found model!");
-			}, 300);
-		};
-	console.log('SCOPE', typeof scope._misoReadyBinding);
+		methodName = 'findByModel',
+		errResult,
+		errFunc = function(){errResult=arguments; doneFunc()},
+		successResult,
+		successFunc = function(){successResult=arguments; doneFunc()},
+		doneFunc = function(){console.log('doneFunc too soon...')};
 	
-	return new Promiz(function(cb, err){
-		args.unshift(function(){
-			console.log('scope done!', arguments);
-			cb.apply(this, arguments);
-		}, err);
-		method.apply(this, args);
-	});
+	args.unshift(successFunc, errFunc);
+	result = myAdaptor[methodName].apply(this, args);
+	
+	return { then: function(cb, err){
+		doneFunc = scope._misoReadyBinding.bind(function(){
+			if(errResult){
+				console.log('ERROR fired!');
+				err(errResult);
+ 			} else {
+				console.log('SUCCESS fired!');
+				cb(successResult);
+			}
+		});
+	}};
 }
 	};
 };

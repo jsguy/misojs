@@ -26,6 +26,7 @@ var fs = require('fs'),
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
 		return function(){
+			console.log('server action');
 			//	Create an array for the arguments
 			var args = Array.prototype.slice.call(arguments, 0),
 				method = adaptor[action];
@@ -43,32 +44,50 @@ var fs = require('fs'),
 	//	Creates actions for use in the server generated code
 	makeServerGenerateAction = function(action, adaptor){
 		return ["function(){",
+			"	console.log('server generate action');",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
-			"		method = "+adaptor[action].toString()+";",
-			"	console.log('SCOPE', typeof scope._misoReadyBinding);",
+			"		methodName = '"+action+"',",
+			"		errResult,",
+			"		errFunc = function(){errResult=arguments; doneFunc()},",
+			"		successResult,",
+			"		successFunc = function(){successResult=arguments; doneFunc()},",
+			"		doneFunc = function(){console.log('doneFunc too soon...')};",
 			"	",
-			"	return new Promiz(function(cb, err){",
-//			"		args.unshift(cb, err);",
-
-			"		args.unshift(function(){",
-			"			console.log('scope done!', arguments);",
-			"			cb.apply(this, arguments);",
-			"		}, err);",
+			"	args.unshift(successFunc, errFunc);",
+			"	result = myAdaptor[methodName].apply(this, args);",
+			"	",
 
 
-			// "		console.log(scope._misoReadyBinding.bind(function(){",
-			// "			console.log('scope done!', arguments);",
-			// "			cb.apply(this, arguments);",
-			// "		}));",
+			//	TODO: We need promiz to call back immediately,
+			//	otherwise mithril baulks.
+
+			// "	return new Promiz(function(cb, err){",
+			// "		doneFunc = scope._misoReadyBinding.bind(function(){",
+			// "			if(errResult){",
+			// "				console.log('ERROR fired!');",
+			// "				err(errResult);",
+			// " 			} else {",
+			// "				console.log('SUCCESS fired!');",
+			// "				cb(successResult);",
+			// "			}",
+			// "		});",
+			// "	});",
 
 
-			// "		args.unshift(scope._misoReadyBinding.bind(function(){",
-			// "			console.log('scope done!', arguments);",
-			// "			cb.apply(this, arguments);",
-			// "		}), err);",
+			"	return { then: function(cb, err){",
+			"		doneFunc = scope._misoReadyBinding.bind(function(){",
+			"			if(errResult){",
+			"				console.log('ERROR fired!');",
+			"				err(errResult);",
+			" 			} else {",
+			"				console.log('SUCCESS fired!');",
+			"				cb(successResult);",
+			"			}",
+			"		});",
+			"	}};",
 
-			"		method.apply(this, args);",
-			"	});",
+
+			
 			"}"].join("\n");
 	},
 
@@ -101,7 +120,8 @@ module.exports = function(app) {
 		utils: {
 			//	Returns a model
 			getModel: function(type){
-				return app.get("model." + type);
+				//return app.get("model." + type);
+				return GLOBAL.misoModels["model." + type];
 			},
 			//	Remove any unrequired model data, and get actual values
 			getModelData: function(model){
@@ -117,7 +137,8 @@ module.exports = function(app) {
 			},
 			//	Returns structure of a model
 			getModelStructure: function(type){
-				var model = app.get("model." + type),
+				//var model = app.get("model." + type),
+				var model = GLOBAL.misoModels["model." + type],
 					st = self.utils.getModelData(new model({}));
 
 				for(var s in st) {

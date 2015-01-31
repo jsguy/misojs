@@ -20,6 +20,12 @@ module.exports = function(app, adaptorType, apiPath){
 		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
 		responseType = 'json';
 
+
+	//	TODO: New approach - add in the adaptor as is, then add 
+	//	the methods that call the adaptor methods...
+
+
+
 	//	API setup
 	app.use(apiPath + "/:action", function(req, res, next){
 		var action = req.params.action,
