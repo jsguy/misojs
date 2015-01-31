@@ -2,8 +2,6 @@ var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-//	store = require('../server/store.js')(this);
-	//	Testing
 	api = require('../system/api.server.js')(m, this);
 
 //	Basic todo app
@@ -56,61 +54,16 @@ var self = module.exports.index = {
 			ctrl.model.todos(list);
 		};
 
-
-		//	WIP: Need to implement _misReadyBinding on the controller.
-
-		// //	Fake call to store.load
-		// store.load('todo', 1).then(function(loadedTodos) {
-		// 	ctrl.model = new ctrl.vm.todoList([
-		// 		new self.models.todo({ text: "learn mithril", done: true}),
-  //     			new self.models.todo({ text: "build a mithril app", done: false})
-		// 	]);
-		// });
-
-
-		// ctrl.model = new ctrl.vm.todoList([
-		// 	new self.models.todo({ text: "learn mithril", done: true}),
-		// 	new self.models.todo({ text: "build a mithril app", done: false})
-		// ]);
-
-
-		// ctrl.model = new ctrl.vm.todoList([
-		// 	new self.models.todo({ text: "1 learn mithril", done: true}),
-		// 	new self.models.todo({ text: "1 build a mithril app", done: false})
-		// ]);
-
-		//ctrl.model = new ctrl.vm.todoList([]);
-
-		//	Test load our todos
+		//	Load our todos
 		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
-			console.log('loaded todos', loadedTodos);
-			// loadedTodos.map(function(value, idx){
-			// 	//console.log(value);	
-			// });
-			Object.keys(loadedTodos).map(function(key) {
-				var value = loadedTodos[key];
-				console.log(value);	
+			var list = Object.keys(loadedTodos).map(function(key) {
+				return new self.models.todo(loadedTodos[key]);
 			});
-			
-			ctrl.model = new ctrl.vm.todoList([
-				new self.models.todo({ text: "2 learn mithril", done: true}),
-				new self.models.todo({ text: "2 build a mithril app", done: false})
-			]);
+
+			ctrl.model = new ctrl.vm.todoList(list);
 		}, function(){
 			console.log('ERRROROROROROROR!', arguments);
 		});
-
-
-		//	Test saving
-		// var theTodo = new self.models.todo({
-		// 	text: "Something", 
-		// 	done: false
-		// });
-
-		// api.save({ type: 'todo.index.todo', model: theTodo } ).then(function(){
-		// 	console.log("Saved", arguments);
-		// });
-
 
 		return ctrl;
 	},

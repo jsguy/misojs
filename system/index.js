@@ -18,7 +18,7 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run
-	forceBrowserify = true,
+	forceBrowserify = false,
 	//	What node we attach our app to in the layout
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
@@ -195,9 +195,6 @@ module.exports = function(app, options) {
 
 					app.set(key, value);
 					GLOBAL.misoModels[key] = value;
-
-
-//					app.set("model." + args.name + "." + args.action + "." + m, args.route[args.action].models[m]);
 				}
 			}
 
@@ -210,21 +207,13 @@ module.exports = function(app, options) {
 					//	Check for ready binder - we only use
 					//	it if there is asyc loading to be done.
 					if (!args.route._misoReadyBinding) {
-
-
-						console.log('No _misoReadyBinding for ', args.action);
-
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 
 							mvc.view, 
 						scope));
 					} else {
-
-						console.log('bind _misoReadyBinding');
-
 						//	Add "last" binding for miso ready event
 						args.route._misoReadyBinding.bindLast(function() {
-							console.log('bound last fired!');
 							res.end(skin(_.isFunction(mvc.view)? 
 								mvc.view(scope): 
 								mvc.view, 
@@ -271,7 +260,7 @@ module.exports = function(app, options) {
 
 	//	TODO
 	//
-	//	* Movel api.client and api.server to their 
+	//	* Move api.client and api.server to their 
 	//		respective adaptor directories, and rename them.
 	//	* Make generating adaptors conditional, so that you can 
 	//		just declare the server / client version
@@ -294,9 +283,6 @@ module.exports = function(app, options) {
 		api: serverApi.server.api,
 		adaptor: serverConfig.adaptor
 	})));
-
-
-
 
 
 

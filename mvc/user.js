@@ -5,6 +5,9 @@ var store = require('../server/store.js')(this),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m);
 
+var api = require('../system/api.server.js')(m, this);
+
+
 //	Index user
 module.exports.index = {
 	controller: function(params) {

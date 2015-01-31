@@ -118,20 +118,3 @@ module.exports = function(utils){
 		}
 	};
 };
-
-/*
-var model = {id: 12};
-
-module.exports.api.findById({type: 'user', id: 12}).then(function(result){
-	console.log("CCCBBB", result);
-});
-
-module.exports.api.findByModel({model: model }).then(function(result, model){
-	console.log("CCCBBB", arguments);
-});
-*/
-
-//	Example usage in an mvc ?
-
-
-
