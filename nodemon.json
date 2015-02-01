@@ -1,5 +1,7 @@
 {
 	"ignore": [
+		"system/api.client.js",
+		"system/api.server.js",
 		"system/main.js",
 		"client/miso.js"
 	]

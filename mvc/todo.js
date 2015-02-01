@@ -1,3 +1,6 @@
+/*
+	This is a sample todo app that uses the single url mvc miso pattern
+*/
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
@@ -62,7 +65,7 @@ var self = module.exports.index = {
 
 			ctrl.model = new ctrl.vm.todoList(list);
 		}, function(){
-			console.log('ERRROROROROROROR!', arguments);
+			console.log('Error', arguments);
 		});
 
 		return ctrl;

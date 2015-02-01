@@ -123,6 +123,9 @@ module.exports.index = {
 	}
 };
 },{"../server/mithril.sugartags.node.js":10,"mithril":6}],4:[function(require,module,exports){
+/*
+	This is a sample todo app that uses the single url mvc miso pattern
+*/
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
@@ -187,7 +190,7 @@ var self = module.exports.index = {
 
 			ctrl.model = new ctrl.vm.todoList(list);
 		}, function(){
-			console.log('ERRROROROROROROR!', arguments);
+			console.log('Error', arguments);
 		});
 
 		return ctrl;
@@ -214,6 +217,10 @@ var self = module.exports.index = {
 	}
 };
 },{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6}],5:[function(require,module,exports){
+/*
+	This is a sample user management app that uses the 
+	multi url miso pattern.
+*/
 var store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
@@ -223,22 +230,89 @@ var store = require('../server/store.js')(this),
 
 var api = require('../system/api.server.js')(m, this);
 
+//	TODO: This might be a useful practice - use self as module.exports
+var self = module.exports;
+
+//	TODO: Ability to load this from a separate file?
+var editView = function(ctrl){
+	with(sugartags) {
+		return [
+			H2({class: "pageHeader"}, "Edit user"),
+			DIV([
+				LABEL("Name"), INPUT({value: ctrl.user.name}),
+				DIV({class: ctrl.user.isValid('name') == true? "valid": "invalid"}, [
+					ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
+				])
+			]),
+			DIV([
+				LABEL("Email"), INPUT({value: ctrl.user.email}),
+				DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
+					ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
+				])
+			]),
+			DIV({class: "indented"},[
+				BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
+			])
+		];
+	}
+};
+
 
 //	Index user
 module.exports.index = {
 	controller: function(params) {
-		var self = this;
-		this.users = [];
+		var ctrl = this;
+//		this.users = m.p();
 
-		store.load('user', 1).then(function(loadedUsers) {
-			self.users = loadedUsers;
+		ctrl.vm = {
+			userList: function(users){
+				this.users = m.p(users);
+			}
+		};
+
+		// store.load('user', 1).then(function(loadedUsers) {
+		// 	self.users = loadedUsers;
+		// });
+
+		api.find({type: 'user.edit.user'}).then(function(users) {
+			var list = Object.keys(users).map(function(key) {
+				return new self.edit.models.user(users[key]);
+			});
+
+			ctrl.users = new ctrl.vm.userList(list);
+		}, function(){
+			console.log('Error', arguments);
 		});
 
-		return self;
+
+/*
+				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
+					console.log("Saved", arguments);
+				});
+		//	Load our todos
+		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
+			var list = Object.keys(loadedTodos).map(function(key) {
+				return new self.models.todo(loadedTodos[key]);
+			});
+
+			ctrl.model = new ctrl.vm.todoList(list);
+		}, function(){
+			console.log('ERRROROROROROROR!', arguments);
+		});
+*/
+
+
+		return this;
 	},
 	view: function(ctrl){
+		var c = ctrl,
+			u = c.users;
 		with(sugartags) {
-			return DIV('All the users would be listed here');
+			return UL([
+				u.users().map(function(user, idx){
+					return LI({}, user.name);
+				})
+			])
 		}
 	}
 };
@@ -266,45 +340,37 @@ module.exports.edit = {
 		}
 	},
 	controller: function(params) {
-		var self = this,
+		var ctrl = this,
 			userId = miso.getParam('user_id', params);
 
-		store.load('user', userId).then(function(user) {
-			user.email = "is_email.com";
-			self.user = new module.exports.edit.models.user(user);
+		// store.load('user', userId).then(function(user) {
+		// 	user.email = "is_email.com";
+		// 	ctrl.user = new module.exports.edit.models.user(user);
+		// });
+
+		//	Load our user
+		api.find({type: 'user.edit.user', _id: userId}).then(function(user) {
+			ctrl.user = self.edit.models.user(user);
+		}, function(){
+			console.log('Error', arguments);
 		});
 
-		self.save = function(){
-			//	Type of model, and the data
-			store.save('user.edit.models.user', self.user).then(function(res){
-				console.log(res.result? res.result: res.error);
+		ctrl.save = function(){
+			// //	Type of model, and the data
+			// store.save('user.edit.models.user', ctrl.user).then(function(res){
+			// 	console.log(res.result? res.result: res.error);
+			// });
+
+
+			api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
+				console.log("Saved", arguments);
 			});
+
 		};
 
-		return self;
+		return ctrl;
 	},
-	view: function(ctrl){
-		with(sugartags) {
-			return [
-				H2({class: "pageHeader"}, "Edit user"),
-				DIV([
-					LABEL("Name"), INPUT({value: ctrl.user.name}),
-					DIV({class: ctrl.user.isValid('name') == true? "valid": "invalid"}, [
-						ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
-					])
-				]),
-				DIV([
-					LABEL("Email"), INPUT({value: ctrl.user.email}),
-					DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
-						ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
-					])
-				]),
-				DIV({class: "indented"},[
-					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
-				])
-			];
-		}
-	}
+	view: editView
 };
 },{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
 var m = (function app(window, undefined) {
