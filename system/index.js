@@ -18,7 +18,7 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run
-	forceBrowserify = true,
+	forceBrowserify = false,
 	//	What node we attach our app to in the layout
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
