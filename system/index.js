@@ -233,7 +233,8 @@ module.exports = function(app, options) {
 		lastRouteModified = new Date(1970,0,1);
 
 
-	//	Sort routes so that "new" comes before "edit", otheriwse edit will override it
+	//	Sort routes so that "new" comes before "index", otheriwse index 
+	//	will override it
 	var routeKeys = Object.keys(routes).map(function(key) {
 		return key;
 	});
@@ -244,7 +245,9 @@ module.exports = function(app, options) {
 			a > b;
 	});
 
+	options.verbose && console.log('');
 	options.verbose && console.log('Miso app route map');
+	options.verbose && console.log('');
 
 	//	Generate list of routes
 	_.forOwn(routeKeys, function(action){
