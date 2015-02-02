@@ -2,14 +2,12 @@
 	This is a sample user management app that uses the 
 	multi url miso pattern.
 */
-var //store = require('../server/store.js')(this),
-	miso = require('../server/miso.util.js'),
+var miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
-	bindings = require('../server/mithril.bindings.node.js')(m);
-
-var api = require('../system/api.server.js')(m, this);
+	bindings = require('../server/mithril.bindings.node.js')(m)
+	api = require('../system/api.server.js')(m, this);
 
 //	TODO: This might be a useful practice - use self as module.exports
 var self = module.exports;

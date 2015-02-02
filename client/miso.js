@@ -27,57 +27,7 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":6}],2:[function(require,module,exports){
-var m = require('mithril');
-
-module.exports = function(scope) {
-
-	//	Remove any unrequired model data, and get actual values
-	var getModelData = function(model){
-		var i, result = {};
-		for(i in model) {if(model.hasOwnProperty(i)) {
-			if(i !== "isValid") {
-				result[i] = (typeof model[i] == "function")? model[i](): model[i];
-			}
-		}}
-		return result;
-	};
-
-	return {
-		load: function load(type, id) {
-			if (!type) {
-				throw new Error('no type provided to load model');
-			}
-			if (!id) {
-				throw new Error('no id provided to load model');
-			}
-			//	TODO: Make this use the API!
-			return m.request({
-				method: 'GET',
-				//url: 'api/' + type + '/' + id),
-				url: '/user.json'
-			});
-		},
-		save: function(type, model){
-			var v = model.isValid? model.isValid(): true,
-				data;
-			//	Only try to save if model is valid
-			if(v === true) {
-				data = getModelData(model);
-				return m.request({
-					method: 'POST',
-					url: '/api/' + type,
-					data: data
-					//url: '/user.json'
-				});
-			} else {
-				//	TODO: Show notification via notification framework
-				console.log('Model invalid', v);
-			}
-		}
-	};
-};
-},{"mithril":6}],3:[function(require,module,exports){
+},{"mithril":5}],2:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
@@ -122,7 +72,7 @@ module.exports.index = {
 		}
 	}
 };
-},{"../server/mithril.sugartags.node.js":10,"mithril":6}],4:[function(require,module,exports){
+},{"../server/mithril.sugartags.node.js":9,"mithril":5}],3:[function(require,module,exports){
 /*
 	This is a sample todo app that uses the single url mvc miso pattern
 */
@@ -216,19 +166,17 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6}],5:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../system/api.server.js":10,"mithril":5}],4:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the 
 	multi url miso pattern.
 */
-var //store = require('../server/store.js')(this),
-	miso = require('../server/miso.util.js'),
+var miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
-	bindings = require('../server/mithril.bindings.node.js')(m);
-
-var api = require('../system/api.server.js')(m, this);
+	bindings = require('../server/mithril.bindings.node.js')(m)
+	api = require('../system/api.server.js')(m, this);
 
 //	TODO: This might be a useful practice - use self as module.exports
 var self = module.exports;
@@ -367,7 +315,7 @@ module.exports.edit = {
 	},
 	view: editView
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../system/api.server.js":10,"mithril":5,"validator.modelbinder":6}],5:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1381,7 +1329,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -1486,7 +1434,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":8}],8:[function(require,module,exports){
+},{"validator":7}],7:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -2055,7 +2003,7 @@ module.exports = {
 
 });
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2273,7 +2221,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2301,7 +2249,7 @@ module.exports = function(m, lower){
 	}}
 	return scope;
 };
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -2336,12 +2284,11 @@ module.exports = function(m){
 }
 	};
 };
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
-var store = require('../server/store.js');
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
 var todo = require('../mvc/todo.js');
@@ -2359,4 +2306,4 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/user/:user_id': user.edit,
 '/users': user.index
 });
-},{"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":6}]},{},[12]);
+},{"../mvc/home.js":2,"../mvc/todo.js":3,"../mvc/user.js":4,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"mithril":5}]},{},[11]);
