@@ -21,8 +21,14 @@ module.exports.index = function(ctrl){
 		"	var getModelData = function(model){",
 		"		var i, result = {};",
 		"		for(i in model) {if(model.hasOwnProperty(i)) {",
+		//	Skip our isValid model attribute
 		"			if(i !== 'isValid') {",
-		"				result[i] = (typeof model[i] == 'function')? model[i](): model[i];",
+		//	For ids, mongoose expects _id
+		"				if(i == 'id') {",
+		"					result['_id'] = (typeof model[i] == 'function')? model[i](): model[i];",
+		"				} else {",
+		"					result[i] = (typeof model[i] == 'function')? model[i](): model[i];",
+		"				}",
 		"			}",
 		"		}}",
 		"		return result;",

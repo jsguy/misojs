@@ -4,7 +4,11 @@ module.exports = function(m){
 		var i, result = {};
 		for(i in model) {if(model.hasOwnProperty(i)) {
 			if(i !== 'isValid') {
-				result[i] = (typeof model[i] == 'function')? model[i](): model[i];
+				if(i == 'id') {
+					result['_id'] = (typeof model[i] == 'function')? model[i](): model[i];
+				} else {
+					result[i] = (typeof model[i] == 'function')? model[i](): model[i];
+				}
 			}
 		}}
 		return result;

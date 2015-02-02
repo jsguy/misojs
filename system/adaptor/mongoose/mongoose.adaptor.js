@@ -80,6 +80,11 @@ module.exports = function(utils){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model, validation;
 
+
+			//	TODO: Find out how to update - maybe see if there
+			//	is an ID or whatever...
+
+
 			if(!Model) {
 				return err("Model not found " + args.type);
 			}
