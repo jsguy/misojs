@@ -39,25 +39,20 @@ var fs = require('fs'),
 	makeServerGenerateAction = function(action, adaptor){
 		return ["function(){",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
-			"		methodName = '"+action+"',",
 			"		errResult,",
 			"		errFunc = function(){errResult=arguments; doneFunc()},",
 			"		successResult,",
 			"		successFunc = function(){successResult=arguments; doneFunc()},",
-			"		doneFunc = function(){throw 'called doneFunc too soon...';};",
+			"		doneFunc = function(){throw 'miso ready binding failed';};",
 			"	",
 			"	args.unshift(successFunc, errFunc);",
-			"	result = myAdaptor[methodName].apply(this, args);",
+			"	result = myAdaptor['"+action+"'].apply(this, args);",
 			//	Add a binding object, so we can block till ready
-			//	
-			//		TODO: This blocks everywhere - we need to limit it to the
-			//		method for the particular user
-			//	
-			//	
-			"	scope._misoReadyBinding = miso.readyBinderFactory();",
+			"	var bindScope = arguments.callee.caller;",
+			"	bindScope._misoReadyBinding = miso.readyBinderFactory();",
 			"	",
 			"	return { then: function(cb, err){",
-			"		doneFunc = scope._misoReadyBinding.bind(function(){",
+			"		doneFunc = bindScope._misoReadyBinding.bind(function(){",
 			"			if(errResult){",
 			"				err(errResult);",
 			" 			} else {",
@@ -72,10 +67,8 @@ var fs = require('fs'),
 	//	Creates client action method
 	makeClientAction = function(action, adaptor, apiPath){
 		return ["function(args){",
-
 			//	Unwrap the model, so we post data
 			"	args.model = args.model? getModelData(args.model): {};",
-
 			"	return m.request({",
 			"		method:'post', ",
 			"		url: '"+apiPath + "/" + action + "',",

@@ -50,10 +50,6 @@ module.exports.index = {
 			}
 		};
 
-		//
-		//	TODO: We need to refactor what scope the misobinding for this is added to..
-		//	
-		//	
 		api.find({type: 'user.edit.user'}).then(function(users) {
 			var list = Object.keys(users).map(function(key) {
 				return new self.edit.models.user(users[key]);
@@ -64,42 +60,36 @@ module.exports.index = {
 			console.log('Error', arguments);
 		});
 
-		// ctrl.users = new ctrl.vm.userList([
-		// 	new self.edit.models.user({name: 'test1', email: 'test1@example.com'}),
-		// 	new self.edit.models.user({name: 'test2', email: 'test2@example.com'})
-		// ]);
-
 		return this;
 	},
 	view: function(ctrl){
 		var c = ctrl,
 			u = c.users;
+
 		with(sugartags) {
 			return [UL([
 				u.users().map(function(user, idx){
-					return LI({}, "name:" + user.name() + " (" + user.email() + ")");
+					return LI(A({ href: '/user/' + user.id(), config: m.route}, user.name() + " - " + user.email()));
 				})
 			]),
-			A({class:"button", href:"/users/new"}, "Add new user")
+			A({class:"button", href:"/users/new", config: m.route}, "Add new user")
 			]
 		}
 	}
 };
 
 
-//	TODO: WIP: PROBLEMO: the API binding is interfering with routing... We are using a too-generic scope - need to use the action instead...
-
-
 //	New user
 module.exports.new = {
 	controller: function(params) {
 		var ctrl = this;
-		ctrl.user = self.edit.models.user({name: "", email: ""});
+		ctrl.user = new self.edit.models.user({name: "", email: ""});
 		ctrl.header = "New user";
 
 		ctrl.save = function(){
+			//	TODO: return a proper THEN.
 			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
-				console.log("Saved", arguments);
+				console.log("Added user", arguments);
 			});
 		};
 
@@ -115,7 +105,7 @@ module.exports.edit = {
 		user: function(data){
 			this.name = m.p(data.name||"");
 			this.email = m.p(data.email||"");
-			//this.id = m.p(data.id||"");
+			this.id = m.p(data._id||"");
 
 			//	Validate the model		
 			this.isValid = validate.bind(this, {
@@ -138,15 +128,19 @@ module.exports.edit = {
 		ctrl.header = "Edit user " + userId;
 
 		//	Load our user
-		api.find({type: 'user.edit.user', _id: userId}).then(function(user) {
-			ctrl.user = self.edit.models.user(user);
+		api.find({type: 'user.edit.user', query: {_id: userId}}).then(function(user) {
+			if(user && user.length > 0) {
+				ctrl.user = new self.edit.models.user(user[0]);
+			} else {
+				console.log('User not found', userId);
+			}
 		}, function(){
 			console.log('Error', arguments);
 		});
 
 		ctrl.save = function(){
 			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
-				console.log("Saved", arguments);
+				console.log("Saved user", arguments);
 			});
 		};
 

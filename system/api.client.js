@@ -25,22 +25,6 @@ module.exports = function(m){
 		url: '/api/save',
 		data: args
 	});
-},
-'findById': function(args){
-	args.model = args.model? getModelData(args.model): {};
-	return m.request({
-		method:'post', 
-		url: '/api/findById',
-		data: args
-	});
-},
-'findByModel': function(args){
-	args.model = args.model? getModelData(args.model): {};
-	return m.request({
-		method:'post', 
-		url: '/api/findByModel',
-		data: args
-	});
 }
 	};
 };

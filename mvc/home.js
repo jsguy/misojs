@@ -34,8 +34,8 @@ module.exports.index = {
 				]),
 				DIV({ class: "box" }, [
 					UL([
-						LI(A({ href: '/user/1', config: m.route}, "User edit example")),
-						LI(A({ href: '/todos', config: m.route}, "Todos example"))
+						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
+						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))
 					])
 				])
 			]);

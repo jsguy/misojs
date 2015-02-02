@@ -100,10 +100,7 @@ module.exports = function(app, options) {
 
 				index 		GET 		[controller] + 's'			List the items
 				edit 		GET 		[controller]/[id]			Display a form to edit the item
-				delete 		POST 		[controller]/[id]/delete 	Deletes an item
 				new 		GET 		[controller] + 's' + /new 	Display a form to add a new item
-				create 		POST 		[controller] 				Creates a new item
-				update 		POST 		[controller]/[id] 			Updates an item
 
 				Note: We are using RESTful-style URLs, but only GET and POST here,
 					we could obviously add PUT, DELETE and so on, but we're keeping 
@@ -138,29 +135,11 @@ module.exports = function(app, options) {
 							method = 'get';
 							routePath = '/' + routeName + '/:' + routeName + idPostfix;
 							break;
-						//	Delete an item
-						case 'delete':
-							method = 'post';
-							routePath = '/' + routeName + '/:' + routeName + idPostfix + '/' + deleteKeyword;
-							break;
 						//	New item
 						case 'new':
 							method = 'get';
 							routePath = '/' + routeName + 's/' + newKeyword;
 							break;
-						//	Create an item
-						case 'create':
-							method = 'post';
-							routePath = '/' + routeName;
-							break;
-						//	Update an item
-						case 'update':
-							method = 'post';
-							routePath = '/' + routeName + '/:' + routeName + idPostfix;
-							break;
-						case '_misoReadyBinding':
-							//	For ensuring future bound events have been resolved
-							return;
 						default:
 							var message = 'ERROR: unmapped action: "' + routeName + '.' + action + '" - please map it or make it a private function';
 							if(options.throwUnmappedActions) {
@@ -203,18 +182,21 @@ module.exports = function(app, options) {
 			app[args.method](args.path, function(req, res, next) {
 				try{
 					var scope = args.route[args.action].controller(req.params),
+						bindScope = args.route[args.action].controller;
 						mvc = args.route[args.action];
 
 					//	Check for ready binder - we only use
 					//	it if there is asyc loading to be done.
-					if (!args.route._misoReadyBinding) {
+					if (!bindScope._misoReadyBinding) {
+						options.verbose && console.log("No binding:", args.action + " - " + args.path);
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 
 							mvc.view, 
 						scope));
 					} else {
+						options.verbose && console.log("Binding:", args.action + " - " + args.path);
 						//	Add "last" binding for miso ready event
-						args.route._misoReadyBinding.bindLast(function() {
+						bindScope._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
 								mvc.view(scope): 
 								mvc.view, 
@@ -222,6 +204,7 @@ module.exports = function(app, options) {
 						});
 					}
 				} catch(ex){
+					console.log(ex);
 					next(args.action + " - " + args.path + " threw" + ex);
 				}
 			});
@@ -258,8 +241,6 @@ module.exports = function(app, options) {
 			b.indexOf("/new") != -1? 1:
 			a > b;
 	});
-
-	console.log('routeKeys', routeKeys);
 
 	//	Generate list of routes
 	_.forOwn(routeKeys, function(action){

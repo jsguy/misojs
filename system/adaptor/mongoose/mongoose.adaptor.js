@@ -56,7 +56,7 @@ module.exports = function(utils){
 		find: function(cb, err, args){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model,
-				conditions = args.conditions,
+				query = args.query,
 				fields = args.fields || null,
 				options = args.options || {};
 
@@ -69,7 +69,7 @@ module.exports = function(utils){
 			//	Get an instance of a mongoose model
 			var MonModel = getMongooseModel(args.type, model);
 
-			MonModel.find(conditions, fields, options, function (errorText, docs) {
+			MonModel.find(query, fields, options, function (errorText, docs) {
 				if (errorText) {
 					return err(errorText);
 				}
@@ -103,18 +103,6 @@ module.exports = function(utils){
 				//	Send beack the validation errors
 				return err(validation);
 			}
-		},
-		findById: function(cb, err, args){
-			console.log('findbyid', args);
-			setTimeout(function(){
-				cb("found by id: " + args.id);
-			}, 200);
-		},
-		findByModel: function(cb, err, args){
-			console.log('findbymodel', args.model, args.whatever);
-			setTimeout(function(){
-				cb("found model!");
-			}, 300);
 		}
 	};
 };

@@ -14,6 +14,10 @@ module.exports.index = function(ctrl){
 		"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
 		"module.exports = function(m){",
 
+		//	TODO: guard against incorrect model types here...
+		//	For example, forgetting the "new" keyword in front of 
+		//	the model instanciation
+
 		"	var getModelData = function(model){",
 		"		var i, result = {};",
 		"		for(i in model) {if(model.hasOwnProperty(i)) {",

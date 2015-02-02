@@ -6,19 +6,19 @@ module.exports = function(m, scope){
 	return {
 'find': function(){
 	var args = Array.prototype.slice.call(arguments, 0),
-		methodName = 'find',
 		errResult,
 		errFunc = function(){errResult=arguments; doneFunc()},
 		successResult,
 		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'called doneFunc too soon...';};
+		doneFunc = function(){throw 'miso ready binding failed';};
 	
 	args.unshift(successFunc, errFunc);
-	result = myAdaptor[methodName].apply(this, args);
-	scope._misoReadyBinding = miso.readyBinderFactory();
+	result = myAdaptor['find'].apply(this, args);
+	var bindScope = arguments.callee.caller;
+	bindScope._misoReadyBinding = miso.readyBinderFactory();
 	
 	return { then: function(cb, err){
-		doneFunc = scope._misoReadyBinding.bind(function(){
+		doneFunc = bindScope._misoReadyBinding.bind(function(){
 			if(errResult){
 				err(errResult);
  			} else {
@@ -29,65 +29,19 @@ module.exports = function(m, scope){
 },
 'save': function(){
 	var args = Array.prototype.slice.call(arguments, 0),
-		methodName = 'save',
 		errResult,
 		errFunc = function(){errResult=arguments; doneFunc()},
 		successResult,
 		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'called doneFunc too soon...';};
+		doneFunc = function(){throw 'miso ready binding failed';};
 	
 	args.unshift(successFunc, errFunc);
-	result = myAdaptor[methodName].apply(this, args);
-	scope._misoReadyBinding = miso.readyBinderFactory();
+	result = myAdaptor['save'].apply(this, args);
+	var bindScope = arguments.callee.caller;
+	bindScope._misoReadyBinding = miso.readyBinderFactory();
 	
 	return { then: function(cb, err){
-		doneFunc = scope._misoReadyBinding.bind(function(){
-			if(errResult){
-				err(errResult);
- 			} else {
-				cb(successResult);
-			}
-		});
-	}};
-},
-'findById': function(){
-	var args = Array.prototype.slice.call(arguments, 0),
-		methodName = 'findById',
-		errResult,
-		errFunc = function(){errResult=arguments; doneFunc()},
-		successResult,
-		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'called doneFunc too soon...';};
-	
-	args.unshift(successFunc, errFunc);
-	result = myAdaptor[methodName].apply(this, args);
-	scope._misoReadyBinding = miso.readyBinderFactory();
-	
-	return { then: function(cb, err){
-		doneFunc = scope._misoReadyBinding.bind(function(){
-			if(errResult){
-				err(errResult);
- 			} else {
-				cb(successResult);
-			}
-		});
-	}};
-},
-'findByModel': function(){
-	var args = Array.prototype.slice.call(arguments, 0),
-		methodName = 'findByModel',
-		errResult,
-		errFunc = function(){errResult=arguments; doneFunc()},
-		successResult,
-		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'called doneFunc too soon...';};
-	
-	args.unshift(successFunc, errFunc);
-	result = myAdaptor[methodName].apply(this, args);
-	scope._misoReadyBinding = miso.readyBinderFactory();
-	
-	return { then: function(cb, err){
-		doneFunc = scope._misoReadyBinding.bind(function(){
+		doneFunc = bindScope._misoReadyBinding.bind(function(){
 			if(errResult){
 				err(errResult);
  			} else {
