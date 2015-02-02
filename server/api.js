@@ -1,4 +1,5 @@
-//	Adaptor api 
+//	This exposes an adaptor api on /api
+
 //
 //	TODO: 
 //

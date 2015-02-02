@@ -1,6 +1,6 @@
 /*
 	This is a sample user management app that uses the 
-	multi url miso pattern.
+	multiple url miso pattern.
 */
 var miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),

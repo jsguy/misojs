@@ -17,13 +17,13 @@ module.exports.index = function(ctrl){
 		HTML([
 			HEAD([
 			 	LINK({href: '/css/style.css', rel:'stylesheet'}), 
-			 	//	The reload functionality in development only
+			 	//	The reload functionality. TODO: use in development only
 			 	(ctrl.environment == "development"? SCRIPT({src: '/reload.js'}): "")
 			]),
 		 	BODY([
 			 	HEADER([
 		 			DIV({class: 'cw cf'}, [
-		 				A({alt: 'MISO', href:'/'}, [
+		 				A({alt: 'MISO', href:'/', config: m.route}, [
 		 					IMG({src: '/img/miso_logo.png'})
 		 				])
 		 			])

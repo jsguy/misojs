@@ -186,15 +186,17 @@ module.exports = function(app, options) {
 						mvc = args.route[args.action];
 
 					//	Check for ready binder - we only use
-					//	it if there is asyc loading to be done.
+					//	it if there is asyc data loading to be done,
+					//	to maintain compatibility with mithril-style
+					//	requests.
 					if (!bindScope._misoReadyBinding) {
-						options.verbose && console.log("No binding:", args.action + " - " + args.path);
+						//options.verbose && console.log("No blocking binding:", args.action + " - " + args.path);
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 
 							mvc.view, 
 						scope));
 					} else {
-						options.verbose && console.log("Binding:", args.action + " - " + args.path);
+						//options.verbose && console.log("Blocking binding:", args.action + " - " + args.path);
 						//	Add "last" binding for miso ready event
 						bindScope._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
@@ -242,6 +244,8 @@ module.exports = function(app, options) {
 			a > b;
 	});
 
+	options.verbose && console.log('Miso app route map');
+
 	//	Generate list of routes
 	_.forOwn(routeKeys, function(action){
 		var route = routes[action];
@@ -267,16 +271,15 @@ module.exports = function(app, options) {
 	//
 
 	//	Create API for configured adaptor (serverConfig.adaptor)
-	var clientApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
+	var dbApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
+	//	Client file
 	fs.writeFileSync(apiClientFile, render(apiClientView({
-		api: clientApi.client.api
+		api: dbApi.client.api
 	})));
 
-
-	//apiServerFile
-	var serverApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
+	//	Server file
 	fs.writeFileSync(apiServerFile, render(apiServerView({
-		api: serverApi.server.api,
+		api: dbApi.server.api,
 		adaptor: serverConfig.adaptor
 	})));
 

@@ -10,7 +10,8 @@ var express = require('express'),
 	routeConfig	= require('./cfg/routes.json'),
 	mvc = require('./system');
 
-// parse application/x-www-form-urlencoded and  application/json
+//	We parse application/x-www-form-urlencoded and application/json
+//	TODO: Add any further defaults here and make configurable
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/client')));
 
 //	Basic error handling
+//	TODO: make configurable
 app.use(function(err, req, res, next){
 	console.error(err.stack);
 	res.status(500).send('Something broke!');
@@ -32,10 +34,16 @@ mvc(app, {
 
 //	Run the server
 var server = app.listen(serverConfig.port, function () {
-	var info = server.address();
-	console.log('Miso is listening at http://%s:%s', info.address, info.port);
+	var info = server.address(),
+		address = info.address;
+
+	//	Fix for chrome - it doesn't like 0.0.0.0
+	if(address == "0.0.0.0") {
+		address = "localhost";
+	}
+
+	console.log('Miso is listening at http://%s:%s', address, info.port);
 });
 
-
-//	For dev only - auto reloading
+//	For dev only - auto reloading, TODO: environment support
 reload(server, app);
