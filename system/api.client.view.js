@@ -13,6 +13,17 @@ module.exports.index = function(ctrl){
 	return [
 		"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
 		"module.exports = function(m){",
+
+		"	var getModelData = function(model){",
+		"		var i, result = {};",
+		"		for(i in model) {if(model.hasOwnProperty(i)) {",
+		"			if(i !== 'isValid') {",
+		"				result[i] = (typeof model[i] == 'function')? model[i](): model[i];",
+		"			}",
+		"		}}",
+		"		return result;",
+		"	};",
+
 		"	return {",
 		//	Grab our api action methods
 		(Object.keys(ctrl.api).map(function(key) {

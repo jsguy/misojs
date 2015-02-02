@@ -14,7 +14,7 @@ if(typeof window !== 'undefined') {
 	
 m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
-'/user/new': user.new,
+'/users/new': user.new,
 '/': home.index,
 '/todos': todo.index,
 '/user/:user_id': user.edit,

@@ -240,7 +240,7 @@ var editView = function(ctrl){
 			H2({class: "pageHeader"}, ctrl.header),
 			DIV([
 				LABEL("Name"), INPUT({value: ctrl.user.name}),
-				DIV({class: ctrl.user.isValid('name') == true? "valid": "invalid"}, [
+				DIV({class: (ctrl.user.isValid('name') == true? "valid": "invalid") + " indented"}, [
 					ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
 				])
 			]),
@@ -258,7 +258,7 @@ var editView = function(ctrl){
 };
 
 
-//	Index user
+//	User list
 module.exports.index = {
 	controller: function(params) {
 		var ctrl = this;
@@ -269,6 +269,10 @@ module.exports.index = {
 			}
 		};
 
+		//
+		//	TODO: We need to refactor what scope the misobinding for this is added to..
+		//	
+		//	
 		api.find({type: 'user.edit.user'}).then(function(users) {
 			var list = Object.keys(users).map(function(key) {
 				return new self.edit.models.user(users[key]);
@@ -279,26 +283,37 @@ module.exports.index = {
 			console.log('Error', arguments);
 		});
 
+		// ctrl.users = new ctrl.vm.userList([
+		// 	new self.edit.models.user({name: 'test1', email: 'test1@example.com'}),
+		// 	new self.edit.models.user({name: 'test2', email: 'test2@example.com'})
+		// ]);
+
 		return this;
 	},
 	view: function(ctrl){
 		var c = ctrl,
 			u = c.users;
 		with(sugartags) {
-			return UL([
+			return [UL([
 				u.users().map(function(user, idx){
-					return LI({}, "name:" + user.name);
+					return LI({}, "name:" + user.name() + " (" + user.email() + ")");
 				})
-			])
+			]),
+			A({class:"button", href:"/users/new"}, "Add new user")
+			]
 		}
 	}
 };
+
+
+//	TODO: WIP: PROBLEMO: the API binding is interfering with routing... We are using a too-generic scope - need to use the action instead...
+
 
 //	New user
 module.exports.new = {
 	controller: function(params) {
 		var ctrl = this;
-		ctrl.user = self.edit.models.user({});
+		ctrl.user = self.edit.models.user({name: "", email: ""});
 		ctrl.header = "New user";
 
 		ctrl.save = function(){
@@ -306,6 +321,7 @@ module.exports.new = {
 				console.log("Saved", arguments);
 			});
 		};
+
 		return ctrl;
 	},
 	view: editView
@@ -316,18 +332,18 @@ module.exports.new = {
 module.exports.edit = {
 	models: {
 		user: function(data){
-			this.name = m.p(data.name);
-			this.email = m.p(data.email);
-			this.id = m.p(data.id);
+			this.name = m.p(data.name||"");
+			this.email = m.p(data.email||"");
+			//this.id = m.p(data.id||"");
 
 			//	Validate the model		
 			this.isValid = validate.bind(this, {
 				name: {
-					'isRequired': "You must enter a name"
+					isRequired: "You must enter a name"
 				},
 				email: {
-					'isRequired': "You must enter an email address",
-					'isEmail': "Must be a valid email address"
+					isRequired: "You must enter an email address",
+					isEmail: "Must be a valid email address"
 				}
 			});
 
@@ -340,11 +356,6 @@ module.exports.edit = {
 
 		ctrl.header = "Edit user " + userId;
 
-		// store.load('user', userId).then(function(user) {
-		// 	user.email = "is_email.com";
-		// 	ctrl.user = new module.exports.edit.models.user(user);
-		// });
-
 		//	Load our user
 		api.find({type: 'user.edit.user', _id: userId}).then(function(user) {
 			ctrl.user = self.edit.models.user(user);
@@ -353,16 +364,9 @@ module.exports.edit = {
 		});
 
 		ctrl.save = function(){
-			// //	Type of model, and the data
-			// store.save('user.edit.models.user', ctrl.user).then(function(res){
-			// 	console.log(res.result? res.result: res.error);
-			// });
-
-
-			api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
+			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 				console.log("Saved", arguments);
 			});
-
 		};
 
 		return ctrl;
@@ -2306,8 +2310,18 @@ module.exports = function(m, lower){
 },{}],11:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
+	var getModelData = function(model){
+		var i, result = {};
+		for(i in model) {if(model.hasOwnProperty(i)) {
+			if(i !== 'isValid') {
+				result[i] = (typeof model[i] == 'function')? model[i](): model[i];
+			}
+		}}
+		return result;
+	};
 	return {
 'find': function(args){
+	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
 		url: '/api/find',
@@ -2315,6 +2329,7 @@ module.exports = function(m){
 	});
 },
 'save': function(args){
+	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
 		url: '/api/save',
@@ -2322,6 +2337,7 @@ module.exports = function(m){
 	});
 },
 'findById': function(args){
+	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
 		url: '/api/findById',
@@ -2329,6 +2345,7 @@ module.exports = function(m){
 	});
 },
 'findByModel': function(args){
+	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
 		url: '/api/findByModel',
@@ -2354,7 +2371,7 @@ if(typeof window !== 'undefined') {
 	
 m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
-'/user/new': user.new,
+'/users/new': user.new,
 '/': home.index,
 '/todos': todo.index,
 '/user/:user_id': user.edit,

@@ -18,7 +18,7 @@ var fs			= require('fs'),
 	render = require('mithril-node-render'),
 
 	//	Force the browserify to run
-	forceBrowserify = false,
+	forceBrowserify = true,
 	//	What node we attach our app to in the layout
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
@@ -101,7 +101,7 @@ module.exports = function(app, options) {
 				index 		GET 		[controller] + 's'			List the items
 				edit 		GET 		[controller]/[id]			Display a form to edit the item
 				delete 		POST 		[controller]/[id]/delete 	Deletes an item
-				new 		GET 		[controller]/new 			Display a form to add a new item
+				new 		GET 		[controller] + 's' + /new 	Display a form to add a new item
 				create 		POST 		[controller] 				Creates a new item
 				update 		POST 		[controller]/[id] 			Updates an item
 
@@ -146,7 +146,7 @@ module.exports = function(app, options) {
 						//	New item
 						case 'new':
 							method = 'get';
-							routePath = '/' + routeName + '/' + newKeyword;
+							routePath = '/' + routeName + 's/' + newKeyword;
 							break;
 						//	Create an item
 						case 'create':
@@ -187,7 +187,7 @@ module.exports = function(app, options) {
 		//	route, name, path, method, action
 		createRoute = function(args) {
 
-			//	Add pointer to models for use in store/save
+			//	Add pointer to models for use in store/save/whatever we call it...
 			if(args.route[args.action].models) {
 				GLOBAL.misoModels = GLOBAL.misoModels || {};
 				for(var m in args.route[args.action].models) {
@@ -222,7 +222,7 @@ module.exports = function(app, options) {
 						});
 					}
 				} catch(ex){
-					next(ex);
+					next(args.action + " - " + args.path + " threw" + ex);
 				}
 			});
 
@@ -259,6 +259,8 @@ module.exports = function(app, options) {
 			a > b;
 	});
 
+	console.log('routeKeys', routeKeys);
+
 	//	Generate list of routes
 	_.forOwn(routeKeys, function(action){
 		var route = routes[action];
@@ -274,7 +276,7 @@ module.exports = function(app, options) {
 	//	TODO
 	//
 	//	* Move api.client and api.server to their 
-	//		respective adaptor directories, and rename them.
+	//		respective adaptor directories, and rename them as per adaptor.
 	//	* Make generating adaptors conditional, so that you can 
 	//		just declare the server / client version
 	//	* Make each adaptor a seperate module, and include
