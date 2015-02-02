@@ -15,8 +15,6 @@ module.exports.index = function(ctrl){
 		"var miso = require('../server/miso.util.js');",
 		"var myAdaptor = require('../system/adaptor/" + ctrl.adaptor + "/" + ctrl.adaptor + ".adaptor.js')(utils);",
 		"module.exports = function(m, scope){",
-		//	Add a binding object, so we can block till ready
-		"	scope._misoReadyBinding = miso.readyBinderFactory();",
 		"	return {",
 		//	Grab our api action methods
 		(Object.keys(ctrl.api).map(function(key) {

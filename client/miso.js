@@ -221,7 +221,7 @@ var self = module.exports.index = {
 	This is a sample user management app that uses the 
 	multi url miso pattern.
 */
-var store = require('../server/store.js')(this),
+var //store = require('../server/store.js')(this),
 	miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
@@ -237,7 +237,7 @@ var self = module.exports;
 var editView = function(ctrl){
 	with(sugartags) {
 		return [
-			H2({class: "pageHeader"}, "Edit user"),
+			H2({class: "pageHeader"}, ctrl.header),
 			DIV([
 				LABEL("Name"), INPUT({value: ctrl.user.name}),
 				DIV({class: ctrl.user.isValid('name') == true? "valid": "invalid"}, [
@@ -262,17 +262,12 @@ var editView = function(ctrl){
 module.exports.index = {
 	controller: function(params) {
 		var ctrl = this;
-//		this.users = m.p();
 
 		ctrl.vm = {
 			userList: function(users){
 				this.users = m.p(users);
 			}
 		};
-
-		// store.load('user', 1).then(function(loadedUsers) {
-		// 	self.users = loadedUsers;
-		// });
 
 		api.find({type: 'user.edit.user'}).then(function(users) {
 			var list = Object.keys(users).map(function(key) {
@@ -284,24 +279,6 @@ module.exports.index = {
 			console.log('Error', arguments);
 		});
 
-
-/*
-				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
-					console.log("Saved", arguments);
-				});
-		//	Load our todos
-		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
-			var list = Object.keys(loadedTodos).map(function(key) {
-				return new self.models.todo(loadedTodos[key]);
-			});
-
-			ctrl.model = new ctrl.vm.todoList(list);
-		}, function(){
-			console.log('ERRROROROROROROR!', arguments);
-		});
-*/
-
-
 		return this;
 	},
 	view: function(ctrl){
@@ -310,12 +287,30 @@ module.exports.index = {
 		with(sugartags) {
 			return UL([
 				u.users().map(function(user, idx){
-					return LI({}, user.name);
+					return LI({}, "name:" + user.name);
 				})
 			])
 		}
 	}
 };
+
+//	New user
+module.exports.new = {
+	controller: function(params) {
+		var ctrl = this;
+		ctrl.user = self.edit.models.user({});
+		ctrl.header = "New user";
+
+		ctrl.save = function(){
+			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
+				console.log("Saved", arguments);
+			});
+		};
+		return ctrl;
+	},
+	view: editView
+};
+
 
 //	Edit user
 module.exports.edit = {
@@ -342,6 +337,8 @@ module.exports.edit = {
 	controller: function(params) {
 		var ctrl = this,
 			userId = miso.getParam('user_id', params);
+
+		ctrl.header = "Edit user " + userId;
 
 		// store.load('user', userId).then(function(user) {
 		// 	user.email = "is_email.com";
@@ -372,7 +369,7 @@ module.exports.edit = {
 	},
 	view: editView
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -2346,9 +2343,10 @@ var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var store = require('../server/store.js');
-var home = require('../mvc/home.js');
 var user = require('../mvc/user.js');
+var home = require('../mvc/home.js');
 var todo = require('../mvc/todo.js');
+
 
 if(typeof window !== 'undefined') {
 	window.m = m;
@@ -2356,9 +2354,10 @@ if(typeof window !== 'undefined') {
 	
 m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
+'/user/new': user.new,
 '/': home.index,
-'/user/:user_id': user.edit,
 '/todos': todo.index,
+'/user/:user_id': user.edit,
 '/users': user.index
 });
 },{"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../server/store.js":2,"mithril":6}]},{},[12]);

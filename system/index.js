@@ -143,6 +143,7 @@ module.exports = function(app, options) {
 							method = 'post';
 							routePath = '/' + routeName + '/:' + routeName + idPostfix + '/' + deleteKeyword;
 							break;
+						//	New item
 						case 'new':
 							method = 'get';
 							routePath = '/' + routeName + '/' + newKeyword;
@@ -246,8 +247,21 @@ module.exports = function(app, options) {
 		mainFileModified = fs.existsSync(mainFile)? fs.statSync(mainFile).mtime: new Date(1970,0,1),
 		lastRouteModified = new Date(1970,0,1);
 
+
+	//	Sort routes so that "new" comes before "edit", otheriwse edit will override it
+	var routeKeys = Object.keys(routes).map(function(key) {
+		return key;
+	});
+
+	routeKeys = routeKeys.sort(function(a,b){
+		return a.indexOf("/new") != -1? -1:
+			b.indexOf("/new") != -1? 1:
+			a > b;
+	});
+
 	//	Generate list of routes
-	_.forOwn(routes, function(route, idx){
+	_.forOwn(routeKeys, function(action){
+		var route = routes[action];
 		//	Check controller timestamp
 		lastRouteModified = (lastRouteModified > route.stats.mtime)?
 			lastRouteModified: 
@@ -255,7 +269,6 @@ module.exports = function(app, options) {
 		routeList.push(route);
 		createRoute(route);
 	});
-
 
 
 	//	TODO

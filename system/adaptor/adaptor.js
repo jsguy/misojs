@@ -48,8 +48,9 @@ var fs = require('fs'),
 			"	",
 			"	args.unshift(successFunc, errFunc);",
 			"	result = myAdaptor[methodName].apply(this, args);",
+			//	Add a binding object, so we can block till ready
+			"	scope._misoReadyBinding = miso.readyBinderFactory();",
 			"	",
-			//	TODO: might want to ensure this works as we need...
 			"	return { then: function(cb, err){",
 			"		doneFunc = scope._misoReadyBinding.bind(function(){",
 			"			if(errResult){",
