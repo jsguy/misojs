@@ -44,6 +44,7 @@ var server = app.listen(serverConfig.port, function () {
 
 	console.log('');
 	console.log('Miso is listening at http://%s:%s', address, info.port);
+	console.log('');
 });
 
 //	For dev only - auto reloading, TODO: environment support
