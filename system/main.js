@@ -4,6 +4,8 @@ var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
+var hello = require('../mvc/hello.js');
+
 var todo = require('../mvc/todo.js');
 
 
@@ -15,6 +17,8 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/users/new': user.new,
 '/': home.index,
+'/hello/:hello_id': hello.edit,
+'/hellos': hello.index,
 '/todos': todo.index,
 '/user/:user_id': user.edit,
 '/users': user.index

@@ -27,9 +27,64 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":5}],2:[function(require,module,exports){
+},{"mithril":6}],2:[function(require,module,exports){
+var m = require('mithril'),
+	miso = require('../server/miso.util.js'),
+	sugartags = require('../server/mithril.sugartags.node.js')(m);
+
+var index = module.exports.index = {
+	models: {
+		//	Our model
+		hello: function(data){
+			this.who = m.p(data.who);
+		}
+	},
+	controller: function(params) {
+		this.model = new index.models.hello({who: "world"});
+		return this;
+	},
+	view: function(ctrl) {
+		var model = ctrl.model;
+		with(sugartags) {
+			return [
+				DIV("Hello " + model.who()),
+				A({href: "/hello/Leo", config: m.route}, "Click me for the edit action")
+			];
+		}
+	}
+};
+
+var edit = module.exports.edit = {
+	controller: function(params) {
+		var who = miso.getParam('hello_id', params);
+		this.model = new index.models.hello({who: who});
+		return this;
+	},
+	view: function(ctrl) {
+		var model = ctrl.model;
+		with(sugartags) {
+			return [
+				DIV("Hello " + model.who())
+			];
+		}
+	}
+};
+},{"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":10,"mithril":6}],3:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
+
+/*
+//	Install button animation
+m.addAnimation("fadePulse", function(prop){
+	var value = prop()? 1: 0;
+	return {
+		opacity: 1-value
+	};
+}, {
+	duration: 'infinite',
+	timingFunction: 'linear' 
+});
+*/
 
 //	Home page
 module.exports.index = {
@@ -37,17 +92,12 @@ module.exports.index = {
 		this.installButtonText = "Install miso now";
 		this.installButtonLink = "#install";
 		//this.introText = "Create apps faster than ever before";
-		this.introText = "Create tiny efficient isomorphic JS apps in a snap!";
+		this.introText = "Create tiny isomorphic JS apps in a snap!";
 		this.install = function(){
 			var h = "installation";
-			// 	url = location.href;
-			// location.href = "#" + h;
-			// history.replaceState(null,null,url);
-
-
-var top = document.getElementById(h).offsetTop; //Getting Y of target element
-    window.scrollTo(0, top);        
-
+			var top = document.getElementById(h).offsetTop;
+		    window.scrollTo(0, top);
+		    console.log()
 		};
 		return this;
 	},
@@ -83,7 +133,7 @@ var top = document.getElementById(h).offsetTop; //Getting Y of target element
 		}
 	}
 };
-},{"../server/mithril.sugartags.node.js":9,"mithril":5}],3:[function(require,module,exports){
+},{"../server/mithril.sugartags.node.js":10,"mithril":6}],4:[function(require,module,exports){
 /*
 	This is a sample todo app that uses the single url mvc miso pattern
 */
@@ -177,7 +227,7 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../system/api.server.js":10,"mithril":5}],4:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6}],5:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the 
 	multiple url miso pattern.
@@ -326,7 +376,7 @@ module.exports.edit = {
 	},
 	view: editView
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"../system/api.server.js":10,"mithril":5,"validator.modelbinder":6}],5:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1340,7 +1390,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -1445,7 +1495,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":7}],7:[function(require,module,exports){
+},{"validator":8}],8:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -2014,7 +2064,7 @@ module.exports = {
 
 });
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2232,7 +2282,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2260,7 +2310,7 @@ module.exports = function(m, lower){
 	}}
 	return scope;
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -2295,13 +2345,15 @@ module.exports = function(m){
 }
 	};
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
+var hello = require('../mvc/hello.js');
+
 var todo = require('../mvc/todo.js');
 
 
@@ -2313,8 +2365,10 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/users/new': user.new,
 '/': home.index,
+'/hello/:hello_id': hello.edit,
+'/hellos': hello.index,
 '/todos': todo.index,
 '/user/:user_id': user.edit,
 '/users': user.index
 });
-},{"../mvc/home.js":2,"../mvc/todo.js":3,"../mvc/user.js":4,"../server/mithril.bindings.node.js":8,"../server/mithril.sugartags.node.js":9,"mithril":5}]},{},[11]);
+},{"../mvc/hello.js":2,"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"mithril":6}]},{},[12]);
