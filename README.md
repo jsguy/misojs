@@ -27,7 +27,7 @@ PS: 6476 = miso if you typed it on a keypad!
 
 Documentation is in [the wiki](../../wiki)
 
-* Note: mongo is simply used for the todo app.
+\* Note: mongo is simply used for the todo app.
 
 ## miso development install
 
