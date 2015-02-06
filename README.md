@@ -3,11 +3,9 @@ misojs
 
 misojs: MIthril iSOmorphic JavaScript framework
 
-_NOTE:_ Not ready for public consumption just yet!
-
 ## Install
 
-Prerequisites: [npm and node](http://nodejs.org/), [mongo DB](http://www.mongodb.org/)*
+Prerequisites: [npm and node](http://nodejs.org/)
 
 ```javascript
 npm install misojs -g
@@ -26,8 +24,6 @@ This creates a new project with the 'todo' skeleton applied, and runs it on http
 PS: 6476 = miso if you typed it on a keypad!
 
 Documentation is in [the wiki](../../wiki)
-
-\* Note: mongo is simply used for the todo app.
 
 ## miso development install
 
