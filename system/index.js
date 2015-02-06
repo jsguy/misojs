@@ -197,6 +197,7 @@ module.exports = function(app, options) {
 						scope));
 					} else {
 						//options.verbose && console.log("Blocking binding:", args.action + " - " + args.path);
+
 						//	Add "last" binding for miso ready event
 						bindScope._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
@@ -206,8 +207,9 @@ module.exports = function(app, options) {
 						});
 					}
 				} catch(ex){
-					console.log(ex);
-					next(args.action + " - " + args.path + " threw" + ex);
+					var problem = args.action + " - " + args.path + " threw: " + ex;
+					console.log(problem);
+					next(problem);
 				}
 			});
 

@@ -1,7 +1,7 @@
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var utils = require('../system/adaptor/adaptor.js')().utils;
 var miso = require('../server/miso.util.js');
-var myAdaptor = require('../system/adaptor/mongoose/mongoose.adaptor.js')(utils);
+var myAdaptor = require('../system/adaptor/flatfiledb/flatfiledb.adaptor.js')(utils);
 module.exports = function(m, scope){
 	return {
 'find': function(){
@@ -10,7 +10,8 @@ module.exports = function(m, scope){
 		errFunc = function(){errResult=arguments; doneFunc()},
 		successResult,
 		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'miso ready binding failed';};
+		isReady = false,
+		doneFunc = function(){isReady = true;};
 	
 	args.unshift(successFunc, errFunc);
 	result = myAdaptor['find'].apply(this, args);
@@ -25,6 +26,9 @@ module.exports = function(m, scope){
 				cb(successResult);
 			}
 		});
+		if(isReady){
+			process.nextTick(doneFunc)
+		}
 	}};
 },
 'save': function(){
@@ -33,7 +37,8 @@ module.exports = function(m, scope){
 		errFunc = function(){errResult=arguments; doneFunc()},
 		successResult,
 		successFunc = function(){successResult=arguments; doneFunc()},
-		doneFunc = function(){throw 'miso ready binding failed';};
+		isReady = false,
+		doneFunc = function(){isReady = true;};
 	
 	args.unshift(successFunc, errFunc);
 	result = myAdaptor['save'].apply(this, args);
@@ -48,6 +53,9 @@ module.exports = function(m, scope){
 				cb(successResult);
 			}
 		});
+		if(isReady){
+			process.nextTick(doneFunc)
+		}
 	}};
 }
 	};

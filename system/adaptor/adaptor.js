@@ -36,6 +36,7 @@ var fs = require('fs'),
 
 
 	//	Creates actions for use in the server generated code
+	//	Note: cannot use a real promise here, as mithril breaks...
 	makeServerGenerateAction = function(action, adaptor){
 		return ["function(){",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
@@ -43,7 +44,8 @@ var fs = require('fs'),
 			"		errFunc = function(){errResult=arguments; doneFunc()},",
 			"		successResult,",
 			"		successFunc = function(){successResult=arguments; doneFunc()},",
-			"		doneFunc = function(){throw 'miso ready binding failed';};",
+			"		isReady = false,",
+			"		doneFunc = function(){isReady = true;};",
 			"	",
 			"	args.unshift(successFunc, errFunc);",
 			"	result = myAdaptor['"+action+"'].apply(this, args);",
@@ -59,6 +61,9 @@ var fs = require('fs'),
 			"				cb(successResult);",
 			"			}",
 			"		});",
+			"		if(isReady){",
+			"			process.nextTick(doneFunc)",
+			"		}",
 			"	}};",
 			"}"].join("\n");
 	},

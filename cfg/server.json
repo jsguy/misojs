@@ -2,6 +2,7 @@
 	"environment": "development",
 	"port": 6476,
 	"apiPath": "/api",
-	"adaptor": "mongoose",
+	"adaptor": "flatfiledb",
+	"COMMENT_adaptor": "mongoose",
 	"minify": false
 }

@@ -14,6 +14,7 @@ var self = module.exports.index = {
 		todo: function(data){
 			this.text = data.text;
 			this.done = m.p(data.done);
+			this._id = data._id;
 		}
 	},
 	controller: function(params) {
@@ -41,8 +42,8 @@ var self = module.exports.index = {
 				var newTodo = new self.models.todo({text: ctrl.vm.input(), done: false});
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
-				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(){
-					console.log("Saved", arguments);
+				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(id){
+					newTodo._id = id;
 				});
 			}
 			e.preventDefault();
@@ -55,6 +56,15 @@ var self = module.exports.index = {
 				if(!todo.done()) { list.push(todo); }
 			});
 			ctrl.model.todos(list);
+		};
+
+		ctrl.done = function(todo){
+			return function() {
+				todo.done(!todo.done());
+				api.save({ type: 'todo.index.todo', model: todo } ).then(function(id){
+					todo._id = id;
+				});
+			}
 		};
 
 		//	Load our todos
@@ -80,7 +90,7 @@ var self = module.exports.index = {
 				BUTTON({ onclick: c.archive }, "Archive"),
 				UL([
 					t.todos().map(function(todo, idx){
-						return LI({ class: todo.done()? "done": "", toggle: todo.done }, todo.text);
+						return LI({ class: todo.done()? "done": "", onclick: c.done(todo) }, todo.text);
 					})
 				]),
 				FORM({ onsubmit: c.addTodo }, [

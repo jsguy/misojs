@@ -28,9 +28,10 @@
 
 
 //	TODO: Move to /cfg
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/testmiso');
+var mongoose = require('mongoose'),
+	uuid = require('node-uuid');
 
+mongoose.connect('mongodb://localhost/testmiso');
 
 
 //	Creates a cache for the constructed models 
@@ -80,11 +81,6 @@ module.exports = function(utils){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model, validation;
 
-
-			//	TODO: Find out how to update - maybe see if there
-			//	is an ID or whatever...
-
-
 			if(!Model) {
 				return err("Model not found " + args.type);
 			}
@@ -98,12 +94,23 @@ module.exports = function(utils){
 				var MonModel = getMongooseModel(args.type, model);
 				var modelInstance = new MonModel(utils.getModelData(model));
 
-				modelInstance.save(function (errorText) {
-					if (errorText) {
-						return err(errorText);
-					}
-					return cb("saved model!");
-				});
+				if(!modelInstance._id) {
+					modelInstance._id = modelInstance._id || uuid.v4();
+					modelInstance.save(function (errorText) {
+						if (errorText) {
+							return err(errorText);
+						}
+						return cb(modelInstance._id);
+					});
+				} else {
+					modelInstance._id = modelInstance._id || uuid.v4();
+					modelInstance.update(modelInstance, function (errorText) {
+						if (errorText) {
+							return err(errorText);
+						}
+						return cb(modelInstance._id);
+					});
+				}
 			} else {
 				//	Send beack the validation errors
 				return err(validation);
