@@ -84,7 +84,7 @@ var self = module.exports.index = {
 		var c = ctrl,
 			t = c.model;
 		with(sugartags) {
-			return [
+			return DIV({ class: "cw" }, [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + c.vm.left() + " of " + t.todos().length + " remaining"),
 				BUTTON({ onclick: c.archive }, "Archive"),
@@ -97,7 +97,7 @@ var self = module.exports.index = {
 					INPUT({ type: "text", value: c.vm.input, placeholder: "Add todo"}),
 					BUTTON({ type: "submit"}, "Add")
 				])
-			];
+			]);
 		}
 	}
 };

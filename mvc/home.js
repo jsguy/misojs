@@ -20,7 +20,7 @@ module.exports.index = {
 		this.installButtonText = "Install miso now";
 		this.installButtonLink = "#install";
 		//this.introText = "Create apps faster than ever before";
-		this.introText = "Create tiny isomorphic JS apps in a snap!";
+		this.introText = "Create isomorphic JavaScript apps in a snap!";
 		this.install = function(){
 			var h = "installation";
 			var top = document.getElementById(h).offsetTop;
@@ -33,17 +33,17 @@ module.exports.index = {
 		with(sugartags) {
 			return DIV([
 				DIV({ class: "intro" }, [
-					DIV({ class: "introText" }, ctrl.introText ),
+					DIV({ class: "introText" }, ctrl.introText),
 					BUTTON({ class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
-				DIV({ class: "box" }, [
+				DIV({ class: "cw" }, [
 					H2({id: "installation"}, A({name: "installation", class: "heading"},"Installation") ),
 					P("To install miso, use npm:"),
 					PRE({ class: "javascript" },[
 						CODE("npm install misojs -g")
 					])
 				]),
-				DIV({ class: "box" }, [
+				DIV({ class: "cw" }, [
 					H2(A({name: "gettingstarted", class: "heading"},"Getting started") ),
 					P("To create and run a new app in the current directory:"),
 					PRE({ class: "javascript" },[
@@ -51,7 +51,7 @@ module.exports.index = {
 					]),
 					P("Congratulations, you are now running your very own miso app!")
 				]),
-				DIV({ class: "box" }, [
+				DIV({ class: "cw" }, [
 					UL([
 						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))

@@ -21,26 +21,41 @@ h5 { font-size: 0.83em }
 h6 { font-size: 0.67em }
 
 /* Center content wrappers: http://www.thesitewizard.com/css/center-div-block.shtml */
-.cw { width: 62em; margin-left: auto ; margin-right: auto; padding: 0 2em; }
+.cw { width: 60em; margin-left: auto ; margin-right: auto; }
 
-header 	{ padding: 1.25em 0; box-shadow: 0 0 0.25em #999; margin-bottom: 1em; background: #fff }
+header 	{ padding: 1.25em 0 1em; margin-bottom: 1em; background: #eea000 }
+.fixed-header>header { position: fixed; width: 100%; border-bottom: 2px solid #000; padding: 0; top: 0; }
+body.fixed-header { margin-top: 4em; }
+
+header>div,
+header a { line-height: 1.5em; height: 1.5em; }
+header div.logo { display: block; float: left; line-height: 4em; margin: 0.4em 0 -0.4em }
+header nav { margin-left: 4em; display: block; float: left }
+header nav ul li { position: relative; display: inline-block; float: left; }
+header nav ul li a { margin-right: 2em; display: block; padding: 0 2em 0 0; line-height: 4em; color: #000; text-decoration: none }
+header nav ul li a:hover { color: #fff; text-decoration: underline; }
+header nav ul li a:last-child { margin-right: 0 }
 
 #content { background: #f3f3f3; }
 #content .cw { background: #fff; padding: 1.2em 1em; }
 #footer { background: #ccc; padding: 1.2em 0; }
 
-/* Arbritary default styles for the miso site. TODO: please make these better */
+/* Arbritary default styles for the miso site. */
+/* TODO: please make these better! */
 h2 { margin-bottom: 1em }
 label { width: 8em; display: inline-block; text-align: right; padding-right: 0.5em; line-height: 2em }
-input { line-height: 1.2em; padding: 0.1em 0.5em; border-radius: 4px; border: 1px solid #eee;}
-button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #eee; cursor: pointer; }
+input { line-height: 1.2em; padding: 0.1em 0.5em; margin-right: 0.5em; border-radius: 4px; border: 1px solid #eee;}
+button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #888; cursor: pointer; }
 button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
+
 .indented { margin-left: 8em; }
 .invalid { color: #f00; }
 .pageHeader { margin-left: 5.3em; }
-.intro { background: #21212c; color: #fff; height: 16em; text-align: center; padding-top: 4em; border-radius: 2px; }
-.introText { font-size: 2.1em; margin-bottom: 1em;}
+.intro { background: #21212c url(/img/background_texture.jpg); color: #fff; height: 28em; text-align: center; padding-top: 4em; border-radius: 2px; margin: -1em 0 1em 0; background-size: 66%; }
+.introText { font-size: 4em; margin: 1em auto; font-weight: bold; width: 15em; }
 .installButton { transition: all 0.3s linear; font-size: 0.8em; letter-spacing: 0.2em;  border: 4px solid #070; color: #fff; border-radius: 1px; background: transparent; padding: 1em 3em; text-transform: uppercase; }
 .installButton:hover { background: #070; border-radius: 0.5em; }
-.box { margin: 1em 0; }
+
 pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; border-radius: 2px}
+
+#misoAttachmentNode { padding-top: 1em; }

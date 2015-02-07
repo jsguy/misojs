@@ -17,18 +17,24 @@ module.exports.index = function(ctrl){
 		HTML([
 			HEAD([
 			 	LINK({href: '/css/style.css', rel:'stylesheet'}), 
-			 	//	The reload functionality. TODO: use in development only
+			 	//	Reload - TODO: use in development only
 			 	(ctrl.environment == "development"? SCRIPT({src: '/reload.js'}): "")
 			]),
-		 	BODY([
+		 	BODY({ class: 'fixed-header' }, [
 			 	HEADER([
 		 			DIV({class: 'cw cf'}, [
-		 				A({alt: 'MISO', href:'/', config: m.route}, [
-		 					IMG({src: '/img/miso_logo.png'})
-		 				])
+		 				DIV({class: 'logo'},
+		 					A({alt: 'MISO', href:'/', config: m.route}, [
+		 						IMG({src: '/img/miso_logo.png'})
+		 					])
+		 				),
+		 				NAV(UL([
+		 					LI(A({href: "/todos", config: m.route}, "Todos")),
+		 					LI(A({href: "/users", config: m.route}, "Users"))
+		 				]))
 		 			])
 		 		]),
-		 		SECTION({class: 'cw', id: ctrl.misoAttachmentNode}, ctrl.content),
+		 		SECTION({id: ctrl.misoAttachmentNode}, ctrl.content),
 				SCRIPT({src: '/miso.js'})
 			])
 		])]
