@@ -1,25 +1,15 @@
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
-/*
-//	Install button animation
-m.addAnimation("fadePulse", function(prop){
-	var value = prop()? 1: 0;
-	return {
-		opacity: 1-value
-	};
-}, {
-	duration: 'infinite',
-	timingFunction: 'linear' 
-});
-*/
-
 //	Home page
 module.exports.index = {
 	controller: function(){
 		this.installButtonText = "Install miso now";
 		this.installButtonLink = "#install";
 		//this.introText = "Create apps faster than ever before";
+
+		//	TODO: Add animation from mithril.animate
+
 		this.introText = "Create isomorphic JavaScript apps in a snap!";
 		this.install = function(){
 			var h = "installation";

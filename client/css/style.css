@@ -30,10 +30,13 @@ body.fixed-header { margin-top: 4em; }
 header>div,
 header a { line-height: 1.5em; height: 1.5em; }
 header div.logo { display: block; float: left; line-height: 4em; margin: 0.4em 0 -0.4em }
-header nav { margin-left: 4em; display: block; float: left }
+header nav { margin-left: 4em; display: block }
+header nav.left { float: left }
+header nav.right { float: right; text-align: right; }
+header nav.right ul li a { margin-left: 2em; margin-right: 0; padding: 0 0 2em 0; }
 header nav ul li { position: relative; display: inline-block; float: left; }
-header nav ul li a { margin-right: 2em; display: block; padding: 0 2em 0 0; line-height: 4em; color: #000; text-decoration: none }
-header nav ul li a:hover { color: #fff; text-decoration: underline; }
+header nav ul li a {margin-right: 2em; display: block; padding: 0 2em 0 0; color: #000; font-size: 0.7em; height: 5.71em; letter-spacing: 1.5px; line-height: 5.71em; text-decoration: none; text-transform: uppercase; }
+header nav ul li a:hover { color: #fff }
 header nav ul li a:last-child { margin-right: 0 }
 
 #content { background: #f3f3f3; }
@@ -51,10 +54,10 @@ button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
 .indented { margin-left: 8em; }
 .invalid { color: #f00; }
 .pageHeader { margin-left: 5.3em; }
-.intro { background: #21212c url(/img/background_texture.jpg); color: #fff; height: 28em; text-align: center; padding-top: 4em; border-radius: 2px; margin: -1em 0 1em 0; background-size: 66%; }
-.introText { font-size: 4em; margin: 1em auto; font-weight: bold; width: 15em; }
-.installButton { transition: all 0.3s linear; font-size: 0.8em; letter-spacing: 0.2em;  border: 4px solid #070; color: #fff; border-radius: 1px; background: transparent; padding: 1em 3em; text-transform: uppercase; }
-.installButton:hover { background: #070; border-radius: 0.5em; }
+.intro { background: #21212c url(/img/background_texture.jpg); color: #fff; height: 20em; text-align: center; padding-top: 3em; border-radius: 2px; margin: -1em 0 1em 0; background-size: 33%; }
+.introText { font-size: 2.5em; margin: 1em auto; font-weight: bold; width: 24em; }
+.installButton { transition: all 0.3s linear; font-size: 0.8em; letter-spacing: 0.2em;  border: 4px solid #eea000; color: #fff; border-radius: 1px; background: transparent; padding: 1em 3em; text-transform: uppercase; }
+.installButton:hover { background: #eea000 }
 
 pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; border-radius: 2px}
 

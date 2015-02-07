@@ -28,9 +28,12 @@ module.exports.index = function(ctrl){
 		 						IMG({src: '/img/miso_logo.png'})
 		 					])
 		 				),
-		 				NAV(UL([
+		 				NAV({class: "left"}, UL([
 		 					LI(A({href: "/todos", config: m.route}, "Todos")),
 		 					LI(A({href: "/users", config: m.route}, "Users"))
+		 				])),
+		 				NAV({class: "right"}, UL([
+		 					LI(A({href: "https://github.com/jsguy/misojs"}, "Github"))
 		 				]))
 		 			])
 		 		]),
