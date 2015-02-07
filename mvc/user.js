@@ -15,7 +15,7 @@ var self = module.exports;
 //	TODO: Ability to load this from a separate file?
 var editView = function(ctrl){
 	with(sugartags) {
-		return [
+		return DIV({ class: "cw" }, [
 			H2({class: "pageHeader"}, ctrl.header),
 			DIV([
 				LABEL("Name"), INPUT({value: ctrl.user.name}),
@@ -32,7 +32,7 @@ var editView = function(ctrl){
 			DIV({class: "indented"},[
 				BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
 			])
-		];
+		]);
 	}
 };
 
@@ -65,13 +65,14 @@ module.exports.index = {
 			u = c.users;
 
 		with(sugartags) {
-			return [UL([
-				u.users().map(function(user, idx){
-					return LI(A({ href: '/user/' + user.id(), config: m.route}, user.name() + " - " + user.email()));
-				})
-			]),
-			A({class:"button", href:"/users/new", config: m.route}, "Add new user")
-			]
+			return DIV({ class: "cw" }, [
+				UL([
+					u.users().map(function(user, idx){
+						return LI(A({ href: '/user/' + user.id(), config: m.route}, user.name() + " - " + user.email()));
+					})
+				]),
+				A({class:"button", href:"/users/new", config: m.route}, "Add new user")
+			]);
 		}
 	}
 };
