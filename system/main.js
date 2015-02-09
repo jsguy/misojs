@@ -2,6 +2,7 @@
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
+var animate = require('../client/mithril.animate.js')(m);
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
 var hello = require('../mvc/hello.js');

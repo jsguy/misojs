@@ -1,29 +1,53 @@
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
+//	Animation binder
+var aniLetters = function(prop, delay){
+	return function(el){
+		(typeof window !== 'undefined') && setTimeout(function(){
+			var value = prop()? 1: 0;
+			m.animateProperties(el, {
+				scale: (value * 10) + 1,
+				opacity: 1-value,
+				duration: "1s"
+			});
+		}, delay * 100);
+	};
+};
+
 //	Home page
-module.exports.index = {
+var self = module.exports.index = {
+	models: {
+		intro: function() {
+			this.text = m.p("Create isomorphic JavaScript apps in a snap!");
+			this.ani = m.p(0);
+		}
+	},
 	controller: function(){
-		this.installButtonText = "Install miso now";
-		this.installButtonLink = "#install";
-		//this.introText = "Create apps faster than ever before";
+		var ctrl = this;
+		ctrl.installButtonText = "Install miso now";
+		ctrl.installButtonLink = "#install";
 
-		//	TODO: Add animation from mithril.animate
-
-		this.introText = "Create isomorphic JavaScript apps in a snap!";
-		this.install = function(){
+		ctrl.install = function(){
 			var h = "installation";
 			var top = document.getElementById(h).offsetTop;
 		    window.scrollTo(0, top);
-		    console.log()
 		};
+
+		ctrl.model = new self.models.intro();
 		return this;
 	},
 	view: function(ctrl){
+		var o = ctrl.model;
 		with(sugartags) {
 			return DIV([
 				DIV({ class: "intro" }, [
-					DIV({ class: "introText" }, ctrl.introText),
+					DIV({ class: "introText" },[
+						o.text().split("").map(function(t, i){
+							t = (t == " ")? "&nbsp;": t;
+							return SPAN({config: aniLetters(o.ani, i)}, m.trust(t));
+						})
+					]),
 					BUTTON({ class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
 				DIV({ class: "cw" }, [

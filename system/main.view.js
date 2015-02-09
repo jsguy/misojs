@@ -19,6 +19,7 @@ module.exports.index = function(ctrl){
 			//	Required libs
 			"var sugartags = require('../server/mithril.sugartags.node.js')(m);",
 			"var bindings = require('../server/mithril.bindings.node.js')(m);",
+			"var animate = require('../client/mithril.animate.js')(m);",
 			
 			//	All our route files
 			(ctrl.routes.map(function(route, idx) {

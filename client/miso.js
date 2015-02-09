@@ -27,7 +27,531 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":6}],2:[function(require,module,exports){
+},{"mithril":7}],2:[function(require,module,exports){
+/*
+	mithril.animate - Copyright 2014 jsguy
+	MIT Licensed.
+*/
+(function(){
+var mithrilAnimate = function (m) {
+	//	Known prefiex
+	var prefixes = ['Moz', 'Webkit', 'Khtml', 'O', 'ms'],
+	transitionProps = ['TransitionProperty', 'TransitionTimingFunction', 'TransitionDelay', 'TransitionDuration', 'TransitionEnd'],
+	transformProps = ['rotate', 'rotatex', 'rotatey', 'scale', 'skew', 'translate', 'translatex', 'translatey', 'matrix'],
+
+	defaultDuration = 400,
+
+	err = function(msg){
+		(typeof window != "undefined") && window.console && console.error && console.error(msg);
+	},
+	
+	//	Capitalise		
+	cap = function(str){
+		return str.charAt(0).toUpperCase() + str.substr(1);
+	},
+
+	//	For checking what vendor prefixes are native
+	div = document.createElement('div'),
+
+	//	vendor prefix, ie: transitionDuration becomes MozTransitionDuration
+	vp = function (prop) {
+		var pf;
+		//	Handle unprefixed
+		if (prop in div.style) {
+			return prop;
+		}
+
+		//	Handle keyframes
+		if(prop == "@keyframes") {
+			for (var i = 0; i < prefixes.length; i += 1) {
+				//	Testing using transition
+				pf = prefixes[i] + "Transition";
+				if (pf in div.style) {
+					return "@-" + prefixes[i].toLowerCase() + "-keyframes";
+				}
+			}
+			return prop;
+		}
+
+		for (var i = 0; i < prefixes.length; i += 1) {
+			pf = prefixes[i] + cap(prop);
+			if (pf in div.style) {
+				return pf;
+			}
+		}
+		//	Can't find it - return original property.
+		return prop;
+	},
+
+	//	See if we can use native transitions
+	supportsTransitions = function() {
+		var b = document.body || document.documentElement,
+			s = b.style,
+			p = 'transition';
+
+		if (typeof s[p] == 'string') { return true; }
+
+		// Tests for vendor specific prop
+		p = p.charAt(0).toUpperCase() + p.substr(1);
+
+		for (var i=0; i<prefixes.length; i++) {
+			if (typeof s[prefixes[i] + p] == 'string') { return true; }
+		}
+
+		return false;
+	},
+
+	//	Converts CSS transition times to MS
+	getTimeinMS = function(str) {
+		var result = 0, tmp;
+		str += "";
+		str = str.toLowerCase();
+		if(str.indexOf("ms") !== -1) {
+			tmp = str.split("ms");
+			result = Number(tmp[0]);
+		} else if(str.indexOf("s") !== -1) {
+			//	s
+			tmp = str.split("s");
+			result = Number(tmp[0]) * 1000;
+		} else {
+			result = Number(str);
+		}
+
+		return Math.round(result);
+	},
+
+	//	Set style properties
+	setStyleProps = function(obj, props){
+		for(var i in props) {if(props.hasOwnProperty(i)) {
+			obj.style[vp(i)] = props[i];
+		}}
+	},
+
+	//	Set props for transitions and transforms with basic defaults
+	setTransitionProps = function(args){
+		var props = {
+				//	ease, linear, ease-in, ease-out, ease-in-out, cubic-bezier(n,n,n,n) initial, inherit
+				TransitionTimingFunction: "ease",
+				TransitionDuration: defaultDuration + "ms",
+				TransitionProperty: "all"
+			},
+			p, i, tmp, tmp2, found;
+
+		//	Set any allowed properties 
+		for(p in args) { if(args.hasOwnProperty(p)) {
+			tmp = 'Transition' + cap(p);
+			tmp2 = p.toLowerCase();
+			found = false;
+
+			//	Look at transition props
+			for(i = 0; i < transitionProps.length; i += 1) {
+				if(tmp == transitionProps[i]) {
+					props[transitionProps[i]] = args[p];
+					found = true;
+					break;
+				}
+			}
+
+			//	Look at transform props
+			for(i = 0; i < transformProps.length; i += 1) {
+				if(tmp2 == transformProps[i]) {
+					props[vp("transform")] = props[vp("transform")] || "";
+					props[vp("transform")] += " " +p + "(" + args[p] + ")";
+					found = true;
+					break;
+				}
+			}
+
+			if(!found) {
+				props[p] = args[p];
+			}
+		}}
+		return props;
+	},
+
+	//	Fix animatiuon properties
+	//	Normalises transforms, eg: rotate, scale, etc...
+	normaliseTransformProps = function(args){
+		var props = {},
+			tmpProp,
+			p, i, found,
+			normal = function(props, p, value){
+				var tmp = p.toLowerCase(),
+					found = false, i;
+
+				//	Look at transform props
+				for(i = 0; i < transformProps.length; i += 1) {
+					if(tmp == transformProps[i]) {
+						props[vp("transform")] = props[vp("transform")] || "";
+						props[vp("transform")] += " " +p + "(" + value + ")";
+						found = true;
+						break;
+					}
+				}
+
+				if(!found) {
+					props[p] = value;
+				} else {
+					//	Remove transform property
+					delete props[p];
+				}
+			};
+
+		//	Set any allowed properties 
+		for(p in args) { if(args.hasOwnProperty(p)) {
+			//	If we have a percentage, we have a key frame
+			if(p.indexOf("%") !== -1) {
+				for(i in args[p]) { if(args[p].hasOwnProperty(i)) {
+					normal(args[p], i, args[p][i]);
+				}}
+				props[p] = args[p];
+			} else {
+				normal(props, p, args[p]);
+			}
+		}}
+
+		return props;
+	},
+
+
+	//	If an object is empty
+	isEmpty = function(obj) {
+		for(var i in obj) {if(obj.hasOwnProperty(i)) {
+			return false;
+		}}
+		return true; 
+	},
+	//	Creates a hashed name for the animation
+	//	Use to create a unique keyframe animation style rule
+	aniName = function(props){
+		return "ani" + JSON.stringify(props).split(/[{},%":]/).join("");
+	},
+	animations = {},
+
+	//	See if we can use transitions
+	canTrans = supportsTransitions();
+
+	//	IE10+ http://caniuse.com/#search=css-animations
+	m.animateProperties = function(el, args, cb){
+		el.style = el.style || {};
+		var props = setTransitionProps(args), time;
+
+		if(typeof props.TransitionDuration !== 'undefined') {
+			props.TransitionDuration = getTimeinMS(props.TransitionDuration) + "ms";
+		} else {
+			props.TransitionDuration = defaultDuration + "ms";
+		}
+
+		time = getTimeinMS(props.TransitionDuration) || 0;
+
+		//	See if we support transitions
+		if(canTrans) {
+			setStyleProps(el, props);
+		} else {
+			//	Try and fall back to jQuery
+			//	TODO: Switch to use velocity, it is better suited.
+			if(typeof $ !== 'undefined' && $.fn && $.fn.animate) {
+				$(el).animate(props, time);
+			}
+		}
+
+		if(cb){
+			setTimeout(cb, time+1);
+		}
+	};
+
+	//	Trigger a transition animation
+	m.trigger = function(name, value, options, cb){
+		options = options || {};
+		var ani = animations[name];
+		if(!ani) {
+			return err("Animation " + name + " not found.");
+		}
+
+		return function(e){
+			var args = ani.fn(function(){
+				return typeof value == 'function'? value(): value;
+			});
+
+			//	Allow override via options
+			for(i in options) if(options.hasOwnProperty(i)) {{
+				args[i] = options[i];
+			}}
+
+			m.animateProperties(e.target, args, cb);
+		};
+	};
+
+	//	Adds an animation for bindings and so on.
+	m.addAnimation = function(name, fn, options){
+		options = options || {};
+
+		if(animations[name]) {
+			return err("Animation " + name + " already defined.");
+		} else if(typeof fn !== "function") {
+			return err("Animation " + name + " is being added as a transition based animation, and must use a function.");
+		}
+
+		options.duration = options.duration || defaultDuration;
+
+		animations[name] = {
+			options: options,
+			fn: fn
+		};
+
+		//	Add a default binding for the name
+		m.addBinding(name, function(prop){
+			m.bindAnimation(name, this, fn, prop);
+		}, true);
+	};
+
+	m.addKFAnimation = function(name, arg, options){
+		options = options || {};
+
+		if(animations[name]) {
+			return err("Animation " + name + " already defined.");
+		}
+
+		var init = function(props) {
+			var aniId = aniName(props),
+				hasAni = document.getElementById(aniId),
+				kf;
+
+			//	Only insert once
+			if(!hasAni) {
+				animations[name].id = aniId;
+
+				props = normaliseTransformProps(props);
+				//  Create keyframes
+				kf = vp("@keyframes") + " " + aniId + " " + JSON.stringify(props)
+					.split("\"").join("")
+					.split("},").join("}\n")
+					.split(",").join(";")
+					.split("%:").join("% ");
+
+				var s = document.createElement('style');
+				s.setAttribute('id', aniId);
+				s.id = aniId;
+				s.textContent = kf;
+				//  Might not have head?
+				document.head.appendChild(s);
+			}
+
+			animations[name].isInitialised = true;
+			animations[name].options.animateImmediately = true;
+		};
+
+		options.duration = options.duration || defaultDuration;
+		options.animateImmediately = options.animateImmediately || false;
+
+		animations[name] = {
+			init: init,
+			options: options,
+			arg: arg
+		};
+
+		//	Add a default binding for the name
+		m.addBinding(name, function(prop){
+			m.bindAnimation(name, this, arg, prop);
+		}, true);
+	};
+
+
+	/*	Options - defaults - what it does:
+
+		Delay - unedefined - delays the animation
+		Direction - 
+		Duration
+		FillMode - "forward" makes sure it sticks: http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp
+		IterationCount, 
+		Name, PlayState, TimingFunction
+	
+	*/
+
+	//	Useful to know, 'to' and 'from': http://lea.verou.me/2012/12/animations-with-one-keyframe/
+	m.animateKF = function(name, el, options, cb){
+		options = options || {};
+		var ani = animations[name], i, props = {};
+		if(!ani) {
+			return err("Animation " + name + " not found.");
+		}
+
+		//	Allow override via options
+		ani.options = ani.options || {};
+		for(i in options) if(options.hasOwnProperty(i)) {{
+			ani.options[i] = options[i];
+		}}
+
+		if(!ani.isInitialised && ani.init) {
+			ani.init(ani.arg);
+		}
+
+		//	Allow animate overrides
+		for(i in ani.options) if(ani.options.hasOwnProperty(i)) {{
+			props[vp("animation" + cap(i))] = ani.options[i];
+		}}
+
+		//	Set required items and default values for props
+		props[vp("animationName")] = ani.id;
+		props[vp("animationDuration")] = (props[vp("animationDuration")]? props[vp("animationDuration")]: defaultDuration) + "ms";
+		props[vp("animationDelay")] = props[vp("animationDelay")]? props[vp("animationDuration")] + "ms": undefined;
+		props[vp("animationFillMode")] = props[vp("animationFillMode")] || "forwards";
+
+		el.style = el.style || {};
+
+		//	Use for callback
+		var endAni = function(){
+			//	Remove listener
+			el.removeEventListener("animationend", endAni, false);
+			if(cb){
+				cb(el);
+			}
+		};
+
+		//	Remove animation if any
+		el.style[vp("animation")] = "";
+		el.style[vp("animationName")] = "";
+
+		//	Must use two request animation frame calls, for FF to
+		//	work properly, does not seem to have any adverse effects
+		requestAnimationFrame(function(){
+			requestAnimationFrame(function(){
+				//	Apply props
+				for(i in props) if(props.hasOwnProperty(i)) {{
+					el.style[i] = props[i];
+				}}
+
+				el.addEventListener("animationend", endAni, false);
+			});
+		});
+	};
+
+	m.triggerKF = function(name, options){
+		return function(){
+			m.animateKF(name, this, options);
+		};
+	};
+
+	m.bindAnimation = function(name, el, options, prop) {
+		var ani = animations[name];
+
+		if(!ani && !ani.name) {
+			return err("Animation " + name + " not found.");
+		}
+
+		if(ani.fn) {
+			m.animateProperties(el, ani.fn(prop));
+		} else {
+			var oldConfig = el.config;
+			el.config = function(el, isInit){
+				if(!ani.isInitialised && ani.init) {
+					ani.init(options);
+				}
+				if(prop() && isInit) {
+					m.animateKF(name, el, options);
+				}
+				if(oldConfig) {
+					oldConfig.apply(el, arguments);
+				}
+			};
+		}
+	};
+
+
+
+	/* Default transform2d bindings */
+	var basicBindings = ['scale', 'scalex', 'scaley', 'translate', 'translatex', 'translatey', 
+		'matrix', 'backgroundColor', 'backgroundPosition', 'borderBottomColor', 
+		'borderBottomWidth', 'borderLeftColor', 'borderLeftWidth', 'borderRightColor', 
+		'borderRightWidth', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'bottom', 
+		'clip', 'color', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 
+		'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 
+		'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineWidth', 
+		'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 
+		'textShadow', 'top', 'verticalAlign', 'visibility', 'width', 'wordSpacing', 'zIndex'],
+		degBindings = ['rotate', 'rotatex', 'rotatey', 'skewx', 'skewy'], i;
+
+	//	Basic bindings where we pass the prop straight through
+	for(i = 0; i < basicBindings.length; i += 1) {
+		(function(name){
+			m.addAnimation(name, function(prop){
+				var options = {};
+				options[name] = prop();
+				return options;
+			});
+		}(basicBindings[i]));
+	}
+
+	//	Degree based bindings - conditionally postfix with "deg"
+	for(i = 0; i < degBindings.length; i += 1) {
+		(function(name){
+			m.addAnimation(name, function(prop){
+				var options = {}, value = prop();
+				options[name] = isNaN(value)? value: value + "deg";
+				return options;
+			});
+		}(degBindings[i]));
+	}
+
+	//	Attributes that require more than one prop
+	m.addAnimation("skew", function(prop){
+		var value = prop();
+		return {
+			skew: [
+				value[0] + (isNaN(value[0])? "":"deg"), 
+				value[1] + (isNaN(value[1])? "":"deg")
+			]
+		};
+	});
+
+
+
+	//	A few more bindings
+	m = m || {};
+	//	Hide node
+	m.addBinding("hide", function(prop){
+		this.style = {
+			display: m.unwrap(prop)? "none" : ""
+		};
+	}, true);
+
+	//	Toggle boolean value on click
+	m.addBinding('toggle', function(prop){
+		this.onclick = function(){
+			var value = prop();
+			prop(!value);
+		}
+	}, true);
+
+	//	Set hover states, a'la jQuery pattern
+	m.addBinding('hover', function(prop){
+		this.onmouseover = prop[0];
+		if(prop[1]) {
+			this.onmouseout = prop[1];
+		}
+	}, true );
+
+
+};
+
+
+
+
+
+
+
+if (typeof module != "undefined" && module !== null && module.exports) {
+	module.exports = mithrilAnimate;
+} else if (typeof define === "function" && define.amd) {
+	define(function() {
+		return mithrilAnimate;
+	});
+} else {
+	mithrilAnimate(typeof window != "undefined"? window.m || {}: {});
+}
+
+}());
+},{}],3:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
@@ -69,33 +593,57 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":10,"mithril":6}],3:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.sugartags.node.js":11,"mithril":7}],4:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('../server/mithril.sugartags.node.js')(m);
 
+//	Animation binder
+var aniLetters = function(prop, delay){
+	return function(el){
+		(typeof window !== 'undefined') && setTimeout(function(){
+			var value = prop()? 1: 0;
+			m.animateProperties(el, {
+				scale: (value * 10) + 1,
+				opacity: 1-value,
+				duration: "1s"
+			});
+		}, delay * 100);
+	};
+};
+
 //	Home page
-module.exports.index = {
+var self = module.exports.index = {
+	models: {
+		intro: function() {
+			this.text = m.p("Create isomorphic JavaScript apps in a snap!");
+			this.ani = m.p(0);
+		}
+	},
 	controller: function(){
-		this.installButtonText = "Install miso now";
-		this.installButtonLink = "#install";
-		//this.introText = "Create apps faster than ever before";
+		var ctrl = this;
+		ctrl.installButtonText = "Install miso now";
+		ctrl.installButtonLink = "#install";
 
-		//	TODO: Add animation from mithril.animate
-
-		this.introText = "Create isomorphic JavaScript apps in a snap!";
-		this.install = function(){
+		ctrl.install = function(){
 			var h = "installation";
 			var top = document.getElementById(h).offsetTop;
 		    window.scrollTo(0, top);
-		    console.log()
 		};
+
+		ctrl.model = new self.models.intro();
 		return this;
 	},
 	view: function(ctrl){
+		var o = ctrl.model;
 		with(sugartags) {
 			return DIV([
 				DIV({ class: "intro" }, [
-					DIV({ class: "introText" }, ctrl.introText),
+					DIV({ class: "introText" },[
+						o.text().split("").map(function(t, i){
+							t = (t == " ")? "&nbsp;": t;
+							return SPAN({config: aniLetters(o.ani, i)}, m.trust(t));
+						})
+					]),
 					BUTTON({ class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
 				DIV({ class: "cw" }, [
@@ -123,7 +671,7 @@ module.exports.index = {
 		}
 	}
 };
-},{"../server/mithril.sugartags.node.js":10,"mithril":6}],4:[function(require,module,exports){
+},{"../server/mithril.sugartags.node.js":11,"mithril":7}],5:[function(require,module,exports){
 /*
 	This is a sample todo app that uses the single url mvc miso pattern
 */
@@ -227,7 +775,7 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6}],5:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":10,"../server/mithril.sugartags.node.js":11,"../system/api.server.js":12,"mithril":7}],6:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the 
 	multiple url miso pattern.
@@ -377,7 +925,7 @@ module.exports.edit = {
 	},
 	view: editView
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"../system/api.server.js":11,"mithril":6,"validator.modelbinder":7}],6:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":10,"../server/mithril.sugartags.node.js":11,"../system/api.server.js":12,"mithril":7,"validator.modelbinder":8}],7:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -1391,7 +1939,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -1496,7 +2044,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":8}],8:[function(require,module,exports){
+},{"validator":9}],9:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -2065,7 +2613,7 @@ module.exports = {
 
 });
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2283,7 +2831,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -2311,7 +2859,7 @@ module.exports = function(m, lower){
 	}}
 	return scope;
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -2346,11 +2894,12 @@ module.exports = function(m){
 }
 	};
 };
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('../server/mithril.sugartags.node.js')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
+var animate = require('../client/mithril.animate.js')(m);
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
 var hello = require('../mvc/hello.js');
@@ -2372,4 +2921,4 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/user/:user_id': user.edit,
 '/users': user.index
 });
-},{"../mvc/hello.js":2,"../mvc/home.js":3,"../mvc/todo.js":4,"../mvc/user.js":5,"../server/mithril.bindings.node.js":9,"../server/mithril.sugartags.node.js":10,"mithril":6}]},{},[12]);
+},{"../client/mithril.animate.js":2,"../mvc/hello.js":3,"../mvc/home.js":4,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/mithril.bindings.node.js":10,"../server/mithril.sugartags.node.js":11,"mithril":7}]},{},[13]);
