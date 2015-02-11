@@ -54,6 +54,17 @@ module.exports = function(utils){
 		return monModel;
 	};
 	return {
+		//
+		//	find is called like so:
+		//	
+		//		api.find({type: MODEL_DESIGNATOR}).then(SUCCESSFUNC, ERRORFUNC);
+		//	
+		//	Where:
+		//	
+		//		* MODEL_DESIGNATOR is the fully qualified name for the model, which is CONTROLLER.ACTION.MODELNAME, eg: 'todo.index.todo'
+		//		* SUCCESSFUNC is a function that will be called if the query completed successfully
+		//		* ERRORFUNC is a function that will be called if the query failed to execute properly
+		//	
 		find: function(cb, err, args){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model,
@@ -77,6 +88,18 @@ module.exports = function(utils){
 				return cb(docs);
 			});
 		},
+		//
+		//	save is called like so:
+		//	
+		//		api.save({type: MODEL_DESIGNATOR, model: MODEL}).then(SUCCESSFUNC, ERRORFUNC);
+		//	
+		//	Where:
+		//	
+		//		* MODEL_DESIGNATOR is the fully qualified name for the model, which is CONTROLLER.ACTION.MODELNAME, eg: 'todo.index.todo'
+		//		* MODEL is a miso model
+		//		* SUCCESSFUNC is a function that will be called if the query completed successfully
+		//		* ERRORFUNC is a function that will be called if the query failed to execute properly
+		//	
 		save: function(cb, err, args){
 			//	Get an instance of the model
 			var Model = utils.getModel(args.type), model, validation;
