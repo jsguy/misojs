@@ -15,7 +15,8 @@ var fs			= require('fs'),
 	//templates = require('../server/mithril.templates.node.js'),
 	vm = require('vm'),
 	exec = require('child_process').exec,
-	render = require('mithril-node-render'),
+	mithrilRender = require('mithril-node-render'),
+	beautify_html = require('js-beautify').html,
 
 	//	Force the browserify to run
 	forceBrowserify = false,
@@ -27,6 +28,14 @@ var fs			= require('fs'),
 	mainView = require('../system/main.view.js').index,
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
+
+	render = function(view){
+		if(serverConfig.pretty) {
+			return beautify_html(mithrilRender(view), {});
+		} else {
+			return mithrilRender(view);
+		}
+	},
 
 	//  Puts the lotion on its...
 	skin = function(content) {

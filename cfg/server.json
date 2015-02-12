@@ -4,5 +4,6 @@
 	"apiPath": "/api",
 	"adaptor": "flatfiledb",
 	"COMMENT_adaptor": "mongoose",
-	"minify": false
+	"minify": false,
+	"pretty": true
 }

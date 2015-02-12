@@ -727,7 +727,12 @@ var self = module.exports.index = {
 		ctrl.archive = function(){
 			var list = [];
 			ctrl.model.todos().map(function(todo) {
-				if(!todo.done()) { list.push(todo); }
+				if(!todo.done()) {
+					list.push(todo); 
+				} else {
+					//	Delete?
+					
+				}
 			});
 			ctrl.model.todos(list);
 		};
