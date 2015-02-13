@@ -23,7 +23,7 @@ module.exports.index = function(ctrl){
 		"		for(i in model) {if(model.hasOwnProperty(i)) {",
 		//	Skip our isValid model attribute
 		"			if(i !== 'isValid') {",
-		//	For ids, mongoose expects _id
+		//	For ids, mongoose expects _id, so let's use that for now.
 		"				if(i == 'id') {",
 		"					result['_id'] = (typeof model[i] == 'function')? model[i](): model[i];",
 		"				} else {",

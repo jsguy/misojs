@@ -17,21 +17,23 @@ var editView = function(ctrl){
 	with(sugartags) {
 		return DIV({ class: "cw" }, [
 			H2({class: "pageHeader"}, ctrl.header),
-			DIV([
-				LABEL("Name"), INPUT({value: ctrl.user.name}),
-				DIV({class: (ctrl.user.isValid('name') == true? "valid": "invalid") + " indented"}, [
-					ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
+			ctrl.user ? [
+				DIV([
+					LABEL("Name"), INPUT({value: ctrl.user.name}),
+					DIV({class: (ctrl.user.isValid('name') == true? "valid": "invalid") + " indented"}, [
+						ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
+					])
+				]),
+				DIV([
+					LABEL("Email"), INPUT({value: ctrl.user.email}),
+					DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
+						ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
+					])
+				]),
+				DIV({class: "indented"},[
+					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
 				])
-			]),
-			DIV([
-				LABEL("Email"), INPUT({value: ctrl.user.email}),
-				DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
-					ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
-				])
-			]),
-			DIV({class: "indented"},[
-				BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
-			])
+			]: DIV("User not found")
 		]);
 	}
 };
@@ -48,12 +50,20 @@ module.exports.index = {
 			}
 		};
 
-		api.find({type: 'user.edit.user'}).then(function(users) {
-			var list = Object.keys(users).map(function(key) {
-				return new self.edit.models.user(users[key]);
-			});
+		api.find({type: 'user.edit.user'}).then(function(data) {
+			if(data.error) {
+				console.log("Error " + data.error);
+				return;
+			}
+			if(data.result) {
+				var list = Object.keys(data.result).map(function(key) {
+					return new self.edit.models.user(data.result[key]);
+				});
 
-			ctrl.users = new ctrl.vm.userList(list);
+				ctrl.users = new ctrl.vm.userList(list);
+			} else {
+				ctrl.users = new ctrl.vm.userList([]);
+			}
 		}, function(){
 			console.log('Error', arguments);
 		});
@@ -89,6 +99,7 @@ module.exports.new = {
 			//	TODO: return a proper THEN.
 			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 				console.log("Added user", arguments);
+				m.route("/users");
 			});
 		};
 
@@ -127,7 +138,8 @@ module.exports.edit = {
 		ctrl.header = "Edit user " + userId;
 
 		//	Load our user
-		api.find({type: 'user.edit.user', query: {_id: userId}}).then(function(user) {
+		api.find({type: 'user.edit.user', query: {_id: userId}}).then(function(data) {
+			var user = data.result;
 			if(user && user.length > 0) {
 				ctrl.user = new self.edit.models.user(user[0]);
 			} else {
@@ -140,10 +152,20 @@ module.exports.edit = {
 		ctrl.save = function(){
 			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 				console.log("Saved user", arguments);
+				m.route("/users");
 			});
 		};
 
 		return ctrl;
 	},
 	view: editView
+	/*
+	,
+	//	Any authentication info
+	//	Note: leave out, if open url
+	//	TODO: Make sure this makes sense...?
+	authenticate: {
+		roles: ['admin', 'support']
+	}
+	*/
 };

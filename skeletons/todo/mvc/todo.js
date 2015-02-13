@@ -53,7 +53,12 @@ var self = module.exports.index = {
 		ctrl.archive = function(){
 			var list = [];
 			ctrl.model.todos().map(function(todo) {
-				if(!todo.done()) { list.push(todo); }
+				if(!todo.done()) {
+					list.push(todo); 
+				} else {
+					//	Delete?
+					
+				}
 			});
 			ctrl.model.todos(list);
 		};
@@ -68,7 +73,12 @@ var self = module.exports.index = {
 		};
 
 		//	Load our todos
-		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
+		api.find({type: 'todo.index.todo'}).then(function(data) {
+			var loadedTodos = data.result || [];
+			if(data.error){
+				return console.log("Error " + data.error);
+			}
+
 			var list = Object.keys(loadedTodos).map(function(key) {
 				return new self.models.todo(loadedTodos[key]);
 			});
@@ -84,7 +94,7 @@ var self = module.exports.index = {
 		var c = ctrl,
 			t = c.model;
 		with(sugartags) {
-			return [
+			return DIV({ class: "cw" }, [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + c.vm.left() + " of " + t.todos().length + " remaining"),
 				BUTTON({ onclick: c.archive }, "Archive"),
@@ -97,7 +107,7 @@ var self = module.exports.index = {
 					INPUT({ type: "text", value: c.vm.input, placeholder: "Add todo"}),
 					BUTTON({ type: "submit"}, "Add")
 				])
-			];
+			]);
 		}
 	}
 };

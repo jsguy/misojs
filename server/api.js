@@ -19,7 +19,28 @@ module.exports = function(app, adaptorType, apiPath){
 		adaptor = adaptorInstance.create(myAdaptor),
 		serverAdaptor = adaptorInstance.createServer(myAdaptor),
 		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
-		responseType = 'json';
+		responseType = 'json',
+		/*	Use a JSON RPC 2.0 response
+			* Either include a 'result' OR an 'error' attribute - if 
+				error, no result will be sent.
+			* 'id' is optional but might be useful in some circumstances, 
+				eg: if you use multiple simultaneous requests
+		*/
+		jsonRpcResponse = function(result, err, id){
+			var res = {
+				jsonrpc: "2.0",
+				id: null
+			};
+
+			//	Can't have both result and error
+			if(err) {
+				res.error = err;
+			} else {
+				res.result = result;
+			}
+
+			return result;
+		};
 
 	//	API setup
 	app.use(apiPath + "/:action", function(req, res, next){

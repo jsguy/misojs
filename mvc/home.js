@@ -37,6 +37,55 @@ var self = module.exports.index = {
 		ctrl.model = new self.models.intro();
 		return this;
 	},
+
+
+	/*
+
+		This is how we do
+
+		TODO: 
+		* This will show screenshots with annotations, 60/40 split
+		* From start to finish creating the todo app
+
+
+		What's miso all about?
+
+		Stats:
+
+		* Full stack isomorphic framework - uses Mithril MVC on both client and server
+		* Tiny footprint - less than 25kb (gzipped and minified)
+		* Open source (MIT licensed) - do what you like, the code is fully open source
+
+		Fun to work with:
+
+		* Fast live-code reload - smarter reload to help you work faster
+		* High performance - virtual dom engine, tiny footprint, fast as!
+		* Much less code - create a deployable app in less than 30 lines of code
+		
+		Built using high quality open source software including:
+
+		* Node.js
+		* Express 4
+		* Browserify
+		* Mithril
+
+
+		Why miso?
+
+		* Tiny footprint - other isomorphic frameworks have huge footprints (~400kb or more)
+		* Really fast to work with - other isomorphic frameworks take forever to update when developing
+		* Data store adaptors - create an adaptor for storing data on anything!
+
+		What state is the project in?
+
+		* The project is deployable as-is!
+		* We are adding more core features, such as sessions, use managements, etc.
+		
+
+
+	*/
+
+
 	view: function(ctrl){
 		var o = ctrl.model;
 		with(sugartags) {

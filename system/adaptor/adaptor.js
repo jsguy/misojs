@@ -125,13 +125,14 @@ module.exports = function() {
 				};
 
 				//	Can't have both result and error
+				//	Favour error
 				if(err) {
 					res.error = err;
 				} else {
 					res.result = result;
 				}
 
-				return result;
+				return res;
 			},
 			//	Our response type
 			responseType: "json"

@@ -1,6 +1,10 @@
 {
 	"environment": "development",
 	"port": 6476,
+	"session": {
+		"secret": "im-so-miso"
+	},
+	"authKey": "secretauthkey",
 	"apiPath": "/api",
 	"adaptor": "flatfiledb",
 	"COMMENT_adaptor": "mongoose",

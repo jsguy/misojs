@@ -73,7 +73,12 @@ var self = module.exports.index = {
 		};
 
 		//	Load our todos
-		api.find({type: 'todo.index.todo'}).then(function(loadedTodos) {
+		api.find({type: 'todo.index.todo'}).then(function(data) {
+			var loadedTodos = data.result || [];
+			if(data.error){
+				return console.log("Error " + data.error);
+			}
+
 			var list = Object.keys(loadedTodos).map(function(key) {
 				return new self.models.todo(loadedTodos[key]);
 			});

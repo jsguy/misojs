@@ -8,8 +8,10 @@ var fs			= require('fs'),
 	_			= require('lodash'),
 	routes		= {},
 	serverConfig = require('../cfg/server.json'),
+	restrictions = require('../cfg/restrictions.json'),
 	m = require('mithril'),
 	miso = require('../server/miso.util.js');
+	restrict = require('../server/miso.restrictions.js');
 	sugartags = require('../server/mithril.sugartags.node.js')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	//templates = require('../server/mithril.templates.node.js'),
@@ -29,9 +31,11 @@ var fs			= require('fs'),
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
 
-	render = function(view){
-		if(serverConfig.pretty) {
-			return beautify_html(mithrilRender(view), {});
+	render = function(view, ignorePretty){
+		if(serverConfig.pretty && !ignorePretty) {
+			return beautify_html(mithrilRender(view), {
+				wrap_line_length: 999999
+			});
 		} else {
 			return mithrilRender(view);
 		}
@@ -56,7 +60,8 @@ var fs			= require('fs'),
 //	This generates the client side code from our routes/controller/views
 module.exports = function(app, options) {
 
-	var routesPath = __dirname + "/../mvc/"
+	var routesPath = __dirname + "/../mvc/",
+		auth = require('../system/auth.js')(app, serverConfig.authKey);
 
 	//	Add configured routes
 	if(options.routeConfig) {
@@ -75,6 +80,7 @@ module.exports = function(app, options) {
 				name: routeObj.name,
 				action: routeObj.action,
 				path: routePath,
+				authenticate: route[routeObj.action].authenticate,
 				file: file,
 				stats: routeStats
 			});
@@ -187,11 +193,26 @@ module.exports = function(app, options) {
 				}
 			}
 
-			//	Setup the route on the app
-			app[args.method](args.path, function(req, res, next) {
+			//	Setup the route
+			var myRoute = function(req, res, next) {
+
+				//	Here I need the user roles - let's assume we can
+				//	use the session...
+				//sess=req.session;
+				var restrictObj = restrictions["app"][args.name + "." + args.action],
+					user = req.session.user || {
+						name: "you",
+						roles: ['admin']
+					};
+
+				if(!restrict(restrictObj, user)){
+					//	ACCESS DENIED - show login page?
+					return res.end(skin(["ACCESS DENIED"],{}));
+				}
+
 				try{
 					var scope = args.route[args.action].controller(req.params),
-						bindScope = args.route[args.action].controller;
+						bindScope = args.route[args.action].controller,
 						mvc = args.route[args.action];
 
 					//	Check for ready binder - we only use
@@ -206,7 +227,6 @@ module.exports = function(app, options) {
 						scope));
 					} else {
 						//options.verbose && console.log("Blocking binding:", args.action + " - " + args.path);
-
 						//	Add "last" binding for miso ready event
 						bindScope._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
@@ -217,10 +237,18 @@ module.exports = function(app, options) {
 					}
 				} catch(ex){
 					var problem = args.action + " - " + args.path + " threw: " + ex;
-					console.log(problem);
+					console.log(ex, problem);
 					next(problem);
 				}
-			});
+			};
+
+			//	Apply authentication if specified
+			if(args.authenticate) {
+				console.log('apply auth...');
+				app[args.method](args.path, auth(args.authenticate), myRoute);
+			} else {
+				app[args.method](args.path, myRoute);
+			}
 
 			options.verbose && console.log('    %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
 			routeMap[args.path] = args;
@@ -289,32 +317,37 @@ module.exports = function(app, options) {
 	//	Client file
 	fs.writeFileSync(apiClientFile, render(apiClientView({
 		api: dbApi.client.api
-	})));
+	}), true));
 
 	//	Server file
 	fs.writeFileSync(apiServerFile, render(apiServerView({
 		api: dbApi.server.api,
 		adaptor: serverConfig.adaptor
-	})));
-
+	}), true));
 
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({
 		routes: routeList,
+		restrictions: JSON.stringify(restrictions),
 		attachmentNodeSelector: attachmentNodeSelector
-	})));
+	}), true));
 
 	//	Run browserify when either a controller or view has changed.
 	//	We use exec to run it - this gives us a little more flexibility
 	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
-		exec(browserifyCmd, function (error, stdout, stderr) {
-			if(error) {
-				throw error
-			}
-			app.set("MISOREADY", true);
-		});
+		//setTimeout(function(){
+
+			exec(browserifyCmd, function (error, stdout, stderr) {
+				if(error) {
+					throw error
+				}
+				app.set("MISOREADY", true);
+			});
+
+		//}, 100);
+
 	} else {
 		app.set("MISOREADY", true);
 	}

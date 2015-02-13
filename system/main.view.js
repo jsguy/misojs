@@ -20,7 +20,21 @@ module.exports.index = function(ctrl){
 			"var sugartags = require('../server/mithril.sugartags.node.js')(m);",
 			"var bindings = require('../server/mithril.bindings.node.js')(m);",
 			"var animate = require('../client/mithril.animate.js')(m);",
+			"var restrictions = require('../server/miso.restrictions.js');",
 			
+
+			//	Setup an restrict method
+			//	TODO: Need user roles here, then copy index.js
+			//	functionality.
+			"var restrict = function(route, actionName){",
+			//"	console.log('here...', actionName);",
+			"	return route;",
+			"",
+			"};",
+
+//			"var restrictObj = (" + ctrl.restrictions + ");",
+			"var restrictObj = (" + ctrl.restrictions + ");",
+
 			//	All our route files
 			(ctrl.routes.map(function(route, idx) {
 				var result = usedRoute[route.name]? "" :
@@ -42,7 +56,8 @@ module.exports.index = function(ctrl){
 			//	Add the route map for mithril here
 			(ctrl.routes.map(function(route, idx) {
 				return [
-					"'" + route.path + "': " + route.name + "." + route.action
+					"'" + route.path + "': restrict(" + route.name + "." + route.action + ", '" + route.name + "." + route.action + "')"
+					//"'" + route.path + "': " + route.name + "." + route.action
 				].join("\n");
 			})).join(",\n"),
 			"});"
