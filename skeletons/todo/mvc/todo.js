@@ -2,7 +2,7 @@
 	This is a sample todo app that uses the single url mvc miso pattern
 */
 var m = require('mithril'),
-	sugartags = require('../server/mithril.sugartags.node.js')(m),
+	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
 	api = require('../system/api.server.js')(m, this);
@@ -39,11 +39,14 @@ var self = module.exports.index = {
 		ctrl.addTodo = function(e){
 			var value = ctrl.vm.input();
 			if(value) {
-				var newTodo = new self.models.todo({text: ctrl.vm.input(), done: false});
+				var newTodo = new self.models.todo({
+					text: ctrl.vm.input(),
+					done: false
+				});
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
-				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(id){
-					newTodo._id = id;
+				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(res){
+					newTodo._id = res.result.id;
 				});
 			}
 			e.preventDefault();
@@ -56,8 +59,10 @@ var self = module.exports.index = {
 				if(!todo.done()) {
 					list.push(todo); 
 				} else {
-					//	Delete?
-					
+					//	Delete
+					api.remove({ type: 'todo.index.todo', _id: todo._id }).then(function(response){
+						console.log(response.result);
+					});
 				}
 			});
 			ctrl.model.todos(list);
@@ -66,8 +71,8 @@ var self = module.exports.index = {
 		ctrl.done = function(todo){
 			return function() {
 				todo.done(!todo.done());
-				api.save({ type: 'todo.index.todo', model: todo } ).then(function(id){
-					todo._id = id;
+				api.save({ type: 'todo.index.todo', model: todo } ).then(function(res){
+					todo._id = res.result.id;
 				});
 			}
 		};
@@ -80,7 +85,9 @@ var self = module.exports.index = {
 			}
 
 			var list = Object.keys(loadedTodos).map(function(key) {
-				return new self.models.todo(loadedTodos[key]);
+				var myTodo = loadedTodos[key];
+				myTodo.done = !! (myTodo.done !== "false");
+				return new self.models.todo(myTodo);
 			});
 
 			ctrl.model = new ctrl.vm.todoList(list);
