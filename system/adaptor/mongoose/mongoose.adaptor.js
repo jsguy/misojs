@@ -42,7 +42,7 @@ var modelCache = {};
 module.exports = function(utils){
 
 	//	Gets a mongoose model
-	var getMongooseModel = function(type, model){
+	var getMongooseModel = function(type){
 		var monModel;
 		if(modelCache[type]) {
 			monModel = modelCache[type];
@@ -67,19 +67,17 @@ module.exports = function(utils){
 		//	
 		find: function(cb, err, args){
 			//	Get an instance of the model
-			var Model = utils.getModel(args.type), model,
+			var Model = utils.getModel(args.type),
 				query = args.query,
 				fields = args.fields || null,
 				options = args.options || {};
 
 			if(!Model) {
 				return err("Model not found " + args.type);
-			} else {
-				model = new Model(args.model || {});
 			}
 
 			//	Get an instance of a mongoose model
-			var MonModel = getMongooseModel(args.type, model);
+			var MonModel = getMongooseModel(args.type);
 
 			MonModel.find(query, fields, options, function (errorText, docs) {
 				if (errorText) {
@@ -114,7 +112,7 @@ module.exports = function(utils){
 			//	Validate the model data
 			if(validation === true) {
 				//	Get an instance of a mongoose model
-				var MonModel = getMongooseModel(args.type, model);
+				var MonModel = getMongooseModel(args.type);
 				var modelInstance = new MonModel(utils.getModelData(model));
 
 				if(!modelInstance._id) {
@@ -123,7 +121,7 @@ module.exports = function(utils){
 						if (errorText) {
 							return err(errorText);
 						}
-						return cb(modelInstance._id);
+						return cb({ id: modelInstance._id });
 					});
 				} else {
 					modelInstance._id = modelInstance._id || uuid.v4();
@@ -138,6 +136,27 @@ module.exports = function(utils){
 				//	Send beack the validation errors
 				return err(validation);
 			}
+		},
+		//	Delete
+		remove: function(cb, err, args){
+			//	Get an instance of the model
+			var Model = utils.getModel(args.type),
+				id = args._id,
+				model,
+				MonModel;
+
+			if(!Model) {
+				return err("Model not found " + args.type);
+			}
+
+			MonModel = getMongooseModel(args.type);
+
+			MonModel.findByIdAndRemove(id, function (errorText, docs) {
+				if (errorText) {
+					return err(errorText);
+				}
+				return cb(docs);
+			});
 		}
 	};
 };

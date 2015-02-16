@@ -31,7 +31,8 @@ var editView = function(ctrl){
 					])
 				]),
 				DIV({class: "indented"},[
-					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user")
+					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user"),
+					BUTTON({onclick: ctrl.remove, class: "negative"}, "Delete user")
 				])
 			]: DIV("User not found")
 		]);
@@ -154,6 +155,15 @@ module.exports.edit = {
 				console.log("Saved user", arguments);
 				m.route("/users");
 			});
+		};
+
+		ctrl.remove = function(){
+			if(confirm("Delete user?")) {
+				api.remove({ type: 'user.edit.user', _id: userId }).then(function(data){
+					console.log("Deleted user", data.result);
+					m.route("/users");
+				});
+			}
 		};
 
 		return ctrl;

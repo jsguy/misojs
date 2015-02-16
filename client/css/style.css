@@ -21,7 +21,7 @@ h5 { font-size: 0.83em }
 h6 { font-size: 0.67em }
 
 /* Center content wrappers: http://www.thesitewizard.com/css/center-div-block.shtml */
-.cw { width: 60em; margin-left: auto ; margin-right: auto; }
+.cw { width: 64em; padding: 0 2em; margin-left: auto ; margin-right: auto; }
 
 header 	{ padding: 1.25em 0 1em; margin-bottom: 1em; background: #eea000 }
 .fixed-header>header { position: fixed; z-index: 10; width: 100%; border-bottom: 2px solid #000; padding: 0; top: 0; }
@@ -48,8 +48,9 @@ header nav ul li a:last-child { margin-right: 0 }
 h2 { margin-bottom: 1em }
 label { width: 8em; display: inline-block; text-align: right; padding-right: 0.5em; line-height: 2em }
 input { line-height: 1.2em; padding: 0.1em 0.5em; margin-right: 0.5em; border-radius: 4px; border: 1px solid #eee;}
-button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #888; cursor: pointer; }
+button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #fff; cursor: pointer; }
 button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
+button.negative { color: #fff; background: #a12; margin-top: 0.5em; margin-left: 1em;}
 
 .indented { margin-left: 8em; }
 .invalid { color: #f00; }

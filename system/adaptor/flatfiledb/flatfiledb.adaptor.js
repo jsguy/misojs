@@ -67,6 +67,18 @@ module.exports = function(utils){
 				//	Send beack the validation errors
 				return err(validation);
 			}
+		},
+		remove: function(cb, err, args){
+			var id = args._id;
+			if(db.has(id)) {
+				db.del(id, function(errorText){
+					if (errorText) {
+						return err(errorText);
+					} else {
+						return cb("Successfully deleted " + id);
+					}
+				});
+			}
 		}
 	};
 };
