@@ -2,6 +2,7 @@
 
 //	TODO: Move to /cfg
 var flatfile = require('flat-file-db'),
+	_ = require('lodash'),
 	uuid = require('node-uuid'),
 	db = flatfile.sync('./system/adaptor/flatfiledb/data/flat-data-file.db');
 
@@ -13,14 +14,29 @@ module.exports = function(utils){
 	return {
 		find: function(cb, err, args){
 			var list = db.keys(),
-				result = [], tmp, i;
+				result = [], tmp, i, pass;
 
 			for(i = 0; i < list.length; i += 1) {
 				tmp = db.get(list[i]);
 				if(args.type == tmp.type) {
-					result.push(tmp);
+					//	Apply query
+					if(args.query) {
+						pass = true;
+						_.each(args.query, function(value, key){
+							if(tmp[key] !== value) {
+								pass = false;
+								return false;
+							}
+						});
+						if(pass){
+							result.push(tmp);
+						}
+					} else {
+						result.push(tmp);
+					}
 				}
 			}
+
 			cb(result);
 		},
 		save: function(cb, err, args){

@@ -18,6 +18,9 @@ var fs = require('fs'),
 	_ = require('lodash'),
 	Promiz = require('promiz'),
 
+
+
+
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
 		return function(){
@@ -52,13 +55,12 @@ var fs = require('fs'),
 			//	Add a binding object, so we can block till ready
 			"	var bindScope = arguments.callee.caller;",
 			"	bindScope._misoReadyBinding = miso.readyBinderFactory();",
-			"	",
 			"	return { then: function(cb, err){",
 			"		doneFunc = bindScope._misoReadyBinding.bind(function(){",
 			"			if(errResult){",
 			"				err(errResult);",
 			" 			} else {",
-			"				cb(successResult);",
+			"				cb(miso.response(successResult[0]));",
 			"			}",
 			"		});",
 			"		if(isReady){",
@@ -113,11 +115,11 @@ module.exports = function() {
 
 				return st;
 			},
-			/*	Use a JSON RPC 2.0 response
-
-				* Either include a 'result' OR an 'error' attribute - if error, no result will be sent.
-				* 'id' is optional but might be useful in some circumstances, eg: if you use multiple simultaneous requests
-			*/
+	
+			//	We always use a JSON RPC 2.0 response
+			//
+			//	Note: this is applied in the api.js file.
+			//
 			response: function(result, err, id){
 				var res = {
 					jsonrpc: "2.0",
@@ -133,9 +135,7 @@ module.exports = function() {
 				}
 
 				return res;
-			},
-			//	Our response type
-			responseType: "json"
+			}
 		},
 
 

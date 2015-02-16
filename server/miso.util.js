@@ -20,6 +20,27 @@ module.exports = {
 			}
 		};
 	},
+
+	/*	Use a JSON RPC 2.0 response
+		this is used by the server response in the adaptor.
+	*/
+	response: function(result, err, id){
+		var res = {
+			jsonrpc: "2.0",
+			id: null
+		};
+
+		//	Can't have both result and error
+		//	Favour error
+		if(err) {
+			res.error = err;
+		} else {
+			res.result = result;
+		}
+
+		return res;
+	},
+
 	//	Get parameters for an action
 	getParam: function(key, params, def){
 		return typeof params[key] !== "undefined"? params[key]: def;

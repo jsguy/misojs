@@ -17,13 +17,12 @@ module.exports = function(m, scope){
 	result = myAdaptor['find'].apply(this, args);
 	var bindScope = arguments.callee.caller;
 	bindScope._misoReadyBinding = miso.readyBinderFactory();
-	
 	return { then: function(cb, err){
 		doneFunc = bindScope._misoReadyBinding.bind(function(){
 			if(errResult){
 				err(errResult);
  			} else {
-				cb(successResult);
+				cb(miso.response(successResult[0]));
 			}
 		});
 		if(isReady){
@@ -44,13 +43,12 @@ module.exports = function(m, scope){
 	result = myAdaptor['save'].apply(this, args);
 	var bindScope = arguments.callee.caller;
 	bindScope._misoReadyBinding = miso.readyBinderFactory();
-	
 	return { then: function(cb, err){
 		doneFunc = bindScope._misoReadyBinding.bind(function(){
 			if(errResult){
 				err(errResult);
  			} else {
-				cb(successResult);
+				cb(miso.response(successResult[0]));
 			}
 		});
 		if(isReady){

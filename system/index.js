@@ -200,7 +200,7 @@ module.exports = function(app, options) {
 				//	use the session...
 				//sess=req.session;
 				var restrictObj = restrictions["app"][args.name + "." + args.action],
-					user = req.session.user || {
+					user = req.session && req.session.user? req.session.user: {
 						name: "you",
 						roles: ['admin']
 					};
@@ -337,17 +337,12 @@ module.exports = function(app, options) {
 	//	We use exec to run it - this gives us a little more flexibility
 	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
-		//setTimeout(function(){
-
-			exec(browserifyCmd, function (error, stdout, stderr) {
-				if(error) {
-					throw error
-				}
-				app.set("MISOREADY", true);
-			});
-
-		//}, 100);
-
+		exec(browserifyCmd, function (error, stdout, stderr) {
+			if(error) {
+				throw error
+			}
+			app.set("MISOREADY", true);
+		});
 	} else {
 		app.set("MISOREADY", true);
 	}
