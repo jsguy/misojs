@@ -8,7 +8,7 @@
 
 */
 var m = require('mithril'),
-	sugartags = require('../server/mithril.sugartags.node.js')(m);
+	sugartags = require('mithril.sugartags')(m);
 
 module.exports.index = function(ctrl){
 	with(sugartags) {

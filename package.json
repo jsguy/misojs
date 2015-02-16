@@ -24,6 +24,7 @@
     "minimist": "^1.1.0",
     "mithril": "*",
     "mithril-node-render": "*",
+    "mithril.sugartags": "0.0.5",
     "model": "^6.0.1",
     "mongodb": "^1.4.29",
     "mongoose": "^3.8.21",

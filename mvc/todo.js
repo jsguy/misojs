@@ -2,7 +2,7 @@
 	This is a sample todo app that uses the single url mvc miso pattern
 */
 var m = require('mithril'),
-	sugartags = require('../server/mithril.sugartags.node.js')(m),
+	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
 	api = require('../system/api.server.js')(m, this);

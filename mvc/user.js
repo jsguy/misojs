@@ -5,7 +5,7 @@
 var miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
-	sugartags = require('../server/mithril.sugartags.node.js')(m),
+	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m)
 	api = require('../system/api.server.js')(m, this);
 
