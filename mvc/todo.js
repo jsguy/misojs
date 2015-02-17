@@ -12,6 +12,7 @@ var self = module.exports.index = {
 	models: {
 		//	Our todo model
 		todo: function(data){
+			data.done = data.done == "false"? false: data.done;
 			this.text = data.text;
 			this.done = m.p(data.done);
 			this._id = data._id;
@@ -46,7 +47,7 @@ var self = module.exports.index = {
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
 				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(res){
-					newTodo._id = res.result.id;
+					newTodo._id = res.result;
 				});
 			}
 			e.preventDefault();
@@ -72,7 +73,7 @@ var self = module.exports.index = {
 			return function() {
 				todo.done(!todo.done());
 				api.save({ type: 'todo.index.todo', model: todo } ).then(function(res){
-					todo._id = res.result.id;
+					todo._id = res.result;
 				});
 			}
 		};
@@ -86,7 +87,6 @@ var self = module.exports.index = {
 
 			var list = Object.keys(loadedTodos).map(function(key) {
 				var myTodo = loadedTodos[key];
-				myTodo.done = !! (myTodo.done !== "false");
 				return new self.models.todo(myTodo);
 			});
 

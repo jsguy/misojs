@@ -45,7 +45,7 @@ header nav ul li a:last-child { margin-right: 0 }
 
 /* Arbritary default styles for the miso site. */
 /* TODO: please make these better! */
-h2 { margin-bottom: 1em }
+h2 { margin: 1em 0 }
 label { width: 8em; display: inline-block; text-align: right; padding-right: 0.5em; line-height: 2em }
 input { line-height: 1.2em; padding: 0.1em 0.5em; margin-right: 0.5em; border-radius: 4px; border: 1px solid #eee;}
 button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #fff; cursor: pointer; }
@@ -62,3 +62,13 @@ button.negative { color: #fff; background: #a12; margin-top: 0.5em; margin-left:
 .installButton:hover { background: #eea000 }
 pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; border-radius: 2px}
 #misoAttachmentNode { padding-top: 1em; }
+
+.frameworks { height: 12em; padding: 2em 0 }
+.frameworks .fwcontainer { margin-left: auto; margin-right: auto; width: 54em; height: 4em; }
+.frameworks .fw { float: left; width: 12em; padding: 5em 4em; margin-right: 2em; background: #333; border: 1px solid #000; border-radius: 4px }
+.frameworks .fw:last-child { margin-right: 0 }
+.frameworks .fwcontainer .fw { background-position: 34px 21px; background-repeat: no-repeat; }
+.frameworks .fwcontainer .mithril {background-image: url(/img/logo_mithril.png);}
+.frameworks .fwcontainer .express {background-image: url(/img/logo_express.png);}
+.frameworks .fwcontainer .browserify {background-image: url(/img/logo_browserify.png);}
+.frameworks .fwcontainer .nodemon {background-image: url(/img/logo_nodemon.png);}

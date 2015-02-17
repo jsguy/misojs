@@ -17,7 +17,7 @@ module.exports.index = function(ctrl){
 			"var m = require('mithril');",
 			
 			//	Required libs
-			"var sugartags = require('../server/mithril.sugartags.node.js')(m);",
+			"var sugartags = require('mithril.sugartags')(m);",
 			"var bindings = require('../server/mithril.bindings.node.js')(m);",
 			"var animate = require('../client/mithril.animate.js')(m);",
 			"var restrictions = require('../server/miso.restrictions.js');",

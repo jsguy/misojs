@@ -90,31 +90,49 @@ var self = module.exports.index = {
 		var o = ctrl.model;
 		with(sugartags) {
 			return DIV([
-				DIV({ class: "intro" }, [
-					DIV({ class: "introText" },[
+				DIV({class: "intro"}, [
+					DIV({class: "introText"},[
 						o.text().split("").map(function(t, i){
 							t = (t == " ")? "&nbsp;": t;
 							return SPAN({config: aniLetters(o.ani, i)}, m.trust(t));
 						})
 					]),
-					BUTTON({ class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
+					BUTTON({class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
-				DIV({ class: "cw" }, [
+
+
+				DIV({class: "cw"}, [
+					H2(A({name: "installation", class: "heading"},"What is miso?") ),
+					P("Miso is an open source isomorphic javascript framework that allows your to write complete apps with much less effort than other frameworks. It utalises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
+					DIV({class: "frameworks"}, [
+						DIV({class: "fwcontainer cf"},[
+							SPAN({class: "fw mithril"}),
+							SPAN({class: "fw express"}),
+							SPAN({class: "fw browserify"}),
+							SPAN({class: "fw nodemon"})
+						])
+					]),
+				]),
+
+				DIV({class: "cw"}, [
 					H2({id: "installation"}, A({name: "installation", class: "heading"},"Installation") ),
 					P("To install miso, use npm:"),
-					PRE({ class: "javascript" },[
+					PRE({class: "javascript"},[
 						CODE("npm install misojs -g")
 					])
 				]),
-				DIV({ class: "cw" }, [
+
+				DIV({class: "cw"}, [
 					H2(A({name: "gettingstarted", class: "heading"},"Getting started") ),
 					P("To create and run a new app in the current directory:"),
-					PRE({ class: "javascript" },[
+					PRE({class: "javascript"},[
 						CODE("miso -n myApp\ncd myApp && npm install\nmiso run")
 					]),
 					P("Congratulations, you are now running your very own miso app!")
 				]),
-				DIV({ class: "cw" }, [
+
+				DIV({class: "cw"}, [
+					H2(A({name: "examples", class: "heading"},"Examples")),
 					UL([
 						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))

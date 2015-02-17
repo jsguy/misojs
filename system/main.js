@@ -1,6 +1,6 @@
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
-var sugartags = require('../server/mithril.sugartags.node.js')(m);
+var sugartags = require('mithril.sugartags')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var animate = require('../client/mithril.animate.js')(m);
 var restrictions = require('../server/miso.restrictions.js');

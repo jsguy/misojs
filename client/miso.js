@@ -687,31 +687,49 @@ var self = module.exports.index = {
 		var o = ctrl.model;
 		with(sugartags) {
 			return DIV([
-				DIV({ class: "intro" }, [
-					DIV({ class: "introText" },[
+				DIV({class: "intro"}, [
+					DIV({class: "introText"},[
 						o.text().split("").map(function(t, i){
 							t = (t == " ")? "&nbsp;": t;
 							return SPAN({config: aniLetters(o.ani, i)}, m.trust(t));
 						})
 					]),
-					BUTTON({ class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
+					BUTTON({class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
-				DIV({ class: "cw" }, [
+
+
+				DIV({class: "cw"}, [
+					H2(A({name: "installation", class: "heading"},"What is miso?") ),
+					P("Miso is an open source isomorphic javascript framework that allows your to write complete apps with much less effort than other frameworks. It utalises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
+					DIV({class: "frameworks"}, [
+						DIV({class: "fwcontainer cf"},[
+							SPAN({class: "fw mithril"}),
+							SPAN({class: "fw express"}),
+							SPAN({class: "fw browserify"}),
+							SPAN({class: "fw nodemon"})
+						])
+					]),
+				]),
+
+				DIV({class: "cw"}, [
 					H2({id: "installation"}, A({name: "installation", class: "heading"},"Installation") ),
 					P("To install miso, use npm:"),
-					PRE({ class: "javascript" },[
+					PRE({class: "javascript"},[
 						CODE("npm install misojs -g")
 					])
 				]),
-				DIV({ class: "cw" }, [
+
+				DIV({class: "cw"}, [
 					H2(A({name: "gettingstarted", class: "heading"},"Getting started") ),
 					P("To create and run a new app in the current directory:"),
-					PRE({ class: "javascript" },[
+					PRE({class: "javascript"},[
 						CODE("miso -n myApp\ncd myApp && npm install\nmiso run")
 					]),
 					P("Congratulations, you are now running your very own miso app!")
 				]),
-				DIV({ class: "cw" }, [
+
+				DIV({class: "cw"}, [
+					H2(A({name: "examples", class: "heading"},"Examples")),
 					UL([
 						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))
@@ -736,6 +754,7 @@ var self = module.exports.index = {
 	models: {
 		//	Our todo model
 		todo: function(data){
+			data.done = data.done == "false"? false: data.done;
 			this.text = data.text;
 			this.done = m.p(data.done);
 			this._id = data._id;
@@ -770,7 +789,7 @@ var self = module.exports.index = {
 				ctrl.model.todos.push(newTodo);
 				ctrl.vm.input("");
 				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(res){
-					newTodo._id = res.result.id;
+					newTodo._id = res.result;
 				});
 			}
 			e.preventDefault();
@@ -796,7 +815,7 @@ var self = module.exports.index = {
 			return function() {
 				todo.done(!todo.done());
 				api.save({ type: 'todo.index.todo', model: todo } ).then(function(res){
-					todo._id = res.result.id;
+					todo._id = res.result;
 				});
 			}
 		};
@@ -810,7 +829,6 @@ var self = module.exports.index = {
 
 			var list = Object.keys(loadedTodos).map(function(key) {
 				var myTodo = loadedTodos[key];
-				myTodo.done = !! (myTodo.done !== "false");
 				return new self.models.todo(myTodo);
 			});
 
@@ -842,7 +860,7 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":13,"../system/api.server.js":15,"mithril":9,"mithril.sugartags":8}],6:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":13,"../system/api.server.js":14,"mithril":9,"mithril.sugartags":8}],6:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the 
 	multiple url miso pattern.
@@ -1024,7 +1042,7 @@ module.exports.edit = {
 	}
 	*/
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":13,"../system/api.server.js":15,"mithril":9,"mithril.sugartags":8,"validator.modelbinder":10}],7:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":13,"../system/api.server.js":14,"mithril":9,"mithril.sugartags":8,"validator.modelbinder":10}],7:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -9836,34 +9854,6 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 
 }());
 },{}],14:[function(require,module,exports){
-//	Mithril sugar tags.
-//	Copyright (C) 2014 jsguy (Mikkel Bergmann)
-//	MIT licensed
-module.exports = function(m, lower){
-	var arg = function(l1, l2){
-			var i;
-			for (i in l2) {if(l2.hasOwnProperty(i)) {
-				l1.push(l2[i]);
-			}}
-			return l1;
-		}, 
-		tagList = ["A","ABBR","ACRONYM","ADDRESS","AREA","ARTICLE","ASIDE","AUDIO","B","BDI","BDO","BIG","BLOCKQUOTE","BODY","BR","BUTTON","CANVAS","CAPTION","CITE","CODE","COL","COLGROUP","COMMAND","DATALIST","DD","DEL","DETAILS","DFN","DIV","DL","DT","EM","EMBED","FIELDSET","FIGCAPTION","FIGURE","FOOTER","FORM","FRAME","FRAMESET","H1","H2","H3","H4","H5","H6","HEAD","HEADER","HGROUP","HR","HTML","I","IFRAME","IMG","INPUT","INS","KBD","KEYGEN","LABEL","LEGEND","LI","LINK","MAP","MARK","META","METER","NAV","NOSCRIPT","OBJECT","OL","OPTGROUP","OPTION","OUTPUT","P","PARAM","PRE","PROGRESS","Q","RP","RT","RUBY","SAMP","SCRIPT","SECTION","SELECT","SMALL","SOURCE","SPAN","SPLIT","STRONG","STYLE","SUB","SUMMARY","SUP","TABLE","TBODY","TD","TEXTAREA","TFOOT","TH","THEAD","TIME","TITLE","TR","TRACK","TT","UL","VAR","VIDEO","WBR"],
-		lowerTagCache,
-		i,
-		scope = {};
-
-	//	Create sugar'd functions in the required scope
-	for (i in tagList) {if(tagList.hasOwnProperty(i)) {
-		(function(tag){
-			var lowerTag = tag.toLowerCase();
-			scope[tag] = function(){
-				return (m.e? m.e: m).apply(this, arg([lowerTag], arguments));
-			};
-		}(tagList[i]));
-	}}
-	return scope;
-};
-},{}],15:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -9906,10 +9896,10 @@ module.exports = function(m){
 }
 	};
 };
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
-var sugartags = require('../server/mithril.sugartags.node.js')(m);
+var sugartags = require('mithril.sugartags')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
 var animate = require('../client/mithril.animate.js')(m);
 var restrictions = require('../server/miso.restrictions.js');
@@ -9939,4 +9929,4 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')
 });
-},{"../client/mithril.animate.js":2,"../mvc/hello.js":3,"../mvc/home.js":4,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/miso.restrictions.js":12,"../server/mithril.bindings.node.js":13,"../server/mithril.sugartags.node.js":14,"mithril":9}]},{},[16]);
+},{"../client/mithril.animate.js":2,"../mvc/hello.js":3,"../mvc/home.js":4,"../mvc/todo.js":5,"../mvc/user.js":6,"../server/miso.restrictions.js":12,"../server/mithril.bindings.node.js":13,"mithril":9,"mithril.sugartags":8}]},{},[15]);
