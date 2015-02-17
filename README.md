@@ -35,3 +35,8 @@ Use this method, if you want to work on improving miso the framework, instead of
 * bin/miso.bin.js
 * http://localhost:6476
 
+## IE8 support
+
+Mithril needs a bunch of polyfills - grab [from here](https://gist.github.com/jsguy/edc7e51ae56e0ab37a5c) if you need to support IE8, and conditionally include it.
+
+TODO: Do this automatically in miso.
