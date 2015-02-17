@@ -1,6 +1,5 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
-	//sugartags = require('../server/mithril.sugartags.node.js')(m);
 	sugartags = require('mithril.sugartags')(m);
 
 var index = module.exports.index = {

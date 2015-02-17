@@ -1,26 +1,13 @@
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m);
 
-//	Animation binder
-var aniLetters = function(prop, delay){
-	return function(el){
-		(typeof window !== 'undefined') && setTimeout(function(){
-			var value = prop()? 1: 0;
-			m.animateProperties(el, {
-				scale: (value * 10) + 1,
-				opacity: 1-value,
-				duration: "1s"
-			});
-		}, delay * 100);
-	};
-};
-
 //	Home page
 var self = module.exports.index = {
 	models: {
 		intro: function() {
 			this.text = m.p("Create isomorphic JavaScript apps in a snap!");
 			this.ani = m.p(0);
+			this.demoImgSrc = m.p("img/misodemo.gif");
 		}
 	},
 	controller: function(){
@@ -32,6 +19,15 @@ var self = module.exports.index = {
 			var h = "installation";
 			var top = document.getElementById(h).offsetTop;
 		    window.scrollTo(0, top);
+		};
+
+		ctrl.replay = function(){
+			var tmpSrc = ctrl.model.demoImgSrc();
+			ctrl.model.demoImgSrc("");
+			setTimeout(function(){
+				ctrl.model.demoImgSrc(tmpSrc);
+			},0);
+
 		};
 
 		ctrl.model = new self.models.intro();
@@ -90,49 +86,48 @@ var self = module.exports.index = {
 		var o = ctrl.model;
 		with(sugartags) {
 			return DIV([
-				DIV({class: "intro"}, [
-					DIV({class: "introText"},[
-						o.text().split("").map(function(t, i){
-							t = (t == " ")? "&nbsp;": t;
-							return SPAN({config: aniLetters(o.ani, i)}, m.trust(t));
-						})
+				DIV({"class": "intro"}, [
+					DIV({"class": "introText"}, o.text()),
+					DIV({"class": "demoImg"}, [
+						IMG({id: "demoImg", src: o.demoImgSrc()}),
+						SPAN({"class": "replayButton", onclick: ctrl.replay}, "Replay")
 					]),
-					BUTTON({class: "installButton", onclick: ctrl.install }, ctrl.installButtonText )
+					BUTTON({"class": "installButton", onclick: ctrl.install }, ctrl.installButtonText )
 				]),
 
-
-				DIV({class: "cw"}, [
-					H2(A({name: "installation", class: "heading"},"What is miso?") ),
+				DIV({"class": "cw"}, [
+					H2(A({name: "what", "class": "heading"},"What is miso?") ),
 					P("Miso is an open source isomorphic javascript framework that allows your to write complete apps with much less effort than other frameworks. It utalises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
-					DIV({class: "frameworks"}, [
-						DIV({class: "fwcontainer cf"},[
-							SPAN({class: "fw mithril"}),
-							SPAN({class: "fw express"}),
-							SPAN({class: "fw browserify"}),
-							SPAN({class: "fw nodemon"})
+					DIV({"class": "frameworks"}, [
+						DIV({"class": "fwcontainer cf"},[
+							A({"class": "fwLink", href: "http://lhorie.github.io/mithril/", target: "_blank"}, 
+							SPAN({"class": "fw mithril"})),
+							A({"class": "fwLink", href: "http://expressjs.com/", target: "_blank"},SPAN({"class": "fw express"})),
+							A({"class": "fwLink", href: "http://browserify.org/", target: "_blank"},SPAN({"class": "fw browserify"})),
+							A({"class": "fwLink", href: "http://nodemon.io/", target: "_blank"},SPAN({"class": "fw nodemon"}))
 						])
 					]),
 				]),
 
-				DIV({class: "cw"}, [
-					H2({id: "installation"}, A({name: "installation", class: "heading"},"Installation") ),
+				DIV({"class": "cw"}, [
+					H2({id: "installation"}, A({name: "installation", "class": "heading"},"Installation") ),
 					P("To install miso, use npm:"),
-					PRE({class: "javascript"},[
+					PRE({"class": "javascript"},[
 						CODE("npm install misojs -g")
 					])
 				]),
 
-				DIV({class: "cw"}, [
-					H2(A({name: "gettingstarted", class: "heading"},"Getting started") ),
-					P("To create and run a new app in the current directory:"),
-					PRE({class: "javascript"},[
-						CODE("miso -n myApp\ncd myApp && npm install\nmiso run")
+				DIV({"class": "cw"}, [
+					H2(A({name: "gettingstarted", "class": "heading"},"Getting started") ),
+					P("To create and run a miso app in a new directory:"),
+					PRE({"class": "javascript"},[
+						CODE("miso -n myApp\ncd myApp\nmiso run")
 					]),
-					P("Congratulations, you are now running your very own miso app!")
+					P("Congratulations, you are now running your very own miso app in the 'myApp' directory!")
 				]),
 
-				DIV({class: "cw"}, [
-					H2(A({name: "examples", class: "heading"},"Examples")),
+				DIV({"class": "cw"}, [
+					H2(A({name: "examples", "class": "heading"},"Examples")),
 					UL([
 						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))
