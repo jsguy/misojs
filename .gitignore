@@ -30,6 +30,6 @@ node_modules
 # Various generated files
 client/js/miso.js
 system/main.js
-system/adaptor/flatfiledb/data
+system/adaptor/flatfiledb/data/flat-data-file.db
 system/adaptor/api.client.js
 system/adaptor/api.server.js
