@@ -31,7 +31,7 @@ var self = module.exports.index = {
 
 		This is how we do
 
-		TODO: 
+		TODO:
 		* This will show screenshots with annotations, 60/40 split
 		* From start to finish creating the todo app
 
@@ -49,7 +49,7 @@ var self = module.exports.index = {
 		* Fast live-code reload - smarter reload to help you work faster
 		* High performance - virtual dom engine, tiny footprint, fast as!
 		* Much less code - create a deployable app in less than 30 lines of code
-		
+
 		Built using high quality open source software including:
 
 		* Node.js
@@ -68,7 +68,7 @@ var self = module.exports.index = {
 
 		* The project is deployable as-is!
 		* We are adding more core features, such as sessions, use managements, etc.
-		
+
 
 
 	*/
@@ -89,10 +89,10 @@ var self = module.exports.index = {
 
 				DIV({"class": "cw"}, [
 					H2(A({name: "what", "class": "heading"},"What is miso?") ),
-					P("Miso is an open source isomorphic javascript framework that allows your to write complete apps with much less effort than other frameworks. It utalises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
+					P("Miso is an open source isomorphic javascript framework that allows you to write complete apps with much less effort than other frameworks. It utilises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
 					DIV({"class": "frameworks"}, [
 						DIV({"class": "fwcontainer cf"},[
-							A({"class": "fwLink", href: "http://lhorie.github.io/mithril/", target: "_blank"}, 
+							A({"class": "fwLink", href: "http://lhorie.github.io/mithril/", target: "_blank"},
 							SPAN({"class": "fw mithril"})),
 							A({"class": "fwLink", href: "http://expressjs.com/", target: "_blank"},SPAN({"class": "fw express"})),
 							A({"class": "fwLink", href: "http://browserify.org/", target: "_blank"},SPAN({"class": "fw browserify"})),
@@ -133,7 +133,9 @@ var self = module.exports.index = {
 					UL([
 						LI(A({ href: '/todos', config: m.route}, "Todos example (single url SPA)")),
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))
-					])
+					]),
+                                        H2({name: "documentation", "class": "heading"}, "Documentation"),
+                                        A({href:"https://github.com/jsguy/misojs/wiki"}, "Documentation can be found on the wiki")
 				])
 			]);
 		}
