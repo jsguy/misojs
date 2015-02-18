@@ -29,7 +29,7 @@ Documentation is in [the wiki](../../wiki)
 
 Use one of these methods, if you want to work on improving miso the framework, instead of creating a miso app.
 
-### archive download
+### archive download method
 
 * Download this [zip file](https://github.com/jsguy/misojs/archive/master.zip) and expand in a directory somewhere.
 * `npm install`
@@ -37,10 +37,10 @@ Use one of these methods, if you want to work on improving miso the framework, i
 * `bin/miso.bin.js run`
 * Open http://localhost:6476 within your browser
 
-### clone repository
+### clone repository method
 
 * Clone this repository to a directory somewhere `git clone https://github.com/jsguy/misojs.git`
-* cd misojs
+* `cd misojs`
 * `npm install`
 * `chmod +x bin/miso.bin.js`
 * `bin/miso.bin.js run`
