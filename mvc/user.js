@@ -1,12 +1,12 @@
 /*
-	This is a sample user management app that uses the 
+	This is a sample user management app that uses the
 	multiple url miso pattern.
 */
 var miso = require('../server/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	bindings = require('../server/mithril.bindings.node.js')(m)
+	bindings = require('../server/mithril.bindings.node.js')(m),
 	api = require('../system/api.server.js')(m, this);
 
 //	TODO: This might be a useful practice - use self as module.exports
@@ -118,7 +118,7 @@ module.exports.edit = {
 			this.email = m.p(data.email||"");
 			this.id = m.p(data._id||"");
 
-			//	Validate the model		
+			//	Validate the model
 			this.isValid = validate.bind(this, {
 				name: {
 					isRequired: "You must enter a name"
