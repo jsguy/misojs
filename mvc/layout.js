@@ -33,7 +33,7 @@ module.exports.index = function(ctrl){
 		 					LI(A({href: "/users", config: m.route}, "Users"))
 		 				])),
 		 				NAV({class: "right"}, UL([
-		 					LI(A({href: "https://github.com/jsguy/misojs"}, "Github"))
+		 					LI(A({href: "https://github.com/jsguy/misojs", target: "_blank"}, "Github"))
 		 				]))
 		 			])
 		 		]),
