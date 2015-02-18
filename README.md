@@ -33,8 +33,8 @@ Use one of these methods, if you want to work on improving miso the framework, i
 
 * Download this [zip file](https://github.com/jsguy/misojs/archive/master.zip) and expand in a directory somewhere.
 * `npm install`
-* chmod +x bin/miso.bin.js
-* bin/miso.bin.js run
+* `chmod +x bin/miso.bin.js`
+* `bin/miso.bin.js run`
 * Open http://localhost:6476 within your browser
 
 ### clone repository
@@ -42,8 +42,8 @@ Use one of these methods, if you want to work on improving miso the framework, i
 * Clone this repository to a directory somewhere `git clone https://github.com/jsguy/misojs.git`
 * cd misojs
 * `npm install`
-* chmod +x bin/miso.bin.js
-* bin/miso.bin.js run
+* `chmod +x bin/miso.bin.js`
+* `bin/miso.bin.js run`
 * Open http://localhost:6476 within your browser
 
 ## IE8 support
