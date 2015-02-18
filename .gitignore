@@ -26,3 +26,10 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# Various generated files
+client/js/miso.js
+system/main.js
+system/adaptor/flatfiledb/data
+system/adaptor/api.client.js
+system/adaptor/api.server.js
