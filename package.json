@@ -1,6 +1,6 @@
 {
   "name": "misojs",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": false,
   "scripts": {
     "rundev": "nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
