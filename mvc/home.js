@@ -1,5 +1,6 @@
 var m = require('mithril'),
-	sugartags = require('mithril.sugartags')(m);
+	sugartags = require('mithril.sugartags')(m),
+	smoothScroll = require('../client/js/mithril.smoothscroll.js');
 
 //	Home page
 var self = module.exports.index = {
@@ -12,14 +13,6 @@ var self = module.exports.index = {
 	},
 	controller: function(){
 		var ctrl = this;
-		ctrl.installButtonText = "Install miso now";
-		ctrl.installButtonLink = "#install";
-
-		ctrl.install = function(){
-			var h = "installation";
-			var top = document.getElementById(h).offsetTop;
-		    window.scrollTo(0, top);
-		};
 
 		ctrl.replay = function(){
 			var tmpSrc = ctrl.model.demoImgSrc();
@@ -27,7 +20,6 @@ var self = module.exports.index = {
 			setTimeout(function(){
 				ctrl.model.demoImgSrc(tmpSrc);
 			},0);
-
 		};
 
 		ctrl.model = new self.models.intro();
@@ -92,7 +84,7 @@ var self = module.exports.index = {
 						IMG({id: "demoImg", src: o.demoImgSrc()}),
 						SPAN({"class": "replayButton", onclick: ctrl.replay}, "Replay")
 					]),
-					BUTTON({"class": "installButton", onclick: ctrl.install }, ctrl.installButtonText )
+					A({"class": "installButton", config: smoothScroll(ctrl), href: "#installation"}, "Install miso now")
 				]),
 
 				DIV({"class": "cw"}, [
@@ -107,6 +99,16 @@ var self = module.exports.index = {
 							A({"class": "fwLink", href: "http://nodemon.io/", target: "_blank"},SPAN({"class": "fw nodemon"}))
 						])
 					]),
+
+					P("Miso has a tiny clientside footprint - less than 25kb (gzipped and minified), and is MIT licensed."),
+					P(" Miso also features:",[
+						UL({"class": "dotList"}, [
+							LI("Fast live-code reload - smarter reload to help you work faster"),
+							LI("High performance - virtual dom engine, tiny footprint, fast as bro!"),
+							LI("Much less code - create a deployable app in less than 30 lines of code"),
+							LI("Beautiful URLs - and a flexible routing system: automated some routes, take full control of others, you choose!")
+						])
+					])
 				]),
 
 				DIV({"class": "cw"}, [
