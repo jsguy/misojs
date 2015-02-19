@@ -28,8 +28,9 @@ node_modules
 .lock-wscript
 
 # Various generated files
-client/js/miso.js
+client/miso.js
 system/main.js
 system/adaptor/flatfiledb/data/flat-data-file.db
 system/adaptor/api.client.js
 system/adaptor/api.server.js
+documentation/misojs.wiki/

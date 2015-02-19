@@ -27,7 +27,7 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":10}],2:[function(require,module,exports){
+},{"mithril":12}],2:[function(require,module,exports){
 /*
 	mithril.animate - Copyright 2014 jsguy
 	MIT Licensed.
@@ -596,6 +596,53 @@ module.exports = function(ctrl){
 	};
 };
 },{}],4:[function(require,module,exports){
+module.exports = function(){ return {"Goals.md":"Primary goals\n=============\n\n* Easy setup of [isomorphic](http://isomorphic.net/) application based on [mithril](https://github.com/lhorie/mithril.js)\n* Skeleton / scaffold / Boilerplate to allow users to very quickly get up and running.\n* minimal core\n* easy extendible\n* DB agnostic (e. G. plugins for different ORM/ODM)\n\nComponents\n==========\n\n* Routing\n* View rendering\n* i18n/l10n\n* Rest-API (could use restify: http://mcavage.me/node-restify/)\n* optional Websockets (could use restify: http://mcavage.me/node-restify/)\n* easy testing (headless and Browser-Tests)\n* login/session handling\n* models with validation\n\nUseful libs\n===========\n\nHere are some libraries we are considering using, (in no particular order):\n\n* leveldb\n* mithril-query\n* translate.js\n* i18next\n\nAnd some that we're already using:\n\n* express\n* browserify\n* mocha/expect\n* mithril-node-render\n* mithril-sugartags\n* mithril-bindings\n* mithril-animate\n* lodash\n* validator\n","Home.md":"Welcome to the misojs wiki!\n\nGetting started\n===============\n\nSee the [install guide](https://github.com/jsguy/misojs#install).\nRead [how miso works](../How-miso-works), and check out [the patterns](../Patterns), then create something cool!\n","How-miso-works.md":"## Models, views, controllers\n\nWhen creating a route, you must assign a controller and a view to it - this is achieved by creating a file in the `/mvc` directory - by convention, you should name it as per the path you want, (see the [routing section](#routing) for details).\n\nHere is a minimal example using the sugartags, and getting a parameter:\n\n```javascript\nvar m = require('mithril'),\n\tmiso = require('../server/miso.util.js'),\n\tsugartags = require('../server/mithril.sugartags.node.js')(m);\n\nmodule.exports.index = {\n\tcontroller: function(params) {\n\t\tthis.who = miso.getParam('who', params, 'world');\n\t\treturn this;\n\t},\n\tview: function(ctrl){\n\t\twith(sugartags) {\n\t\t\treturn DIV('Hello ' + ctrl.who);\n\t\t}\n\t}\n};\n```\n\nSave this into a file `/mvc/hello.js`, and open http://localhost/hellos, this will show \"Hello world\". Note the 's' on the end - this is due to how the [route by convention](#route-by-convention) works.\n\nNow open `/cfg/routes.json`, and add the following routes:\n\n```javascript\n\t\"/hello\": { \"method\": \"get\", \"name\": \"hello\", \"action\": \"index\" },\n\t\"/hello/:who\": { \"method\": \"get\", \"name\": \"hello\", \"action\": \"index\" }\n```\n\nSave the file, and go back to the browser, and you'll see an error! This is because we have now overridden the automatic route. Open http://localhost/hello, and you'll see our action. Now open http://localhost/hello/YOURNAME, and you'll see it getting the first parameter, and greeting you!\n\n## Routing\n\nThe routing can be defined in one of two ways\n\n### Route by convention\n\nYou can use a naming convention as follows:\n\n|Action \t\t|Method \t\t|URL \t\t\t\t\t\t|Description|\n|---------------|---------------|---------------------------|-----------|\n|index \t\t|GET \t\t|[controller] + 's'\t\t\t|List the items|\n|edit \t\t|GET \t\t|[controller]/[id]\t\t\t|Display a form to edit the item|\n|new \t\t|GET \t\t|[controller] + 's' + '/new' \t\t\t|Display a form to add a new item|\n\nSay you have a mvc file named \"user.js\", and you define an action like so:\n\n```javascript\nmodule.exports.index = {...\n```\n\nMiso will automatically map a \"GET\" to \"/users\".  \nNow say you have a mvc file named \"user.js\", and you define an action like so:\n\n```javascript\nmodule.exports.edit = {...\n```\nMiso will automatically map a \"GET\" to \"/user/:user_id\", so that users can access via a route such as \"/user/27\" for use with ID of 27. *Note:* You can get the user_id using a miso utility: `var userId = miso.getParam('user_id', params);`.\n\n### Route by configuration\n\nBy using `/cfg/routes.json` config file:\n\n```javascript\n{\n\t\"[Pattern]\": { \"method\": \"[Method]\", \"name\": \"[Route name]\", \"action\": \"[Action]\" }\n}\n``` \n\nWhere:\n\n* **Pattern** - the [route pattern](#routing-patterns) we want, including any parameters\n* **Method** - one of 'GET', 'POST', 'PUT', 'DELETE'\n* **Route** name - name of your route file from /mvc\n* **Action** - name of the action to call on your route file from /mvc\n\n**Example**\n\n```javascript\n{\n\t\"/\": { \"method\": \"get\", \"name\": \"home\", \"action\": \"index\" }\n}\n``` \n\nThis will map a \"GET\" to the root of the URL for the `index` action in `home.js`\n\n**Note:** The routing config will override any automatically defined routes, so if you need multiple routes to point to the same action, you must manually define them. For example, if you have a mvc file named \"term.js\", and you define an action like so:\n\n```javascript\nmodule.exports.index = {...\n```\n\nMiso will automatically map a \"GET\" to \"/terms\". Now, if you want to map it also to \"/AGB\", you will need to add two entries in the routes config:\n\n```javascript\n{\n\t\"/terms\": { \"method\": \"get\", \"name\": \"terms\", \"action\": \"index\" },\n\t\"/AGB\": { \"method\": \"get\", \"name\": \"terms\", \"action\": \"index\" }\n}\n``` \n\nThis is because Miso assumes that if you override the defaulted routes, you actually want to replace them, not just override them. *Note:* this is correct behaviour, as it minority case is when you want more than one route pointing to the same action.\n\n### Routing patterns\n\n|Type\t\t\t| Example|\n|---------------|---------|\n|Path \t\t\t| \"/abcd\" - match paths starting with /abcd|\n|Path Pattern\t| \"/abc?d\" - match paths starting with /abcd and /abd|\n|Path Pattern\t| \"/ab+cd\" - match paths starting with /abcd, /abbcd, /abbbbbcd and so on|\n|Path Pattern\t| \"/ab*cd\" - match paths starting with /abcd, /abxcd, /abFOOcd, /abbArcd and so on|\n|Path Pattern\t| \"/a(bc)?d\" - will match paths starting with /ad and /abcd|\n|Regular Expression| /\\/abc\\|\\/xyz/ - will match paths starting with /abc and /xyz|\n|Array\t\t\t| [\"/abcd\", \"/xyza\", /\\/lmn\\|\\/pqr/] - match paths starting with /abcd, /xyza, /lmn, and /pqr|\n\n### Links\n\nWhen you create links, in order to get the app to work as an SPA, you must pass in m.route as a config, so that the history will be updated correctly, for example:\n\n```javascript\nA({href:\"/users/new\", config: m.route}, \"Add new user\")\n```\n\nThis will correctly work as a SPA. If you leave out `config: m.route`, the app will still work, but the page will reload every time the link is followed.\n\n* Lightweight footprint\n* Full-stack isomorphic framework\n* SPA that renders the initial page server side\n* Data models with isomorphic validation\n* Auto-reload browser on changes\n\n## Data models\n\nData models are progressively enhanced mithril models - you simply create your model as usual, then add validation and type information as it becomes pertinent.\nFor example, say you have a model like so:\n\n```javascript\nvar userModel = function(data){\n\tthis.name = m.p(data.name||\"\");\n\tthis.email = m.p(data.email||\"\");\n\tthis.id = m.p(data._id||\"\");\n\treturn this;\n}\n\n```\n\nIn order to make it validatable, add the validator module:\n\n```javascript\nvar validate = require('validator.modelbinder');\n```\n\nThen add a `isValid` validation method to your model, with any declarations based on [node validator](https://github.com/chriso/validator.js#validators):\n\n```javascript\nvar userModel = function(data){\n\tthis.name = m.p(data.name||\"\");\n\tthis.email = m.p(data.email||\"\");\n\tthis.id = m.p(data._id||\"\");\n\n\t//\tValidate the model\t\t\n\tthis.isValid = validate.bind(this, {\n\t\tname: {\n\t\t\tisRequired: \"You must enter a name\"\n\t\t},\n\t\temail: {\n\t\t\tisRequired: \"You must enter an email address\",\n\t\t\tisEmail: \"Must be a valid email address\"\n\t\t}\n\t});\n\n\treturn this;\n};\n```\n\nThis creates a method that the miso database adaptor can use to validate your model.\nYou get full access to the validation info as well, so you can show an error message near your field, for example:\n\n```javascript\nuser.isValid('email')\n```\n\nWill return `true` if the `email` property of your user model is valid, or a list of errors messages if it is invalid:\n\n```javascript\n[\"You must enter an email address\", \"Must be a valid email address\"]\n```\n\nSo you can for example add a class name to a div surrounding your field like so:\n\n```javascript\nDIV({class: (ctrl.user.isValid('email') == true? \"valid\": \"invalid\")}, [...\n```\n\nAnd show the error messages like so:\n\n```javascript\nSPAN(ctrl.user.isValid('email') == true? \"\": ctrl.user.isValid('email').join(\", \"))\n```\n\nTODO: Add progressive type enhancement","Patterns.md":"There are several ways you can write your app and miso is not opinionated about how you go about this so it is important that you choose a pattern that suits your needs. Below are a few suggested patterns to follow when developing apps.\n\n**Note:** miso is a single page app that loads server rendered HTML from any URL, so that SEO works out of the box.\n\n## Single url mvc\n\nIn this pattern everything that your mvc needs to do is done on a single url for all the associated actions. The advantage for this style of development is that you have everything in one mvc container, and you don't need to map any routes - of course the downside being that there are no routes for the user to bookmark. This is pattern works well for smaller entities where there are not too many interactions that the user can do - this is essentially how most mithril apps are written - self-contained, and at a single url.\n\nHere is a \"hello world\" example using the single url pattern\n\n```javascript\nvar m = require('mithril'),\n\tsugartags = require('../server/mithril.sugartags.node.js')(m);\n\nvar self = module.exports.index = {\n\tmodels: {\n\t\t//\tOur model\n\t\thello: function(data){\n\t\t\tthis.who = m.p(data.who);\n\t\t}\n\t},\n\tcontroller: function(params) {\n\t\tthis.model = new self.models.hello({who: \"world\"});\n\t\treturn this;\n\t},\n\tview: function(ctrl) {\n\t\tvar model = ctrl.model;\n\t\twith(sugartags) {\n\t\t\treturn [\n\t\t\t\tDIV(\"Hello \" + model.who())\n\t\t\t];\n\t\t}\n\t}\n};\n```\n\nThis would expose a url /hellos (note: the 's'), and would display \"Hello world\". (You can change the route using custom routing)\n\n## Multi url mvc\n\nIn this pattern we expose multiple mvc routes that in turn translate to multiple URLs. This is useful for splitting up your app, and ensuring each mvc has its own sets of concerns.\n\n```javascript\nvar m = require('mithril'),\n\tmiso = require('../server/miso.util.js'),\n\tsugartags = require('../server/mithril.sugartags.node.js')(m);\n\nvar index = module.exports.index = {\n\tmodels: {\n\t\t//\tOur model\n\t\thello: function(data){\n\t\t\tthis.who = m.p(data.who);\n\t\t}\n\t},\n\tcontroller: function(params) {\n\t\tthis.model = new index.models.hello({who: \"world\"});\n\t\treturn this;\n\t},\n\tview: function(ctrl) {\n\t\tvar model = ctrl.model;\n\t\twith(sugartags) {\n\t\t\treturn [\n\t\t\t\tDIV(\"Hello \" + model.who()),\n\t\t\t\tA({href: \"/hello/Leo\", config: m.route}, \"Click me for the edit action\")\n\t\t\t];\n\t\t}\n\t}\n};\n\nvar edit = module.exports.edit = {\n\tcontroller: function(params) {\n\t\tvar who = miso.getParam('hello_id', params);\n\t\tthis.model = new index.models.hello({who: who});\n\t\treturn this;\n\t},\n\tview: function(ctrl) {\n\t\tvar model = ctrl.model;\n\t\twith(sugartags) {\n\t\t\treturn [\n\t\t\t\tDIV(\"Hello \" + model.who())\n\t\t\t];\n\t\t}\n\t}\n};\n```\n\nHere we also expose a \"/hello/[NAME]\" url, that will show your name when you visit /hello/[YOUR NAME], so there are now multiple urls for our SPA:\n\n* **/hellos** - this is intended to be an index page that lists all your \"hellos\"\n* **/hello/[NAME]** - this is intended to be an edit page where you can edit your \"hellos\"\n\nNote that the anchor tag has `config: m.route` in it's options - this is so that we can route automatically though mithril"}; };
+},{}],5:[function(require,module,exports){
+var m = require('mithril'),
+	miso = require('../server/miso.util.js'),
+	sugartags = require('mithril.sugartags')(m),
+	docs = require("../client/miso.documentation.js");
+
+var index = module.exports.index = {
+	models: {
+		//	Our model
+		hello: function(data){
+			this.who = m.p(data.who);
+		}
+	},
+	controller: function(params) {
+		this.model = new index.models.hello({
+			docs: docs()
+		});
+		return this;
+	},
+	view: function(ctrl) {
+		var model = ctrl.model;
+		with(sugartags) {
+			return [
+				DIV("Hello " + model.who()),
+				A({href: "/hello/Leo", config: m.route}, "Click me for the edit action")
+			];
+		}
+	}
+};
+
+var edit = module.exports.edit = {
+	controller: function(params) {
+		var who = miso.getParam('hello_id', params);
+		this.model = new index.models.hello({who: who});
+		return this;
+	},
+	view: function(ctrl) {
+		var model = ctrl.model;
+		with(sugartags) {
+			return [
+				//DIV("Hello " + model.who())
+			];
+		}
+	}
+};
+},{"../client/miso.documentation.js":4,"../server/miso.util.js":1,"mithril":12,"mithril.sugartags":11}],6:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m);
@@ -637,10 +684,10 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"mithril":10,"mithril.sugartags":9}],5:[function(require,module,exports){
+},{"../server/miso.util.js":1,"mithril":12,"mithril.sugartags":11}],7:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	smoothScroll = require('../client/js/mithril.smoothscroll.js');
+	smoothScroll = require("../client/js/mithril.smoothscroll.js");
 
 //	Home page
 var self = module.exports.index = {
@@ -782,7 +829,7 @@ var self = module.exports.index = {
 	}
 };
 
-},{"../client/js/mithril.smoothscroll.js":3,"mithril":10,"mithril.sugartags":9}],6:[function(require,module,exports){
+},{"../client/js/mithril.smoothscroll.js":3,"mithril":12,"mithril.sugartags":11}],8:[function(require,module,exports){
 /*
 	This is a sample todo app that uses the single url mvc miso pattern
 */
@@ -790,7 +837,7 @@ var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	api = require('../system/api.server.js')(m, this);
+	api = require("../system/api.server.js")(m, this);
 
 //	Basic todo app
 var self = module.exports.index = {
@@ -903,7 +950,7 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":14,"../system/api.server.js":15,"mithril":10,"mithril.sugartags":9}],7:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/api.server.js":17,"mithril":12,"mithril.sugartags":11}],9:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the 
 	multiple url miso pattern.
@@ -913,7 +960,7 @@ var miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m)
-	api = require('../system/api.server.js')(m, this);
+	api = require("../system/api.server.js")(m, this);
 
 //	TODO: This might be a useful practice - use self as module.exports
 var self = module.exports;
@@ -1085,7 +1132,7 @@ module.exports.edit = {
 	}
 	*/
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":14,"../system/api.server.js":15,"mithril":10,"mithril.sugartags":9,"validator.modelbinder":11}],8:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/api.server.js":17,"mithril":12,"mithril.sugartags":11,"validator.modelbinder":13}],10:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -7874,7 +7921,7 @@ module.exports.edit = {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2015 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -7953,7 +8000,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -8967,7 +9014,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -9072,7 +9119,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":12}],12:[function(require,module,exports){
+},{"validator":14}],14:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -9641,7 +9688,7 @@ module.exports = {
 
 });
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /*	miso restrictions
 	Restrict users access to controller actions based on roles 
 */
@@ -9678,7 +9725,7 @@ module.exports = function(restrictions, user){
 
 	return pass;
 };
-},{"lodash":8}],14:[function(require,module,exports){
+},{"lodash":10}],16:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -9896,7 +9943,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -9939,23 +9986,25 @@ module.exports = function(m){
 }
 	};
 };
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('mithril.sugartags')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
-var animate = require('../client/js/mithril.animate.js')(m);
+var animate = require("../client/js/mithril.animate.js")(m);
 var restrictions = require('../server/miso.restrictions.js');
 var restrict = function(route, actionName){
 	return route;
 
 };
 var restrictObj = ({"_COMMENT":"Default is allow: '*', if you specify an 'allow', it will override","_COMMENT2":"If you specify an 'allow', it will override","app":{"todo.index":{"deny":["finance","support"]},"hello.edit":{"deny":"*","allow":["support"]}},"db":{"_COMMENT":"Ok, we need to figure out how to secure stuff","_COMMENT2":" - we now have a generic 'find' method","_COMMENT3":" - what we really want to do is lock down specific","_COMMENT4":" models, so let's try to use that...","/find":{"todo.index.todo":{"allow":["admin","support"]}}}});
-var user = require('../mvc/user.js');
-var home = require('../mvc/home.js');
-var hello = require('../mvc/hello.js');
+var user = require("../mvc/user.js");
+var home = require("../mvc/home.js");
+var doc = require("../mvc/doc.js");
 
-var todo = require('../mvc/todo.js');
+var hello = require("../mvc/hello.js");
+
+var todo = require("../mvc/todo.js");
 
 
 if(typeof window !== 'undefined') {
@@ -9966,10 +10015,12 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/users/new': restrict(user.new, 'user.new'),
 '/': restrict(home.index, 'home.index'),
+'/doc/:doc_id': restrict(doc.edit, 'doc.edit'),
+'/docs': restrict(doc.index, 'doc.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
 '/hellos': restrict(hello.index, 'hello.index'),
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')
 });
-},{"../client/js/mithril.animate.js":2,"../mvc/hello.js":4,"../mvc/home.js":5,"../mvc/todo.js":6,"../mvc/user.js":7,"../server/miso.restrictions.js":13,"../server/mithril.bindings.node.js":14,"mithril":10,"mithril.sugartags":9}]},{},[16]);
+},{"../client/js/mithril.animate.js":2,"../mvc/doc.js":5,"../mvc/hello.js":6,"../mvc/home.js":7,"../mvc/todo.js":8,"../mvc/user.js":9,"../server/miso.restrictions.js":15,"../server/mithril.bindings.node.js":16,"mithril":12,"mithril.sugartags":11}]},{},[18]);

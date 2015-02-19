@@ -11,6 +11,8 @@ var restrict = function(route, actionName){
 var restrictObj = ({"_COMMENT":"Default is allow: '*', if you specify an 'allow', it will override","_COMMENT2":"If you specify an 'allow', it will override","app":{"todo.index":{"deny":["finance","support"]},"hello.edit":{"deny":"*","allow":["support"]}},"db":{"_COMMENT":"Ok, we need to figure out how to secure stuff","_COMMENT2":" - we now have a generic 'find' method","_COMMENT3":" - what we really want to do is lock down specific","_COMMENT4":" models, so let's try to use that...","/find":{"todo.index.todo":{"allow":["admin","support"]}}}});
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
+var doc = require('../mvc/doc.js');
+
 var hello = require('../mvc/hello.js');
 
 var todo = require('../mvc/todo.js');
@@ -24,6 +26,8 @@ m.route.mode = 'pathname';
 m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/users/new': restrict(user.new, 'user.new'),
 '/': restrict(home.index, 'home.index'),
+'/doc/:doc_id': restrict(doc.edit, 'doc.edit'),
+'/docs': restrict(doc.index, 'doc.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
 '/hellos': restrict(hello.index, 'hello.index'),
 '/todos': restrict(todo.index, 'todo.index'),

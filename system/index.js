@@ -265,8 +265,8 @@ module.exports = function(app, options) {
 		outputMap = "./client/miso.map.json",
 		//	If the server config wants a minified miso.js
 		browserifyCmd = serverConfig.minify? 
-			"browserify " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
-			"browserify " + mainFile + " >" + output,
+			"browserify -t ./system/browserifymiso " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
+			"browserify -t ./system/browserifymiso " + mainFile + " >" + output,
 
 		mainFileModified = fs.existsSync(mainFile)? fs.statSync(mainFile).mtime: new Date(1970,0,1),
 		lastRouteModified = new Date(1970,0,1);
