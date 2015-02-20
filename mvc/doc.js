@@ -6,12 +6,16 @@ var m = require('mithril'),
 var index = module.exports.index = {
 	models: {
 		//	Our model
-		hello: function(data){
-			this.who = m.p(data.who);
+		docs: function(data){
+			this.docs = data.docs;
+			this.id = data.id;
+			this.niceName = function(name){
+				return name.substr(0,name.lastIndexOf(".md")).split("-").join(" ");
+			};
 		}
 	},
 	controller: function(params) {
-		this.model = new index.models.hello({
+		this.model = new index.models.docs({
 			docs: docs()
 		});
 		return this;
@@ -20,8 +24,13 @@ var index = module.exports.index = {
 		var model = ctrl.model;
 		with(sugartags) {
 			return [
-				DIV("Hello " + model.who()),
-				A({href: "/hello/Leo", config: m.route}, "Click me for the edit action")
+				UL([
+					miso.each(model.docs, function(doc, key){
+						return LI(
+							A({href: "/doc/" + key, config: m.route}, model.niceName(key))
+						);
+					})
+				])
 			];
 		}
 	}
@@ -29,15 +38,20 @@ var index = module.exports.index = {
 
 var edit = module.exports.edit = {
 	controller: function(params) {
-		var who = miso.getParam('hello_id', params);
-		this.model = new index.models.hello({who: who});
+		var doc_id = miso.getParam('doc_id', params);
+		this.model = new index.models.docs({
+			docs: docs(),
+			id: doc_id
+		});
 		return this;
 	},
 	view: function(ctrl) {
 		var model = ctrl.model;
 		with(sugartags) {
 			return [
-				//DIV("Hello " + model.who())
+				STYLE(""),
+				H2(model.niceName(model.id)),
+				DIV({"class": ""}, m.trust(model.docs[model.id]))
 			];
 		}
 	}

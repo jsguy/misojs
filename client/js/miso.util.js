@@ -8,6 +8,31 @@ module.exports = {
 	isServer: function() {
 		return false;
 	},
+	
+	//	Each abstraction
+	//	
+	//	miso.each(['hello', 'world'], function(value, key){
+	//		console.log(value, key);
+	//	});
+	//	//	hello 0\nhello 1
+	//
+	// 	miso.each({'hello': 'world'}, function(value, key){
+	//		console.log(value, key);
+	//	});
+	//	//	world hello
+	//
+	each: function(obj, fn) {
+		if(Object.prototype.toString.call(obj) === '[object Array]' ) {
+			return obj.map(fn);
+		} else if(typeof obj == 'object') {
+			return Object.keys(obj).map(function(key){
+				return fn(obj[key], key);
+			});
+		} else {
+			return fn(obj);
+		}
+	},
+
 	readyBinder: function(){
 		var bindings = [];
 		return {

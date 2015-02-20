@@ -1,4 +1,7 @@
+//	Grabs the documentation files and returns as object
+//	Also generates the client side version on startup
 var fs = require('fs'),
+	marked = require('marked'),
 	path = require('path'),
 	getExtension = function(filename) {
 		var ext = path.extname(filename||'').split('.');
@@ -15,10 +18,8 @@ fs.readdirSync(docPath)
 	})
 	.forEach(function(file) {
 		var docFile = path.join(docPath, file);
-		console.log(docFile);
-		docs[file] = fs.readFileSync(docFile, {encoding: 'utf8'});
+		docs[file] = marked(fs.readFileSync(docFile, {encoding: 'utf8'}), {gfm: true});
 	});
-
 
 //	Write out client/miso.documentation.js
 fs.writeFileSync("./client/miso.documentation.js", "module.exports = function(){ return " + JSON.stringify(docs) + "; };");

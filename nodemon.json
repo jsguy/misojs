@@ -3,6 +3,7 @@
 		"system/api.client.js",
 		"system/api.server.js",
 		"system/main.js",
-		"client/miso.js"
+		"client/miso.js",
+		"client/miso.documentation.js"
 	]
 }

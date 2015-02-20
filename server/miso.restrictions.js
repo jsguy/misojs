@@ -1,15 +1,18 @@
 /*	miso restrictions
 	Restrict users access to controller actions based on roles 
 */
-var _ = require('lodash'),
+var miso = require('../server/miso.util.js'),
 	hasRole = function(userRoles, roles){
 		var hasRole = false;
+		//	All roles
 		if(userRoles == "*") {
 			return true;
 		}
-		_.forOwn(userRoles, function(userRole){
+		//	Search each user role
+		miso.each(userRoles, function(userRole){
 			userRole = (typeof userRole !== "string")? userRole: [userRole];
-			_.forOwn(roles, function(role){
+			//	Search each role
+			miso.each(roles, function(role){
 				if(userRole == role) {
 					hasRole = true;
 					return false;

@@ -19,8 +19,7 @@ var fs			= require('fs'),
 	exec = require('child_process').exec,
 	mithrilRender = require('mithril-node-render'),
 	beautify_html = require('js-beautify').html,
-
-	//	Force the browserify to run
+	//	Force the browserify process to run
 	forceBrowserify = false,
 	//	What node we attach our app to in the layout
 	misoAttachmentNode = "misoAttachmentNode",
