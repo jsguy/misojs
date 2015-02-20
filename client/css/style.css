@@ -82,3 +82,37 @@ pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; bor
 .frameworks .fwcontainer .express {background-image: url(/img/logo_express.png);}
 .frameworks .fwcontainer .browserify {background-image: url(/img/logo_browserify.png);}
 .frameworks .fwcontainer .nodemon {background-image: url(/img/logo_nodemon.png);}
+
+
+.doc h1,
+.doc h2,
+.doc h3,
+.doc h4,
+.doc h5,
+.doc h6 		{ font-weight: bold; margin: 1em 0; }
+.doc h1 		{ margin-top: 0.5em; }
+
+/* Account for header by weird margin/padding/top/height */
+/* .doc a.anchor 	{ color: #000; display: block; height: 6.41em; margin-bottom: -5.34em; padding-top: 5.6em; position: relative; text-decoration: none; top: -5.6em; } */
+.doc a.anchor 	{ color: #000; text-decoration: none }
+.doc a.anchor span {}
+
+.doc 			{ line-height: 1.33em }
+.doc pre 		{ background: #333; padding: 1em 2em; margin: 1.5em 0; color: #fff; }
+.doc table 		{ margin: 1em 0; border-collapse: collapse; border-spacing: 0; border-color: gray; background: #fbfbfb; }
+.doc table th,
+.doc table td 	{ padding: 0.33em 0.66em; border: 1px solid #ddd; }
+.doc table th 	{ font-weight: bold; text-align: center }
+
+.doc ul 		{ list-style: disc; margin: 1em; }
+.doc ul li 		{ margin: 0.25em 0.5em; }
+
+
+
+
+
+
+
+
+
+

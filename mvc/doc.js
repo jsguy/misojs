@@ -1,7 +1,8 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
-	docs = require('../server/miso.documentation.js');
+	//	Grab the generatedclient version...
+	docs = require('../client/miso.documentation.js');
 
 var index = module.exports.index = {
 	models: {
@@ -23,15 +24,26 @@ var index = module.exports.index = {
 	view: function(ctrl) {
 		var model = ctrl.model;
 		with(sugartags) {
-			return [
+			return DIV({"class": "doc cw"}, [
+				DIV("Below is a list of documentation for miso:"),
 				UL([
 					miso.each(model.docs, function(doc, key){
-						return LI(
-							A({href: "/doc/" + key, config: m.route}, model.niceName(key))
-						);
+						//	Skip home page...
+						if(key !== "Home.md") {
+							return LI(
+								A({href: "/doc/" + key, config: m.route}, model.niceName(key))
+							);
+						} 
 					})
-				])
-			];
+				]),
+				DIV("Examples:"),
+				UL([
+					LI(A({href: "/todos", config: m.route}, "Todos example")),
+					LI(A({href: "/users", config: m.route}, "Users example"))
+				]),
+				//	Use manual prism, so that it works in SPA mode
+				SCRIPT({src: "/external/prism/prism.js", "data-manual": ""})
+			]);
 		}
 	}
 };
@@ -48,11 +60,14 @@ var edit = module.exports.edit = {
 	view: function(ctrl) {
 		var model = ctrl.model;
 		with(sugartags) {
-			return [
-				STYLE(""),
-				H2(model.niceName(model.id)),
-				DIV({"class": ""}, m.trust(model.docs[model.id]))
-			];
+			return DIV({"class": "doc cw"}, [
+				LINK({href: "/external/prism/prism.css", rel: "stylesheet"}),
+				H1(model.niceName(model.id)),
+				ARTICLE(m.trust(model.docs[model.id])),
+				//	Use manual prism, so that it works in SPA mode
+				SCRIPT({src: "/external/prism/prism.js", "data-manual": ""}),
+				SCRIPT("Prism.highlightAll();")
+			]);
 		}
 	}
 };
