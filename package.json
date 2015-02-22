@@ -3,8 +3,8 @@
   "version": "0.0.9",
   "private": false,
   "scripts": {
-    "development": "touch -A -240000 system/main.js && nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
-    "production": "touch -A -240000 system/main.js && node app.js"
+    "development": "touch -t 197804100000.00 system/main.js && nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
+    "production": "touch -t 197804100000.00 system/main.js && node app.js"
   },
   "bin": {
     "miso": "bin/miso.bin.js"
