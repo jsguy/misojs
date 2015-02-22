@@ -54,7 +54,8 @@ module.exports = function(utils){
 			if(validation === true) {
 				var data = utils.getModelData(model);
 
-				data._id = data.id || uuid.v4();
+				//	TODO: fix _id issue.
+				data._id = data.id || data._id || uuid.v4();
 				data.type = data.type || args.type;
 
 				db.put(data._id, data, function (errorText) {

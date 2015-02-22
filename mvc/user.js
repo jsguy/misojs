@@ -160,7 +160,7 @@ module.exports.edit = {
 		ctrl.remove = function(){
 			if(confirm("Delete user?")) {
 				api.remove({ type: 'user.edit.user', _id: userId }).then(function(data){
-					console.log("Deleted user", data.result);
+					console.log(data.result);
 					m.route("/users");
 				});
 			}

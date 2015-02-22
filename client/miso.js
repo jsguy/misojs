@@ -885,7 +885,8 @@ var self = module.exports.index = {
 
 },{"../client/js/mithril.smoothscroll.js":3,"mithril":11,"mithril.sugartags":10}],8:[function(require,module,exports){
 /*
-	This is a sample todo app that uses the single url mvc miso pattern
+	This is a sample todo app that uses the "single url" 
+	mvc miso pattern
 */
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
@@ -1167,7 +1168,7 @@ module.exports.edit = {
 		ctrl.remove = function(){
 			if(confirm("Delete user?")) {
 				api.remove({ type: 'user.edit.user', _id: userId }).then(function(data){
-					console.log("Deleted user", data.result);
+					console.log(data.result);
 					m.route("/users");
 				});
 			}

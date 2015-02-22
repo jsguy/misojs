@@ -1,5 +1,6 @@
 /*
-	This is a sample todo app that uses the single url mvc miso pattern
+	This is a sample todo app that uses the "single url" 
+	mvc miso pattern
 */
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
