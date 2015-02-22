@@ -1,7 +1,7 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
-	//	Grab the generatedclient version...
+	//	Grab the generated client version...
 	docs = require('../client/miso.documentation.js');
 
 var index = module.exports.index = {

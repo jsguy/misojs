@@ -48,9 +48,13 @@ header nav ul li a:last-child { margin-right: 0 }
 h2 { margin: 1em 0 }
 label { width: 8em; display: inline-block; text-align: right; padding-right: 0.5em; line-height: 2em }
 input { line-height: 1.2em; padding: 0.1em 0.5em; margin-right: 0.5em; border-radius: 4px; border: 1px solid #eee;}
-button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #fff; cursor: pointer; }
-button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
-button.negative { color: #fff; background: #a12; margin-top: 0.5em; margin-left: 1em;}
+button,
+.button { font-size: 1em; line-height: 1.2em; padding: 0.25em 1em; border-radius: 4px; border: 1px solid #fff; cursor: pointer; text-decoration: none}
+a.button { margin-top: 0.5em; display: inline-block;}
+button.positive,
+.button.positive { color: #fff; background: #1a2; margin-top: 0.5em;}
+button.negative,
+.button.negative { color: #fff; background: #a12; margin-top: 0.5em; margin-left: 1em;}
 
 ul.dotList { list-style: disc; margin: 1em; }
 ul.dotList li { margin: 0.25em 0.5em; }

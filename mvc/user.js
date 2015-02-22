@@ -16,21 +16,21 @@ var self = module.exports;
 var editView = function(ctrl){
 	with(sugartags) {
 		return DIV({ class: "cw" }, [
-			H2({class: "pageHeader"}, ctrl.header),
+			H2({"class": "pageHeader"}, ctrl.header),
 			ctrl.user ? [
 				DIV([
 					LABEL("Name"), INPUT({value: ctrl.user.name}),
-					DIV({class: (ctrl.user.isValid('name') == true? "valid": "invalid") + " indented"}, [
-						ctrl.user.isValid('name') == true? "": ctrl.user.isValid('name').join(", ")
+					DIV({"class": (ctrl.user.isValid('name') == true || !ctrl.showErrors? "valid": "invalid") + " indented"}, [
+						ctrl.user.isValid('name') == true || !ctrl.showErrors? "": ctrl.user.isValid('name').join(", ")
 					])
 				]),
 				DIV([
 					LABEL("Email"), INPUT({value: ctrl.user.email}),
-					DIV({class: (ctrl.user.isValid('email') == true? "valid": "invalid") + " indented" }, [
-						ctrl.user.isValid('email') == true? "": ctrl.user.isValid('email').join(", ")
+					DIV({"class": (ctrl.user.isValid('email') == true || !ctrl.showErrors? "valid": "invalid") + " indented" }, [
+						ctrl.user.isValid('email') == true || !ctrl.showErrors? "": ctrl.user.isValid('email').join(", ")
 					])
 				]),
-				DIV({class: "indented"},[
+				DIV({"class": "indented"},[
 					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user"),
 					BUTTON({onclick: ctrl.remove, class: "negative"}, "Delete user")
 				])
@@ -82,7 +82,7 @@ module.exports.index = {
 						return LI(A({ href: '/user/' + user.id(), config: m.route}, user.name() + " - " + user.email()));
 					})
 				]),
-				A({class:"button", href:"/users/new", config: m.route}, "Add new user")
+				A({"class":"button positive mtop", href:"/users/new", config: m.route}, "Add new user")
 			]);
 		}
 	}
@@ -95,13 +95,19 @@ module.exports.new = {
 		var ctrl = this;
 		ctrl.user = new self.edit.models.user({name: "", email: ""});
 		ctrl.header = "New user";
+		ctrl.showErrors = false;
 
 		ctrl.save = function(){
-			//	TODO: return a proper THEN.
-			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
-				console.log("Added user", arguments);
-				m.route("/users");
-			});
+			if(ctrl.user.isValid() !== true) {
+				ctrl.showErrors = true;
+				console.log('User is not valid');
+			} else {
+				//	TODO: return a proper THEN.
+				api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
+					console.log("Added user", arguments);
+					m.route("/users");
+				});
+			}
 		};
 
 		return ctrl;
@@ -172,8 +178,6 @@ module.exports.edit = {
 	/*
 	,
 	//	Any authentication info
-	//	Note: leave out, if open url
-	//	TODO: Make sure this makes sense...?
 	authenticate: {
 		roles: ['admin', 'support']
 	}
