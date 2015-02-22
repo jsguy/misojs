@@ -17,8 +17,7 @@ module.exports.index = function(ctrl){
 		HTML([
 			HEAD([
 			 	LINK({href: '/css/style.css', rel:'stylesheet'}), 
-			 	//	Reload - TODO: use in development only
-			 	(ctrl.environment == "development"? SCRIPT({src: '/reload.js'}): "")
+			 	(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
 			]),
 		 	BODY({ class: 'fixed-header' }, [
 			 	HEADER([

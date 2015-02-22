@@ -18,6 +18,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	npm = require('npm'),
 	_ = require("lodash"),
 	pjson = require('../package.json'),
+	environment = process.env.NODE_ENV || "development",
 	name = pjson.name,
 	version = pjson.version,
 	misoPath = __dirname + "/../",
@@ -131,9 +132,9 @@ try {
 	} else if(argv._.indexOf('run') !== -1){
 
 		//	TODO: check this is a miso project.
-		print("Running project...");
+		print("Running project for: " + environment);
 		npm.load(pjson, function (err) {
-			npm.commands.run(["rundev"], function(){
+			npm.commands.run([environment], function(){
 				print("Miso run completed");
 			});
 		});

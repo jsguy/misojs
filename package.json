@@ -1,10 +1,10 @@
 {
   "name": "misojs",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": false,
   "scripts": {
-    "rundev": "nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
-    "start": "node app.js"
+    "development": "touch -A -240000 system/main.js && nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
+    "production": "touch -A -240000 system/main.js && node app.js"
   },
   "bin": {
     "miso": "bin/miso.bin.js"
@@ -21,7 +21,7 @@
     "js-beautify": "^1.5.4",
     "lodash": ">=2.4.1",
     "marked": "^0.3.3",
-    "minifyify": "^5.0.0",
+    "minifyify": "^6.1.1",
     "minimist": "^1.1.0",
     "mithril": "*",
     "mithril-node-render": "*",

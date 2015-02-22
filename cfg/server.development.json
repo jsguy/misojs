@@ -1,0 +1,6 @@
+{
+	"port": 6476,
+	"minify": false,
+	"pretty": true,
+	"reload": true
+}

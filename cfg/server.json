@@ -1,6 +1,5 @@
 {
-	"environment": "development",
-	"port": 6476,
+	"port": 3001,
 	"session": {
 		"secret": "im-so-miso"
 	},
@@ -8,6 +7,6 @@
 	"apiPath": "/api",
 	"adaptor": "flatfiledb",
 	"COMMENT_adaptor": "mongoose",
-	"minify": false,
-	"pretty": true
+	"minify": true,
+	"pretty": false
 }

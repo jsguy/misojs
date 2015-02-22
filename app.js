@@ -14,20 +14,16 @@
 
 var express = require('express'),
 	bodyParser = require('body-parser'),
-
 	session = require('express-session'),
-
 	//	TODO: For dev only
 	reload = require('./server/reload'),
 	path = require('path'),
 	app = express(),
-
-	serverConfig = require('./cfg/server.json'),
+	mode = app.get('env'),
+	serverConfig = require('./system/config.js')(mode),
 	routeConfig	= require('./cfg/routes.json'),
 
 	mvc = require('./system');
-
-
 
 //	Setup session
 //	TODO: Set session store
@@ -63,13 +59,12 @@ var server = app.listen(serverConfig.port, function () {
 	var info = server.address(),
 		address = info.address;
 
-	//	Fix for chrome - it doesn't like 0.0.0.0
-	if(address == "0.0.0.0") {
+	if(address == "::") {
 		address = "localhost";
 	}
 
 	console.log('');
-	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, app.get('env'));
+	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, mode);
 	console.log('');
 });
 

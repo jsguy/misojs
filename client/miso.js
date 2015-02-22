@@ -747,7 +747,7 @@ var m = require('mithril'),
 var self = module.exports.index = {
 	models: {
 		intro: function() {
-			this.text = m.p("Create isomorphic JavaScript apps in a snap!");
+			this.text = m.p("Create apps in a snap!");
 			this.ani = m.p(0);
 			this.demoImgSrc = m.p("img/misodemo.gif");
 		}

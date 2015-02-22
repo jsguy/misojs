@@ -7,7 +7,7 @@ var fs			= require('fs'),
 	path		= require('path'),
 	_			= require('lodash'),
 	routes		= {},
-	serverConfig = require('../cfg/server.json'),
+	serverConfig,
 	restrictions = require('../cfg/restrictions.json'),
 	m = require('mithril'),
 	miso = require('../server/miso.util.js'),
@@ -16,7 +16,7 @@ var fs			= require('fs'),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	//templates = require('../server/mithril.templates.node.js'),
 	vm = require('vm'),
-	exec = require('child_process').exec,
+	cp = require('child_process'),
 	mithrilRender = require('mithril-node-render'),
 	beautify_html = require('js-beautify').html,
 	//	Force the browserify process to run
@@ -43,7 +43,7 @@ var fs			= require('fs'),
 	//  Puts the lotion on its...
 	skin = function(content) {
 		return render(layoutView({
-			environment: serverConfig.environment,
+			reload: serverConfig.reload,
 			misoAttachmentNode: misoAttachmentNode,
 			content: content
 		}));
@@ -58,6 +58,8 @@ var fs			= require('fs'),
 //	Map the routes for the controllers
 //	This generates the client side code from our routes/controller/views
 module.exports = function(app, options) {
+
+	serverConfig = require('../system/config.js')(app.get('environment'));
 
 	var routesPath = __dirname + "/../mvc/",
 		auth = require('../system/auth.js')(app, serverConfig.authKey);
@@ -336,10 +338,8 @@ module.exports = function(app, options) {
 	//	We use exec to run it - this gives us a little more flexibility
 	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
-		exec(browserifyCmd, function (error, stdout, stderr) {
-			if(error) {
-				throw error
-			}
+		cp.execSync(browserifyCmd);
+		process.nextTick(function(){
 			app.set("MISOREADY", true);
 		});
 	} else {
