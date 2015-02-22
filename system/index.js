@@ -201,6 +201,7 @@ module.exports = function(app, options) {
 				//	use the session...
 				//sess=req.session;
 				var restrictObj = restrictions["app"][args.name + "." + args.action],
+					//	TODO: hard coded user should be real
 					user = req.session && req.session.user? req.session.user: {
 						name: "you",
 						roles: ['admin']

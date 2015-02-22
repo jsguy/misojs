@@ -106,7 +106,7 @@ var self = module.exports.index = {
 							LI("Fast live-code reload - smarter reload to help you work faster"),
 							LI("High performance - virtual dom engine, tiny footprint, fast as bro!"),
 							LI("Much less code - create a deployable app in less than 30 lines of code"),
-							LI("Beautiful URLs - and a flexible routing system: automated some routes, take full control of others, you choose!")
+							LI("Beautiful URLs - and a flexible routing system: automate some routes, take full control of others, you choose!")
 						])
 					])
 				]),
