@@ -4,6 +4,7 @@
   "private": false,
   "scripts": {
     "development": "touch -t 197804100000.00 system/main.js && nodemon -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
+    "developmentforever": "touch -t 197804100000.00 system/main.js && nodemon --exitcrash -e js,css,json --watch package.json --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
     "production": "touch -t 197804100000.00 system/main.js && node app.js"
   },
   "bin": {
