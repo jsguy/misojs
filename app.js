@@ -19,8 +19,8 @@ var express = require('express'),
 	reload = require('./server/reload'),
 	path = require('path'),
 	app = express(),
-	mode = app.get('env'),
-	serverConfig = require('./system/config.js')(mode),
+	environment = app.get('env'),
+	serverConfig = require('./system/config.js')(environment),
 	routeConfig	= require('./cfg/routes.json'),
 
 	mvc = require('./system');
@@ -64,9 +64,11 @@ var server = app.listen(serverConfig.port, function () {
 	}
 
 	console.log('');
-	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, mode);
+	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, environment);
 	console.log('');
-});
 
-//	For dev only - auto reloading, TODO: environment support
-reload(server, app);
+	//	For dev only - auto reloading, TODO: environment support
+	if(environment !== 'production') {
+		reload(server, app);
+	}
+});
