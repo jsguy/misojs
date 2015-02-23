@@ -8,7 +8,7 @@ var restrict = function(route, actionName){
 	return route;
 
 };
-var restrictObj = ({&quot;_COMMENT&quot;:&quot;Default is allow: '*', if you specify an 'allow', it will override&quot;,&quot;_COMMENT2&quot;:&quot;If you specify an 'allow', it will override&quot;,&quot;app&quot;:{&quot;todo.index&quot;:{&quot;deny&quot;:[&quot;finance&quot;,&quot;support&quot;]},&quot;hello.edit&quot;:{&quot;deny&quot;:&quot;*&quot;,&quot;allow&quot;:[&quot;support&quot;]}},&quot;db&quot;:{&quot;_COMMENT&quot;:&quot;Ok, we need to figure out how to secure stuff&quot;,&quot;_COMMENT2&quot;:&quot; - we now have a generic 'find' method&quot;,&quot;_COMMENT3&quot;:&quot; - what we really want to do is lock down specific&quot;,&quot;_COMMENT4&quot;:&quot; models, so let's try to use that...&quot;,&quot;/find&quot;:{&quot;todo.index.todo&quot;:{&quot;allow&quot;:[&quot;admin&quot;,&quot;support&quot;]}}}});
+var restrictObj = ({"_COMMENT":"Default is allow: '*', if you specify an 'allow', it will override","_COMMENT2":"If you specify an 'allow', it will override","app":{"todo.index":{"deny":["finance","support"]},"hello.edit":{"deny":"*","allow":["support"]}},"db":{"_COMMENT":"Ok, we need to figure out how to secure stuff","_COMMENT2":" - we now have a generic 'find' method","_COMMENT3":" - what we really want to do is lock down specific","_COMMENT4":" models, so let's try to use that...","/find":{"todo.index.todo":{"allow":["admin","support"]}}}});
 var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
 var doc = require('../mvc/doc.js');
