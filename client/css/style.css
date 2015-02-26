@@ -111,6 +111,7 @@ pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; bor
 .doc ul 		{ list-style: disc; margin: 1em; }
 .doc ul li 		{ margin: 0.25em 0.5em; }
 
+.doc blockquote { border-left: 4px solid #eea000; padding: 0.5em 0 0.5em 1em; background: #fff; margin: 1em 0; }
 
 
 

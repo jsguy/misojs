@@ -56,7 +56,7 @@ var self = module.exports.index = {
 					P(" Miso also features:",[
 						UL({"class": "dotList"}, [
 							LI("Fast live-code reload - smarter reload to help you work faster"),
-							LI("High performance - virtual dom engine, tiny footprint, fast as bro!"),
+							LI("High performance - virtual dom engine, tiny footprint, faster than the rest!"),
 							LI("Much less code - create a deployable app in less than 30 lines of code"),
 							LI("Beautiful URLs - and a flexible routing system: automate some routes, take full control of others, you choose!")
 						])

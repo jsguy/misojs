@@ -28,9 +28,9 @@ renderer.heading = function (text, level) {
 renderer.link = function (href, title, text) {
 	var target;
 
-	if(href.indexOf("../") == 0) {
-		//	If starts with "../", assume wiki/doc link
-		href = "/doc/" + href.substr(3) + ".md";
+	if(href.indexOf("../") == 0 || href.indexOf("https://github.com/jsguy/misojs/wiki/") || href.indexOf("http://github.com/jsguy/misojs/wiki/")) {
+		//	Assume wiki/doc link
+		href = "/doc/" + href.substr(href.lastIndexOf("/") + 1) + ".md";
 	} else if(href.indexOf("http") == 0) {
 		//	If starts with "http", we want a _blank target
 		target = "_blank";

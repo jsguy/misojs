@@ -2,10 +2,10 @@
 	"_COMMENT": "Default is allow: '*', if you specify an 'allow', it will override",
 	"_COMMENT2": "If you specify an 'allow', it will override",
 	"app": {
-		"todo.index": {
+		"COMMENT_todo.index": {
 			"deny": ["finance", "support"]
 		},
-		"hello.edit": {
+		"COMMENT_hello.edit": {
 			"deny": "*",
 			"allow": ["support"]
 		}
