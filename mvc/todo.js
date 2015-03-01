@@ -6,7 +6,7 @@ var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	api = require('../system/api.server.js')(m, this);
+	api = require('../system/adaptor/flatfiledb/api.server.js')(m);
 
 //	Basic todo app
 var self = module.exports.index = {

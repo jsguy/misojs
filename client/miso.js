@@ -627,7 +627,7 @@ var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
 	//	Grab the generated client version...
-	docs = require("../client/miso.documentation.js");
+	docs = require('../client/miso.documentation.js');
 
 var index = module.exports.index = {
 	models: {
@@ -721,7 +721,7 @@ var edit = module.exports.edit = {
 },{"../server/miso.util.js":1,"mithril":12,"mithril.sugartags":11}],7:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	smoothScroll = require("../client/js/mithril.smoothscroll.js");
+	smoothScroll = require('../client/js/mithril.smoothscroll.js');
 
 //	Home page
 var self = module.exports.index = {
@@ -819,12 +819,10 @@ var self = module.exports.index = {
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
-	miso = require('../server/miso.util.js'),
-	api = require("../system/api.server.js")(m, this);
+	api = require("../system/adaptor/flatfiledb/api.client.js")(m);
 
 var self = module.exports.index = {
 	models: {
-		//	Our todo model
 		todo: function(data){
 			this.text = data.text;
 			this.done = m.prop(data.done == "false"? false: data.done);
@@ -838,7 +836,6 @@ var self = module.exports.index = {
 		ctrl.list = Object.keys(myTodos).map(function(key) {
 			return new self.models.todo(myTodos[key]);
 		});
-
 
 		ctrl.addTodo = function(e){
 			var value = ctrl.vm.input();
@@ -854,7 +851,15 @@ var self = module.exports.index = {
 			return false;
 		};
 
-
+		ctrl.archive = function(){
+			var list = [];
+			ctrl.list.map(function(todo) {
+				if(!todo.done()) {
+					list.push(todo); 
+				}
+			});
+			ctrl.list = list;
+		};
 
 		ctrl.vm = {
 			left: function(){
@@ -879,6 +884,7 @@ var self = module.exports.index = {
 			return [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
+				BUTTON({ onclick: ctrl.archive }, "Archive"),
 				UL([
 					ctrl.list.map(function(todo){
 						return LI({ class: todo.done()? "done": "", onclick: ctrl.vm.done(todo) }, todo.text);
@@ -892,7 +898,7 @@ var self = module.exports.index = {
 		};
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/api.server.js":17,"mithril":12,"mithril.sugartags":11}],9:[function(require,module,exports){
+},{"../server/mithril.bindings.node.js":16,"../system/adaptor/flatfiledb/api.client.js":17,"mithril":12,"mithril.sugartags":11}],9:[function(require,module,exports){
 /*
 	This is a sample todo app that uses the "single url" 
 	mvc miso pattern
@@ -901,7 +907,7 @@ var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	miso = require('../server/miso.util.js'),
-	api = require("../system/api.server.js")(m, this);
+	api = require("../system/adaptor/flatfiledb/api.client.js")(m);
 
 //	Basic todo app
 var self = module.exports.index = {
@@ -1014,7 +1020,7 @@ var self = module.exports.index = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/api.server.js":17,"mithril":12,"mithril.sugartags":11}],10:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/adaptor/flatfiledb/api.client.js":17,"mithril":12,"mithril.sugartags":11}],10:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the
 	multiple url miso pattern.
@@ -1024,12 +1030,11 @@ var miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
-	api = require("../system/api.server.js")(m, this);
+	api = require("../system/adaptor/flatfiledb/api.client.js")(m);
 
-//	TODO: This might be a useful practice - use self as module.exports
 var self = module.exports;
 
-//	TODO: Ability to load this from a separate file?
+//	Shared view
 var editView = function(ctrl){
 	with(sugartags) {
 		return DIV({ class: "cw" }, [
@@ -1201,7 +1206,7 @@ module.exports.edit = {
 	*/
 };
 
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/api.server.js":17,"mithril":12,"mithril.sugartags":11,"validator.modelbinder":13}],11:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/adaptor/flatfiledb/api.client.js":17,"mithril":12,"mithril.sugartags":11,"validator.modelbinder":13}],11:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2015 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -3274,20 +3279,20 @@ module.exports = function(m){
 var m = require('mithril');
 var sugartags = require('mithril.sugartags')(m);
 var bindings = require('../server/mithril.bindings.node.js')(m);
-var animate = require("../client/js/mithril.animate.js")(m);
+var animate = require('../client/js/mithril.animate.js')(m);
 var restrictions = require('../server/miso.restrictions.js');
 var restrict = function(route, actionName){
 	return route;
 
 };
 var restrictObj = ({"_COMMENT":"Default is allow: '*', if you specify an 'allow', it will override","_COMMENT2":"If you specify an 'allow', it will override","app":{"COMMENT_todo.index":{"deny":["finance","support"]},"COMMENT_hello.edit":{"deny":"*","allow":["support"]}},"db":{"_COMMENT":"Ok, we need to figure out how to secure stuff","_COMMENT2":" - we now have a generic 'find' method","_COMMENT3":" - what we really want to do is lock down specific","_COMMENT4":" models, so let's try to use that...","/find":{"todo.index.todo":{"allow":["admin","support"]}}}});
-var user = require("../mvc/user.js");
-var home = require("../mvc/home.js");
-var doc = require("../mvc/doc.js");
+var user = require('../mvc/user.js');
+var home = require('../mvc/home.js');
+var doc = require('../mvc/doc.js');
 
-var hello = require("../mvc/hello.js");
-var redo = require("../mvc/redo.js");
-var todo = require("../mvc/todo.js");
+var hello = require('../mvc/hello.js');
+var redo = require('../mvc/redo.js');
+var todo = require('../mvc/todo.js');
 
 
 if(typeof window !== 'undefined') {

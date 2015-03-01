@@ -29,6 +29,7 @@ node_modules
 
 # Various generated files
 client/miso.js
+client/miso.map.json
 system/main.js
 system/adaptor/flatfiledb/data/flat-data-file.db
 system/adaptor/api.client.js

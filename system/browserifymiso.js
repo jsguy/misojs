@@ -10,13 +10,21 @@ module.exports = transformTools.makeRequireTransform('browserifymiso', {
 		evaluateArguments: true
 	},
 	function (args, opts, done) {
-		var find = "server/",
-			replace = "client/";
+		var find = "server",
+			replace = "client";
 
-		if(args && args.length > 0 && args[0].indexOf(find)) {
-			var file = args[0].split(find).join(replace);
-			if(fs.existsSync(baseDir + file) && fs.statSync(baseDir + file).isFile()){
-				done(null, "require(\"" + file + "\")");
+		//	Check if we find something
+		if(args && args.length > 0){
+			//	Check if it has the word "server" in it
+			if(args[0].indexOf(find) !== -1) {
+				//	If we have the same file with the word "client",
+				//	use it for teh cleitn script
+				var file = args[0].split(find).join(replace);
+				if(fs.existsSync(baseDir + file) && fs.statSync(baseDir + file).isFile()){
+					done(null, "require(\"" + file + "\")");
+				} else {
+					done();
+				}
 			} else {
 				done();
 			}

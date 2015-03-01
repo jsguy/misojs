@@ -1,12 +1,10 @@
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
-	miso = require('../server/miso.util.js'),
-	api = require('../system/api.server.js')(m, this);
+	api = require('../system/adaptor/flatfiledb/api.server.js')(m);
 
 var self = module.exports.index = {
 	models: {
-		//	Our todo model
 		todo: function(data){
 			this.text = data.text;
 			this.done = m.prop(data.done == "false"? false: data.done);
@@ -20,7 +18,6 @@ var self = module.exports.index = {
 		ctrl.list = Object.keys(myTodos).map(function(key) {
 			return new self.models.todo(myTodos[key]);
 		});
-
 
 		ctrl.addTodo = function(e){
 			var value = ctrl.vm.input();
@@ -36,7 +33,15 @@ var self = module.exports.index = {
 			return false;
 		};
 
-
+		ctrl.archive = function(){
+			var list = [];
+			ctrl.list.map(function(todo) {
+				if(!todo.done()) {
+					list.push(todo); 
+				}
+			});
+			ctrl.list = list;
+		};
 
 		ctrl.vm = {
 			left: function(){
@@ -61,6 +66,7 @@ var self = module.exports.index = {
 			return [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
+				BUTTON({ onclick: ctrl.archive }, "Archive"),
 				UL([
 					ctrl.list.map(function(todo){
 						return LI({ class: todo.done()? "done": "", onclick: ctrl.vm.done(todo) }, todo.text);

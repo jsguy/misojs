@@ -27,8 +27,13 @@ var fs			= require('fs'),
 
 	layoutView = require('../mvc/layout.js').index,
 	mainView = require('../system/main.view.js').index,
+	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
+	//	Where we put our API files
+	apiDirectory = './system/adaptor/',
+	apiClientFile = 'api.client.js',
+	apiServerFile = 'api.server.js',
 
 	render = function(view, ignorePretty){
 		if(serverConfig.pretty && !ignorePretty) {
@@ -259,9 +264,6 @@ module.exports = function(app, options) {
 	//	Grab our controller file names
 	var routeList = [],
 		mainFile = './system/main.js',
-		//	
-		apiClientFile = './system/api.client.js',
-		apiServerFile = './system/api.server.js',
 
 		output = "./client/miso.js",
 		outputMap = "./client/miso.map.json",
@@ -301,32 +303,25 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
+	var adaptors = _.isArray(serverConfig.adaptor)? 
+		serverConfig.adaptor: 
+		[serverConfig.adaptor];
 
-	//	TODO
-	//
-	//	* Move api.client and api.server to their 
-	//		respective adaptor directories, and rename them as per adaptor.
-	//	* Make generating adaptors conditional, so that you can 
-	//		just declare the server / client version
-	//	* Make each adaptor a seperate module, and include
-	//		info in package.json for what to use in the browser, see:
-	//		https://gist.github.com/defunctzombie/4339901#replace-specific-files---advanced
-	//		Example: https://github.com/websockets/ws/blob/master/package.json
-	//
+	_.forOwn(adaptors, function(adaptor){
+		//	Create API for configured adaptor (serverConfig.adaptor)
+		var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath);
 
-	//	Create API for configured adaptor (serverConfig.adaptor)
-	var dbApi = require('../server/api.js')(app, serverConfig.adaptor, serverConfig.apiPath);
-	//	Client file
-	fs.writeFileSync(apiClientFile, render(apiClientView({
-		api: dbApi.client.api
-	}), true));
+		//	Client file
+		fs.writeFileSync(apiDirectory + adaptor + "/" + apiClientFile, render(apiClientView({
+			api: dbApi.client.api
+		}), true));
 
-	//	Server file
-	fs.writeFileSync(apiServerFile, render(apiServerView({
-		api: dbApi.server.api,
-		adaptor: serverConfig.adaptor
-	}), true));
-
+		//	Server file
+		fs.writeFileSync(apiDirectory + adaptor + "/" + apiServerFile, render(apiServerView({
+			api: dbApi.server.api,
+			adaptor: adaptor
+		}), true));
+	});
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({

@@ -2,5 +2,6 @@
 	"port": 6476,
 	"minify": false,
 	"pretty": true,
-	"reload": true
+	"reload": true,
+	"adaptor": ["flatfiledb"]
 }

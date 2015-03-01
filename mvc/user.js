@@ -7,12 +7,11 @@ var miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
-	api = require('../system/api.server.js')(m, this);
+	api = require('../system/adaptor/flatfiledb/api.server.js')(m);
 
-//	TODO: This might be a useful practice - use self as module.exports
 var self = module.exports;
 
-//	TODO: Ability to load this from a separate file?
+//	Shared view
 var editView = function(ctrl){
 	with(sugartags) {
 		return DIV({ class: "cw" }, [

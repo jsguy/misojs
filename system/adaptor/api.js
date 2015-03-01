@@ -10,12 +10,12 @@
 //
 //
 
-var miso = require('../server/miso.util.js');
+var miso = require('../../server/miso.util.js');
 
 module.exports = function(app, adaptorType, apiPath){
 	apiPath = apiPath || "/api";
-	var adaptorInstance = require('../system/adaptor/adaptor.js')(app),
-		myAdaptor = require('../system/adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
+	var adaptorInstance = require('../adaptor/adaptor.js')(app),
+		myAdaptor = require('../adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
 		adaptor = adaptorInstance.create(myAdaptor),
 		serverAdaptor = adaptorInstance.createServer(myAdaptor),
 		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
