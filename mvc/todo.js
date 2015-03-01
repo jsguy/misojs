@@ -1,42 +1,23 @@
-/*
-	This is a sample todo app that uses the "single url" 
-	mvc miso pattern
-*/
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	bindings = require('../server/mithril.bindings.node.js')(m),
-	miso = require('../server/miso.util.js'),
-	api = require('../system/adaptor/flatfiledb/api.server.js')(m);
+	db = require('../system/adaptor/flatfiledb/api.server.js')(m);
 
-//	Basic todo app
 var self = module.exports.index = {
 	models: {
-		//	Our todo model
 		todo: function(data){
-			data.done = data.done == "false"? false: data.done;
 			this.text = data.text;
-			this.done = m.p(data.done);
+			this.done = m.prop(data.done == "false"? false: data.done);
 			this._id = data._id;
 		}
 	},
 	controller: function(params) {
 		var ctrl = this;
 
-		//	View model
-		ctrl.vm = {
-			todoList: function(todos){
-				this.todos = m.p(todos);
-			},
-			//	How many are left
-			left: function(){
-				var count = 0;
-				ctrl.model.todos().map(function(todo) {
-					count += todo.done() ? 0 : 1;
-				});
-				return count;
-			},
-			input: m.p("")
-		};
+		db.find({type: 'todo.index.todo'}).then(function(data) {
+			ctrl.list = Object.keys(data.result).map(function(key) {
+				return new self.models.todo(data.result[key]);
+			});
+		});
 
 		ctrl.addTodo = function(e){
 			var value = ctrl.vm.input();
@@ -45,9 +26,9 @@ var self = module.exports.index = {
 					text: ctrl.vm.input(),
 					done: false
 				});
-				ctrl.model.todos.push(newTodo);
+				ctrl.list.push(newTodo);
 				ctrl.vm.input("");
-				api.save({ type: 'todo.index.todo', model: newTodo } ).then(function(res){
+				db.save({ type: 'todo.index.todo', model: newTodo } ).then(function(res){
 					newTodo._id = res.result;
 				});
 			}
@@ -57,65 +38,52 @@ var self = module.exports.index = {
 
 		ctrl.archive = function(){
 			var list = [];
-			ctrl.model.todos().map(function(todo) {
+			ctrl.list.map(function(todo) {
 				if(!todo.done()) {
 					list.push(todo); 
 				} else {
-					//	Delete
-					api.remove({ type: 'todo.index.todo', _id: todo._id }).then(function(response){
+					db.remove({ type: 'todo.index.todo', _id: todo._id }).then(function(response){
 						console.log(response.result);
 					});
 				}
 			});
-			ctrl.model.todos(list);
+			ctrl.list = list;
 		};
 
-		ctrl.done = function(todo){
-			return function() {
-				todo.done(!todo.done());
-				api.save({ type: 'todo.index.todo', model: todo } ).then(function(res){
-					todo._id = res.result;
+		ctrl.vm = {
+			left: function(){
+				var count = 0;
+				ctrl.list.map(function(todo) {
+					count += todo.done() ? 0 : 1;
 				});
-			}
+				return count;
+			},
+			done: function(todo){
+				return function() {
+					todo.done(!todo.done());
+				}
+			},
+			input: m.prop("")
 		};
-
-		//	Load our todos
-		api.find({type: 'todo.index.todo'}).then(function(data) {
-			var loadedTodos = data.result || [];
-			if(data.error){
-				return console.log("Error " + data.error);
-			}
-
-			var list = Object.keys(loadedTodos).map(function(key) {
-				var myTodo = loadedTodos[key];
-				return new self.models.todo(myTodo);
-			});
-
-			ctrl.model = new ctrl.vm.todoList(list);
-		}, function(){
-			console.log('Error', arguments);
-		});
 
 		return ctrl;
 	},
 	view: function(ctrl) {
-		var c = ctrl,
-			t = c.model;
 		with(sugartags) {
-			return DIV({ class: "cw" }, [
+			return [
 				STYLE(".done{text-decoration: line-through;}"),
-				H1("Todos - " + c.vm.left() + " of " + t.todos().length + " remaining"),
-				BUTTON({ onclick: c.archive }, "Archive"),
+				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
+				BUTTON({ onclick: ctrl.archive }, "Archive"),
 				UL([
-					t.todos().map(function(todo, idx){
-						return LI({ class: todo.done()? "done": "", onclick: c.done(todo) }, todo.text);
+					ctrl.list.map(function(todo){
+						return LI({ class: todo.done()? "done": "", onclick: ctrl.vm.done(todo) }, todo.text);
 					})
 				]),
-				FORM({ onsubmit: c.addTodo }, [
-					INPUT({ type: "text", value: c.vm.input, placeholder: "Add todo"}),
+				FORM({ onsubmit: ctrl.addTodo }, [
+					INPUT({ type: "text", value: ctrl.vm.input, placeholder: "Add todo"}),
 					BUTTON({ type: "submit"}, "Add")
 				])
-			]);
-		}
+			]
+		};
 	}
 };

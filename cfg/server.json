@@ -5,7 +5,6 @@
 	},
 	"authKey": "secretauthkey",
 	"apiPath": "/api",
-	"adaptor": "flatfiledb",
 	"COMMENT_adaptor": "mongoose",
 	"minify": true,
 	"pretty": false

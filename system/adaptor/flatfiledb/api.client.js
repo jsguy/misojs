@@ -18,7 +18,7 @@ module.exports = function(m){
 	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
-		url: '/api/find',
+		url: '/api/flatfiledb/find',
 		data: args
 	});
 },
@@ -26,7 +26,7 @@ module.exports = function(m){
 	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
-		url: '/api/save',
+		url: '/api/flatfiledb/save',
 		data: args
 	});
 },
@@ -34,7 +34,7 @@ module.exports = function(m){
 	args.model = args.model? getModelData(args.model): {};
 	return m.request({
 		method:'post', 
-		url: '/api/remove',
+		url: '/api/flatfiledb/remove',
 		data: args
 	});
 }

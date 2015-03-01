@@ -172,7 +172,7 @@ module.exports = function() {
 		//	Client adaptor - remote calls with a serialised model
 		createClient: function(adaptor, utils, apiPath) {
 			var obj = {};
-
+			
 			for(var i in adaptor) {
 				obj[i] = makeClientAction(i, adaptor, apiPath);
 			}

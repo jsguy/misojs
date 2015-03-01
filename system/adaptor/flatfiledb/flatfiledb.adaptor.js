@@ -70,7 +70,7 @@ module.exports = function(utils){
 			}
 		},
 		remove: function(cb, err, args){
-			var id = args._id;
+			var id = args._id || args.id;
 			if(db.has(id)) {
 				db.del(id, function(errorText){
 					if (errorText) {

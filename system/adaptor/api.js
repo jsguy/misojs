@@ -1,4 +1,4 @@
-//	This exposes an adaptor api on /api
+//	This exposes an adaptor api on "/api/" + adaptorType
 
 //
 //	TODO: 
@@ -18,11 +18,11 @@ module.exports = function(app, adaptorType, apiPath){
 		myAdaptor = require('../adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
 		adaptor = adaptorInstance.create(myAdaptor),
 		serverAdaptor = adaptorInstance.createServer(myAdaptor),
-		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath),
+		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath + "/" + adaptorType),
 		responseType = 'json';
 
 	//	API setup
-	app.use(apiPath + "/:action", function(req, res, next){
+	app.use(apiPath + "/" + adaptorType + "/:action", function(req, res, next){
 		var action = req.params.action,
 			data = req.body,
 			respond = function(){

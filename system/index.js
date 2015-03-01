@@ -303,25 +303,27 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
-	var adaptors = _.isArray(serverConfig.adaptor)? 
-		serverConfig.adaptor: 
-		[serverConfig.adaptor];
+	if(serverConfig.adaptor) {
+		var adaptors = _.isArray(serverConfig.adaptor)? 
+			serverConfig.adaptor: 
+			[serverConfig.adaptor];
 
-	_.forOwn(adaptors, function(adaptor){
-		//	Create API for configured adaptor (serverConfig.adaptor)
-		var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath);
+		_.forOwn(adaptors, function(adaptor){
+			//	Create API for configured adaptor (serverConfig.adaptor)
+			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath);
 
-		//	Client file
-		fs.writeFileSync(apiDirectory + adaptor + "/" + apiClientFile, render(apiClientView({
-			api: dbApi.client.api
-		}), true));
+			//	Client file
+			fs.writeFileSync(apiDirectory + adaptor + "/" + apiClientFile, render(apiClientView({
+				api: dbApi.client.api
+			}), true));
 
-		//	Server file
-		fs.writeFileSync(apiDirectory + adaptor + "/" + apiServerFile, render(apiServerView({
-			api: dbApi.server.api,
-			adaptor: adaptor
-		}), true));
-	});
+			//	Server file
+			fs.writeFileSync(apiDirectory + adaptor + "/" + apiServerFile, render(apiServerView({
+				api: dbApi.server.api,
+				adaptor: adaptor
+			}), true));
+		});
+	}
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({
