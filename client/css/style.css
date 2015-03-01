@@ -41,7 +41,7 @@ header nav ul li a:last-child { margin-right: 0 }
 
 #content { background: #f3f3f3; }
 #content .cw { background: #fff; padding: 1.2em 1em; }
-#footer { background: #ccc; padding: 1.2em 0; }
+#footer { background: #333; color: #fff; padding: 1.2em 0; margin-top: 2em;  min-height: 3em;}
 
 /* Arbritary default styles for the miso site. */
 /* TODO: please make these better! */

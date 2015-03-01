@@ -16,27 +16,30 @@ module.exports.index = function(ctrl){
 		m.trust("<!doctype html>"),
 		HTML([
 			HEAD([
-			 	LINK({href: '/css/style.css', rel:'stylesheet'}), 
-			 	(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
+			 	LINK({href: '/css/style.css', rel:'stylesheet'})
 			]),
-		 	BODY({ class: 'fixed-header' }, [
+		 	BODY({"class": 'fixed-header' }, [
 			 	HEADER([
-		 			DIV({class: 'cw cf'}, [
-		 				DIV({class: 'logo'},
+		 			DIV({"class": 'cw cf'}, [
+		 				DIV({"class": 'logo'},
 		 					A({alt: 'MISO', href:'/', config: m.route}, [
 		 						IMG({src: '/img/miso_logo.png'})
 		 					])
 		 				),
-		 				NAV({class: "left"}, UL([
+		 				NAV({"class": "left"}, UL([
 		 					LI(A({href: "http://misojs.com/docs", target: "_blank"}, "Documentation"))
 		 				])),
-		 				NAV({class: "right"}, UL([
+		 				NAV({"class": "right"}, UL([
 		 					LI(A({href: "https://github.com/jsguy/misojs", target: "_blank"}, "Github"))
 		 				]))
 		 			])
 		 		]),
 		 		SECTION({id: ctrl.misoAttachmentNode}, ctrl.content),
-				SCRIPT({src: '/miso.js'})
+		 		SECTION({id: "footer"}, [
+		 			DIV({"class": 'cw cf'}, m.trust("Copyright &copy; 2015 jsguy"))
+		 		]),
+				SCRIPT({src: '/miso.js'}),
+			 	(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
 			])
 		])]
 	}

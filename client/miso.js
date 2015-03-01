@@ -762,7 +762,18 @@ var self = module.exports.index = {
 
 				DIV({"class": "cw"}, [
 					H2(A({name: "what", "class": "heading"},"What is miso?") ),
-					P("Miso is an open source isomorphic javascript framework that allows you to write complete apps with much less effort than other frameworks. It utilises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
+					P("Miso is an open source isomorphic javascript framework that allows you to write complete apps with much less effort than other frameworks. Miso features:",[
+						UL({"class": "dotList"}, [
+							LI("Single page apps with serverside rendered HTML for the first page - works perfectly with SEO and older browsers"),
+							LI("Beautiful URLs - with a flexible routing system: automate some routes, take full control of others"),
+							LI("Tiny clientside footprint - less than 25kb (gzipped and minified)"),
+							LI("Fast live-code reload - smarter reload to help you work faster"),
+							LI(["High performance - virtual dom engine, tiny footprint, faster than the rest", A({href: "http://lhorie.github.io/mithril/benchmarks.html", target: "_blank"}, "*")]),
+							LI("Much less code - create a deployable app in less than 30 lines of code"),
+							LI("Open source - MIT licensed")
+						])
+					]),
+					P("Miso utilises excellent open source libraries and frameworks to create an extremely efficient full web stack. These frameworks include:"),
 					DIV({"class": "frameworks"}, [
 						DIV({"class": "fwcontainer cf"},[
 							A({"class": "fwLink", href: "http://lhorie.github.io/mithril/", target: "_blank"},
@@ -770,16 +781,6 @@ var self = module.exports.index = {
 							A({"class": "fwLink", href: "http://expressjs.com/", target: "_blank"},SPAN({"class": "fw express"})),
 							A({"class": "fwLink", href: "http://browserify.org/", target: "_blank"},SPAN({"class": "fw browserify"})),
 							A({"class": "fwLink", href: "http://nodemon.io/", target: "_blank"},SPAN({"class": "fw nodemon"}))
-						])
-					]),
-
-					P("Miso has a tiny clientside footprint - less than 25kb (gzipped and minified), and is MIT licensed."),
-					P(" Miso also features:",[
-						UL({"class": "dotList"}, [
-							LI("Fast live-code reload - smarter reload to help you work faster"),
-							LI("High performance - virtual dom engine, tiny footprint, faster than the rest!"),
-							LI("Much less code - create a deployable app in less than 30 lines of code"),
-							LI("Beautiful URLs - and a flexible routing system: automate some routes, take full control of others, you choose!")
 						])
 					])
 				]),
