@@ -14,7 +14,6 @@ var home = require('../mvc/home.js');
 var doc = require('../mvc/doc.js');
 
 var hello = require('../mvc/hello.js');
-var redo = require('../mvc/redo.js');
 var todo = require('../mvc/todo.js');
 
 
@@ -29,7 +28,6 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/doc/:doc_id': restrict(doc.edit, 'doc.edit'),
 '/docs': restrict(doc.index, 'doc.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
-'/redos': restrict(redo.index, 'redo.index'),
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')

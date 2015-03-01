@@ -52,7 +52,7 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":12}],2:[function(require,module,exports){
+},{"mithril":11}],2:[function(require,module,exports){
 /*
 	mithril.animate - Copyright 2014 jsguy
 	MIT Licensed.
@@ -696,7 +696,7 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../client/miso.documentation.js":4,"../server/miso.util.js":1,"mithril":12,"mithril.sugartags":11}],6:[function(require,module,exports){
+},{"../client/miso.documentation.js":4,"../server/miso.util.js":1,"mithril":11,"mithril.sugartags":10}],6:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m);
@@ -718,7 +718,7 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"mithril":12,"mithril.sugartags":11}],7:[function(require,module,exports){
+},{"../server/miso.util.js":1,"mithril":11,"mithril.sugartags":10}],7:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	smoothScroll = require('../client/js/mithril.smoothscroll.js');
@@ -815,7 +815,7 @@ var self = module.exports.index = {
 	}
 };
 
-},{"../client/js/mithril.smoothscroll.js":3,"mithril":12,"mithril.sugartags":11}],8:[function(require,module,exports){
+},{"../client/js/mithril.smoothscroll.js":3,"mithril":11,"mithril.sugartags":10}],8:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	db = require("../system/adaptor/flatfiledb/api.client.js")(m);
@@ -905,9 +905,7 @@ var self = module.exports.index = {
 		};
 	}
 };
-},{"../system/adaptor/flatfiledb/api.client.js":17,"mithril":12,"mithril.sugartags":11}],9:[function(require,module,exports){
-arguments[4][8][0].apply(exports,arguments)
-},{"../system/adaptor/flatfiledb/api.client.js":17,"dup":8,"mithril":12,"mithril.sugartags":11}],10:[function(require,module,exports){
+},{"../system/adaptor/flatfiledb/api.client.js":16,"mithril":11,"mithril.sugartags":10}],9:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the
 	multiple url miso pattern.
@@ -1093,7 +1091,7 @@ module.exports.edit = {
 	*/
 };
 
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":16,"../system/adaptor/flatfiledb/api.client.js":17,"mithril":12,"mithril.sugartags":11,"validator.modelbinder":13}],11:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":15,"../system/adaptor/flatfiledb/api.client.js":16,"mithril":11,"mithril.sugartags":10,"validator.modelbinder":12}],10:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2015 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -1172,7 +1170,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -2186,7 +2184,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -2291,7 +2289,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":14}],14:[function(require,module,exports){
+},{"validator":13}],13:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -2860,7 +2858,7 @@ module.exports = {
 
 });
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*	miso restrictions
 	Restrict users access to controller actions based on roles 
 */
@@ -2900,7 +2898,7 @@ module.exports = function(restrictions, user){
 
 	return pass;
 };
-},{"../server/miso.util.js":1}],16:[function(require,module,exports){
+},{"../server/miso.util.js":1}],15:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -3118,7 +3116,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -3161,7 +3159,7 @@ module.exports = function(m){
 }
 	};
 };
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('mithril.sugartags')(m);
@@ -3178,7 +3176,6 @@ var home = require('../mvc/home.js');
 var doc = require('../mvc/doc.js');
 
 var hello = require('../mvc/hello.js');
-var redo = require('../mvc/redo.js');
 var todo = require('../mvc/todo.js');
 
 
@@ -3193,9 +3190,8 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/doc/:doc_id': restrict(doc.edit, 'doc.edit'),
 '/docs': restrict(doc.index, 'doc.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
-'/redos': restrict(redo.index, 'redo.index'),
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')
 });
-},{"../client/js/mithril.animate.js":2,"../mvc/doc.js":5,"../mvc/hello.js":6,"../mvc/home.js":7,"../mvc/redo.js":8,"../mvc/todo.js":9,"../mvc/user.js":10,"../server/miso.restrictions.js":15,"../server/mithril.bindings.node.js":16,"mithril":12,"mithril.sugartags":11}]},{},[18]);
+},{"../client/js/mithril.animate.js":2,"../mvc/doc.js":5,"../mvc/hello.js":6,"../mvc/home.js":7,"../mvc/todo.js":8,"../mvc/user.js":9,"../server/miso.restrictions.js":14,"../server/mithril.bindings.node.js":15,"mithril":11,"mithril.sugartags":10}]},{},[17]);
