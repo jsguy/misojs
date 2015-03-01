@@ -28,7 +28,7 @@ module.exports.index = function(ctrl){
 		 					])
 		 				),
 		 				NAV({class: "left"}, UL([
-		 					LI(A({href: "/docs", config: m.route}, "Documentation"))
+		 					LI(A({href: "http://misojs.com/docs", target: "_blank"}, "Documentation"))
 		 				])),
 		 				NAV({class: "right"}, UL([
 		 					LI(A({href: "https://github.com/jsguy/misojs", target: "_blank"}, "Github"))

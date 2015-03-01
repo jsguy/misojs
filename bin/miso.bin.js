@@ -28,7 +28,10 @@ var argv = require('minimist')(process.argv.slice(2)),
 	},
 	createdProject = false,
 	projectPath,
-	excludeFiles = ['skeletons', 'bin', 'README.md', ''],
+	//	What to exclude
+	excludeFiles = ['mvc', 'documentation', 'skeletons', 'bin', 'README.md', ''],
+	//	What to always copy
+	copyFiles = ['mvc/layout.js'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {
@@ -36,11 +39,11 @@ var argv = require('minimist')(process.argv.slice(2)),
 			//	Create the new directory
 			fs.mkdirSync(projectPath);
 
-			//	Loop on our files
+			//	Loop on all our files
 			fs.readdirSync(misoPath)
 				.filter(function(file) {
 					//	All files that don't start with '.' and are not in the exclude list
-					return (file.indexOf('.') !== 0) && (excludeFiles.indexOf(file) == -1);
+					return ((file.indexOf('.') !== 0) && excludeFiles.indexOf(file) == -1);
 				})
 				.forEach(function(fileName) {
 					//	Copy files and directories, using real paths
@@ -54,6 +57,21 @@ var argv = require('minimist')(process.argv.slice(2)),
 
 					fs.copySync(file, toPath);
 				});
+
+			//	Copy the specific files
+			_.forOwn(copyFiles, function(fileName) {
+				//	Copy files and directories, using real paths
+				file = fs.realpathSync(misoPath + fileName);
+				var stat = fs.statSync(file),
+					toPath = projectPath + "/" + fileName;
+
+				if(stat.isDirectory()) {
+					file = fs.realpathSync(file + "/../" + fileName);
+				}
+
+				fs.copySync(file, toPath);
+			});
+
 
 			//	Create package
 			fs.writeFileSync(projectPath +"/package.json", createPackage(projectName));
