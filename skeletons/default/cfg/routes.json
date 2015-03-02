@@ -1,0 +1,3 @@
+{
+	"/": { "method": "get", "name": "home", "action": "index" }
+}

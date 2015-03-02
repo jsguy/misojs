@@ -171,6 +171,9 @@ try {
 			//	We can also apply a skeleton when creating a new project
 			if(argv.s) {
 				addSkeleton(argv.s, projectPath, argv.n);
+			} else {
+				//	Apply default skeleton
+				addSkeleton("default", projectPath, argv.n);
 			}
 		}
 
