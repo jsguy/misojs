@@ -30,8 +30,12 @@ var fs			= require('fs'),
 	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
+	adaptorPath = "../",
 	//	Where we put our API files
 	apiDirectory = './system/adaptor/',
+	//	Where we put adaptor override files
+	moduleAdaptorDirectory = './modules/adaptor/',
+
 	apiClientFile = 'api.client.js',
 	apiServerFile = 'api.server.js',
 
@@ -288,6 +292,45 @@ module.exports = function(app, options) {
 			a > b;
 	});
 
+	//	Add any adaptors
+	if(serverConfig.adaptor) {
+		var adaptors = _.isArray(serverConfig.adaptor)? 
+			serverConfig.adaptor: 
+			[serverConfig.adaptor],
+			adaptorRequirePath,
+			apiDir = apiDirectory,
+			myAdaptorPath = adaptorPath;
+
+		_.forOwn(adaptors, function(adaptor){
+
+			//	Check the module adaptor directory first
+			if(fs.existsSync(moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js')) {
+				apiDir = moduleAdaptorDirectory;
+				adaptorRequirePath = "../." + moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js';
+				myAdaptorPath = "../../../system/adaptor/";
+			} else {
+				apiDir = apiDirectory;
+				adaptorRequirePath = undefined;
+				myAdaptorPath = adaptorPath;
+			}
+
+			//	Create API for configured adaptor (serverConfig.adaptor)
+			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath, adaptorRequirePath);
+
+			//	Client file
+			fs.writeFileSync(apiDir + adaptor + "/" + apiClientFile, render(apiClientView({
+				api: dbApi.client.api
+			}), true));
+
+			//	Server file
+			fs.writeFileSync(apiDir + adaptor + "/" + apiServerFile, render(apiServerView({
+				api: dbApi.server.api,
+				adaptor: adaptor,
+				adaptorPath: myAdaptorPath
+			}), true));
+		});
+	}
+
 	options.verbose && console.log('');
 	options.verbose && console.log('Miso app route map');
 	options.verbose && console.log('');
@@ -303,27 +346,9 @@ module.exports = function(app, options) {
 		createRoute(route);
 	});
 
-	if(serverConfig.adaptor) {
-		var adaptors = _.isArray(serverConfig.adaptor)? 
-			serverConfig.adaptor: 
-			[serverConfig.adaptor];
 
-		_.forOwn(adaptors, function(adaptor){
-			//	Create API for configured adaptor (serverConfig.adaptor)
-			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath);
 
-			//	Client file
-			fs.writeFileSync(apiDirectory + adaptor + "/" + apiClientFile, render(apiClientView({
-				api: dbApi.client.api
-			}), true));
 
-			//	Server file
-			fs.writeFileSync(apiDirectory + adaptor + "/" + apiServerFile, render(apiServerView({
-				api: dbApi.server.api,
-				adaptor: adaptor
-			}), true));
-		});
-	}
 
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({

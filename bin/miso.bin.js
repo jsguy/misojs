@@ -29,7 +29,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	createdProject = false,
 	projectPath,
 	//	What to exclude
-	excludeFiles = ['mvc', 'documentation', 'skeletons', 'bin', 'README.md', ''],
+	excludeFiles = ['mvc', 'modules', 'documentation', 'skeletons', 'bin', 'README.md', ''],
 	//	What to always copy
 	copyFiles = ['mvc/layout.js'],
 	//	Creates a new project folder and copies all required files

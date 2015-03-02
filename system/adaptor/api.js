@@ -12,10 +12,11 @@
 
 var miso = require('../../server/miso.util.js');
 
-module.exports = function(app, adaptorType, apiPath){
+module.exports = function(app, adaptorType, apiPath, adaptorRequirePath){
 	apiPath = apiPath || "/api";
+	adaptorRequirePath = (typeof adaptorRequirePath !== 'undefined')? adaptorRequirePath: '../adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js';
 	var adaptorInstance = require('../adaptor/adaptor.js')(app),
-		myAdaptor = require('../adaptor/' + adaptorType + '/' + adaptorType + '.adaptor.js')(adaptorInstance.utils),
+		myAdaptor = require(adaptorRequirePath)(adaptorInstance.utils),
 		adaptor = adaptorInstance.create(myAdaptor),
 		serverAdaptor = adaptorInstance.createServer(myAdaptor),
 		clientAdaptor = adaptorInstance.createClient(myAdaptor, null, apiPath + "/" + adaptorType),
