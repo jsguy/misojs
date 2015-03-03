@@ -15,7 +15,6 @@ var doc = require('../mvc/doc.js');
 
 var flickr = require('../mvc/flickr.js');
 var hello = require('../mvc/hello.js');
-var kameron = require('../mvc/kameron.js');
 var todo = require('../mvc/todo.js');
 
 
@@ -31,7 +30,6 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/docs': restrict(doc.index, 'doc.index'),
 '/flickrs': restrict(flickr.index, 'flickr.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
-'/kamerons': restrict(kameron.index, 'kameron.index'),
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')

@@ -52,7 +52,7 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	}
 };
-},{"mithril":14}],2:[function(require,module,exports){
+},{"mithril":13}],2:[function(require,module,exports){
 /*
 	mithril.animate - Copyright 2014 jsguy
 	MIT Licensed.
@@ -723,7 +723,7 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../client/miso.documentation.js":4,"../server/miso.util.js":1,"mithril":14,"mithril.sugartags":13}],7:[function(require,module,exports){
+},{"../client/miso.documentation.js":4,"../server/miso.util.js":1,"mithril":13,"mithril.sugartags":12}],7:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
@@ -753,7 +753,7 @@ var index = module.exports.index = {
 		}
 	}
 };
-},{"../modules/adaptor/flickr/api.client.js":5,"../server/miso.util.js":1,"mithril":14,"mithril.sugartags":13}],8:[function(require,module,exports){
+},{"../modules/adaptor/flickr/api.client.js":5,"../server/miso.util.js":1,"mithril":13,"mithril.sugartags":12}],8:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m);
@@ -775,7 +775,7 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../server/miso.util.js":1,"mithril":14,"mithril.sugartags":13}],9:[function(require,module,exports){
+},{"../server/miso.util.js":1,"mithril":13,"mithril.sugartags":12}],9:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	smoothScroll = require('../client/js/mithril.smoothscroll.js');
@@ -873,9 +873,7 @@ var self = module.exports.index = {
 	}
 };
 
-},{"../client/js/mithril.smoothscroll.js":3,"mithril":14,"mithril.sugartags":13}],10:[function(require,module,exports){
-arguments[4][7][0].apply(exports,arguments)
-},{"../modules/adaptor/flickr/api.client.js":5,"../server/miso.util.js":1,"dup":7,"mithril":14,"mithril.sugartags":13}],11:[function(require,module,exports){
+},{"../client/js/mithril.smoothscroll.js":3,"mithril":13,"mithril.sugartags":12}],10:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	db = require("../system/adaptor/flatfiledb/api.client.js")(m);
@@ -965,7 +963,7 @@ var self = module.exports.index = {
 		};
 	}
 };
-},{"../system/adaptor/flatfiledb/api.client.js":19,"mithril":14,"mithril.sugartags":13}],12:[function(require,module,exports){
+},{"../system/adaptor/flatfiledb/api.client.js":18,"mithril":13,"mithril.sugartags":12}],11:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the
 	multiple url miso pattern.
@@ -1151,7 +1149,7 @@ module.exports.edit = {
 	*/
 };
 
-},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":18,"../system/adaptor/flatfiledb/api.client.js":19,"mithril":14,"mithril.sugartags":13,"validator.modelbinder":15}],13:[function(require,module,exports){
+},{"../server/miso.util.js":1,"../server/mithril.bindings.node.js":17,"../system/adaptor/flatfiledb/api.client.js":18,"mithril":13,"mithril.sugartags":12,"validator.modelbinder":14}],12:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2015 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -1230,7 +1228,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -2244,7 +2242,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -2349,7 +2347,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":16}],16:[function(require,module,exports){
+},{"validator":15}],15:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -2918,7 +2916,7 @@ module.exports = {
 
 });
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*	miso restrictions
 	Restrict users access to controller actions based on roles 
 */
@@ -2958,7 +2956,7 @@ module.exports = function(restrictions, user){
 
 	return pass;
 };
-},{"../server/miso.util.js":1}],18:[function(require,module,exports){
+},{"../server/miso.util.js":1}],17:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -3176,7 +3174,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -3219,7 +3217,7 @@ module.exports = function(m){
 }
 	};
 };
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 var m = require('mithril');
 var sugartags = require('mithril.sugartags')(m);
@@ -3237,7 +3235,6 @@ var doc = require('../mvc/doc.js');
 
 var flickr = require('../mvc/flickr.js');
 var hello = require('../mvc/hello.js');
-var kameron = require('../mvc/kameron.js');
 var todo = require('../mvc/todo.js');
 
 
@@ -3253,9 +3250,8 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/docs': restrict(doc.index, 'doc.index'),
 '/flickrs': restrict(flickr.index, 'flickr.index'),
 '/hello/:hello_id': restrict(hello.edit, 'hello.edit'),
-'/kamerons': restrict(kameron.index, 'kameron.index'),
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')
 });
-},{"../client/js/mithril.animate.js":2,"../mvc/doc.js":6,"../mvc/flickr.js":7,"../mvc/hello.js":8,"../mvc/home.js":9,"../mvc/kameron.js":10,"../mvc/todo.js":11,"../mvc/user.js":12,"../server/miso.restrictions.js":17,"../server/mithril.bindings.node.js":18,"mithril":14,"mithril.sugartags":13}]},{},[20]);
+},{"../client/js/mithril.animate.js":2,"../mvc/doc.js":6,"../mvc/flickr.js":7,"../mvc/hello.js":8,"../mvc/home.js":9,"../mvc/todo.js":10,"../mvc/user.js":11,"../server/miso.restrictions.js":16,"../server/mithril.bindings.node.js":17,"mithril":13,"mithril.sugartags":12}]},{},[19]);
