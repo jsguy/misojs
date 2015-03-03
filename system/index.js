@@ -335,7 +335,7 @@ module.exports = function(app, options) {
 	options.verbose && console.log('Miso app route map');
 	options.verbose && console.log('');
 
-	//	Generate list of routes
+	//	Create routes and generate list of routes
 	_.forOwn(routeKeys, function(action){
 		var route = routes[action];
 		//	Check controller timestamp
@@ -345,9 +345,6 @@ module.exports = function(app, options) {
 		routeList.push(route);
 		createRoute(route);
 	});
-
-
-
 
 
 	//	Output our main JS file for browserify

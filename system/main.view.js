@@ -23,7 +23,7 @@ module.exports.index = function(ctrl){
 			"var restrictions = require('../server/miso.restrictions.js');",
 			
 
-			//	Setup an restrict method
+			//	Setup a restrict method
 			//	TODO: Need user roles here, then copy index.js
 			//	functionality.
 			"var restrict = function(route, actionName){",

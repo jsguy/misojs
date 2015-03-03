@@ -3,5 +3,5 @@
 	"minify": false,
 	"pretty": true,
 	"reload": true,
-	"adaptor": "flatfiledb"
+	"adaptor": ["flatfiledb", "flickr"]
 }
