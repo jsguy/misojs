@@ -15,7 +15,9 @@ module.exports = function(m){
 	};
 	return {
 'photos': function(args){
-	args.model = args.model? getModelData(args.model): {};
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
 	return m.request({
 		method:'post', 
 		url: '/api/flickr/photos',

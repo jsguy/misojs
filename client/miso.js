@@ -640,7 +640,9 @@ module.exports = function(m){
 	};
 	return {
 'photos': function(args){
-	args.model = args.model? getModelData(args.model): {};
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
 	return m.request({
 		method:'post', 
 		url: '/api/flickr/photos',
@@ -737,7 +739,7 @@ var index = module.exports.index = {
 	},
 	controller: function(params) {
 		var ctrl = this;
-		flickr.photos({}).then(function(data){
+		flickr.photos({tags: "Sydney opera house", tagmode: "any"}).then(function(data){
 			ctrl.model.flickrData(data.result.items);
 		});
 		ctrl.model = new index.models.pics({flickrData: {}});
@@ -746,7 +748,7 @@ var index = module.exports.index = {
 	view: function(ctrl) {
 		with(sugartags) {
 			return DIV([
-				ctrl.model.flickrData().map(function(item){
+				miso.each(ctrl.model.flickrData(), function(item){
 					return IMG({src: item.media.m});
 				})
 			]);
@@ -3192,7 +3194,9 @@ module.exports = function(m){
 	};
 	return {
 'find': function(args){
-	args.model = args.model? getModelData(args.model): {};
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
 	return m.request({
 		method:'post', 
 		url: '/api/flatfiledb/find',
@@ -3200,7 +3204,9 @@ module.exports = function(m){
 	});
 },
 'save': function(args){
-	args.model = args.model? getModelData(args.model): {};
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
 	return m.request({
 		method:'post', 
 		url: '/api/flatfiledb/save',
@@ -3208,7 +3214,9 @@ module.exports = function(m){
 	});
 },
 'remove': function(args){
-	args.model = args.model? getModelData(args.model): {};
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
 	return m.request({
 		method:'post', 
 		url: '/api/flatfiledb/remove',

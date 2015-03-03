@@ -75,7 +75,9 @@ var fs = require('fs'),
 	makeClientAction = function(action, adaptor, apiPath){
 		return ["function(args){",
 			//	Unwrap the model, so we post data
-			"	args.model = args.model? getModelData(args.model): {};",
+			"	if(args.model) {",
+			" 		args.model = getModelData(args.model);",
+			"	}",
 			"	return m.request({",
 			"		method:'post', ",
 			"		url: '"+apiPath + "/" + action + "',",

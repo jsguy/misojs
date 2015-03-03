@@ -1,6 +1,11 @@
 //	endpoint adaptor to make http requests via flickr
 var request = require('request'),
-	flickrJsonParser = function(jsonpData){
+	miso = require('../../../server/miso.util.js'),
+	//	Parse out the unwanted parts of the json
+	//	typically this would be run on the client
+	//	we run this using "request" on  the server, so
+	//	no need for the jsonp callback
+	jsonParser = function(jsonpData){
 		var json, startPos, endPos;
 		try {
 			startPos = jsonpData.indexOf('({');
@@ -20,11 +25,16 @@ var request = require('request'),
 module.exports = function(utils){
 	return {
 		photos: function(cb, err, args){
+			args = args || {};
 			var url = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
+			//	Add parameters
+			url += miso.each(args, function(value, key){
+				return "&" + key + "=" + value;
+			});
 
 			request(url, function (error, response, body) {
 				if (!error && response.statusCode == 200) {
-					cb(flickrJsonParser(body));
+					cb(jsonParser(body));
 				} else {
 					err(error);
 				}
