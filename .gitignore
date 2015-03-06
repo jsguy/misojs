@@ -32,6 +32,8 @@ client/miso.js
 client/miso.map.json
 system/main.js
 system/adaptor/flatfiledb/data/flat-data-file.db
-system/adaptor/api.client.js
-system/adaptor/api.server.js
+system/adaptor/*/api.client.js
+system/adaptor/*/api.server.js
+modules/adaptor/*/api.client.js
+modules/adaptor/*/api.server.js
 documentation/misojs.wiki/
