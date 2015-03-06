@@ -642,10 +642,11 @@ module.exports = function(m){
 'photos': function(args, options){
 	options = options || {};
 	var requestObj = {
-		method:'post', 
-		url: '/api/flickr/photos',
-		data: args
-	};
+			method:'post', 
+			url: '/api/flickr/photos',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
 	for(var i in options) {if(options.hasOwnProperty(i)){
 		requestObj[i] = options[i];
 	}}
@@ -655,8 +656,10 @@ module.exports = function(m){
 	if(requestObj.background) {
 		m.startComputation();
 	}
+	rootNode.className += ' loading';
 	var myDeferred = m.deferred();
 	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
 		myDeferred.resolve.apply(this, arguments);
 		if(requestObj.background) {
 			m.endComputation();
@@ -3237,10 +3240,11 @@ module.exports = function(m){
 'find': function(args, options){
 	options = options || {};
 	var requestObj = {
-		method:'post', 
-		url: '/api/flatfiledb/find',
-		data: args
-	};
+			method:'post', 
+			url: '/api/flatfiledb/find',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
 	for(var i in options) {if(options.hasOwnProperty(i)){
 		requestObj[i] = options[i];
 	}}
@@ -3250,8 +3254,10 @@ module.exports = function(m){
 	if(requestObj.background) {
 		m.startComputation();
 	}
+	rootNode.className += ' loading';
 	var myDeferred = m.deferred();
 	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
 		myDeferred.resolve.apply(this, arguments);
 		if(requestObj.background) {
 			m.endComputation();
@@ -3262,10 +3268,11 @@ module.exports = function(m){
 'save': function(args, options){
 	options = options || {};
 	var requestObj = {
-		method:'post', 
-		url: '/api/flatfiledb/save',
-		data: args
-	};
+			method:'post', 
+			url: '/api/flatfiledb/save',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
 	for(var i in options) {if(options.hasOwnProperty(i)){
 		requestObj[i] = options[i];
 	}}
@@ -3275,8 +3282,10 @@ module.exports = function(m){
 	if(requestObj.background) {
 		m.startComputation();
 	}
+	rootNode.className += ' loading';
 	var myDeferred = m.deferred();
 	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
 		myDeferred.resolve.apply(this, arguments);
 		if(requestObj.background) {
 			m.endComputation();
@@ -3287,10 +3296,11 @@ module.exports = function(m){
 'remove': function(args, options){
 	options = options || {};
 	var requestObj = {
-		method:'post', 
-		url: '/api/flatfiledb/remove',
-		data: args
-	};
+			method:'post', 
+			url: '/api/flatfiledb/remove',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
 	for(var i in options) {if(options.hasOwnProperty(i)){
 		requestObj[i] = options[i];
 	}}
@@ -3300,8 +3310,10 @@ module.exports = function(m){
 	if(requestObj.background) {
 		m.startComputation();
 	}
+	rootNode.className += ' loading';
 	var myDeferred = m.deferred();
 	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
 		myDeferred.resolve.apply(this, arguments);
 		if(requestObj.background) {
 			m.endComputation();

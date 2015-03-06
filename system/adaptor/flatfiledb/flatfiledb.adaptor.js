@@ -36,7 +36,6 @@ module.exports = function(utils){
 					}
 				}
 			}
-
 			cb(result);
 		},
 		save: function(cb, err, args){

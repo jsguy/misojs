@@ -6,20 +6,12 @@
 	ie: we are not opinionated of how it works, beyond how 
 		to call methods, so that we can override them.
 
-
-	TODO:
-
-	* Clean up what methods we need from here...
-
 */
 
 var fs = require('fs'),
 	miso = require('../../server/miso.util.js'),
 	_ = require('lodash'),
 	Promiz = require('promiz'),
-
-
-
 
 	//	Creates actions for use on the server
 	makeServerAction = function(action, adaptor){
@@ -75,14 +67,15 @@ var fs = require('fs'),
 		return ["function(args, options){",
 			"	options = options || {};",
 			"	var requestObj = {",
-			"		method:'post', ",
-			"		url: '"+apiPath + "/" + action + "',",
-			"		data: args",
-			"	};",
+			"			method:'post', ",
+			"			url: '"+apiPath + "/" + action + "',",
+			"			data: args",
+			"		},",
+			"		rootNode = document.documentElement || document.body;",
 			"	for(var i in options) {if(options.hasOwnProperty(i)){",
 			"		requestObj[i] = options[i];",
 			"	}}",
-			
+
 			//	Unwrap the model, so we can post the data
 			"	if(args.model) {",
 			" 		args.model = getModelData(args.model);",
@@ -93,8 +86,16 @@ var fs = require('fs'),
 			"	if(requestObj.background) {",
 			"		m.startComputation();",
 			"	}",
+			
+			//	Loader
+			"	rootNode.className += ' loading';",
+			//	Create deferred
 			"	var myDeferred = m.deferred();",
 			"	m.request(requestObj).then(function(){",
+				
+			//	Turn off loader
+			"		rootNode.className = rootNode.className.split(' loading').join('');",
+
 			"		myDeferred.resolve.apply(this, arguments);",
 			"		if(requestObj.background) {",
 			"			m.endComputation();",
@@ -159,8 +160,7 @@ module.exports = function() {
 			}
 		},
 
-
-		//	Server adaptor - makes calls to the actual adaptor
+		//	Server adaptor creates actions
 		create: function(adaptor, utils) {
 			var obj = {}
 

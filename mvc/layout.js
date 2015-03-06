@@ -35,6 +35,9 @@ module.exports.index = function(ctrl){
 		 			])
 		 		]),
 		 		SECTION({id: ctrl.misoAttachmentNode}, ctrl.content),
+		 		SECTION({id: "loader"}, [
+		 			DIV({"class": "loader"})
+		 		]),
 		 		SECTION({id: "footer"}, [
 		 			DIV({"class": 'cw cf'}, m.trust("Copyright &copy; 2015 jsguy"))
 		 		]),

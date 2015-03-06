@@ -114,10 +114,14 @@ pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; bor
 .doc blockquote { border-left: 4px solid #eea000; padding: 0.5em 0 0.5em 1em; background: #fff; margin: 1em 0; }
 
 
-
-
-
-
+/* loader */
+#loader 			{ font-size: 0.8em; display: none; position: absolute; z-index: 10; width: 4em; height: 4em; left: 50%; top: 0.5em; margin: 0 0 0 -2em; border: 1em solid #fff; border-right-color: transparent; border-radius: 50%; box-shadow: 0 0 3em 0.5em #eee; -webkit-animation: spin 1s linear infinite; -moz-animation: spin 1s linear infinite; -ms-animation: spin 1s linear infinite; -o-animation: spin 1s linear infinite; animation: spin 1s linear infinite; }
+.loading #loader 	{ display: block; }
+@-webkit-keyframes spin {from { -webkit-transform: rotate(0deg); } 50%  { -webkit-transform: rotate(180deg); } to   { -webkit-transform: rotate(360deg); } }
+@-moz-keyframes spin {from { -moz-transform: rotate(0deg); } 50%  { -moz-transform: rotate(180deg); } to   { -moz-transform: rotate(360deg); } }
+@-ms-keyframes spin {from { -ms-transform: rotate(0deg); } 50%  { -ms-transform: rotate(180deg); } to   { -ms-transform: rotate(360deg); } }
+@-o-keyframes spin {from { -o-transform: rotate(0deg); } 50%  { -o-transform: rotate(180deg); } to   { -o-transform: rotate(360deg); } }
+@keyframes spin {from { transform: rotate(0deg); } 50%  { transform: rotate(180deg); } to   { transform: rotate(360deg); } }
 
 
 
