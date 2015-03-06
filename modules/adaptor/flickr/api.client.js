@@ -29,15 +29,15 @@ module.exports = function(m){
 	}
 	if(requestObj.background) {
 		m.startComputation();
-		var myDeferred = m.deferred();
-		m.request(requestObj).then(function(){
-			myDeferred.resolve.apply(this, arguments);
-			m.endComputation();
-		});
-		return myDeferred.promise;
-	} else {
-		return m.request(requestObj);
 	}
+	var myDeferred = m.deferred();
+	m.request(requestObj).then(function(){
+		myDeferred.resolve.apply(this, arguments);
+		if(requestObj.background) {
+			m.endComputation();
+		}
+	});
+	return myDeferred.promise;
 }
 	};
 };

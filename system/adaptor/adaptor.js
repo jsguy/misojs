@@ -82,24 +82,25 @@ var fs = require('fs'),
 			"	for(var i in options) {if(options.hasOwnProperty(i)){",
 			"		requestObj[i] = options[i];",
 			"	}}",
+			
 			//	Unwrap the model, so we can post the data
 			"	if(args.model) {",
 			" 		args.model = getModelData(args.model);",
 			"	}",
+
+			//	Create our own deferred, so we get control of the request
 			//	For background requests, we must use a computation.
 			"	if(requestObj.background) {",
 			"		m.startComputation();",
-			//	Create our own deferred
-			"		var myDeferred = m.deferred();",
-			//	When we're good and ready
-			"		m.request(requestObj).then(function(){",
-			"			myDeferred.resolve.apply(this, arguments);",
-			"			m.endComputation();",
-			"		});",
-			"		return myDeferred.promise;",
-			"	} else {",
-			"		return m.request(requestObj);",
 			"	}",
+			"	var myDeferred = m.deferred();",
+			"	m.request(requestObj).then(function(){",
+			"		myDeferred.resolve.apply(this, arguments);",
+			"		if(requestObj.background) {",
+			"			m.endComputation();",
+			"		}",
+			"	});",
+			"	return myDeferred.promise;",
 			"}"].join("\n");
 	};
 
