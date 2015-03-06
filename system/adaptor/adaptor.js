@@ -75,30 +75,22 @@ var fs = require('fs'),
 			"	for(var i in options) {if(options.hasOwnProperty(i)){",
 			"		requestObj[i] = options[i];",
 			"	}}",
-
 			//	Unwrap the model, so we can post the data
 			"	if(args.model) {",
 			" 		args.model = getModelData(args.model);",
 			"	}",
-
 			//	Create our own deferred, so we get control of the request
-			//	For background requests, we must use a computation.
-			"	if(requestObj.background) {",
-			"		m.startComputation();",
-			"	}",
-			
-			//	Loader
+			//	Add loader class
 			"	rootNode.className += ' loading';",
 			//	Create deferred
 			"	var myDeferred = m.deferred();",
 			"	m.request(requestObj).then(function(){",
-				
-			//	Turn off loader
+			//	Turn off loader class name
 			"		rootNode.className = rootNode.className.split(' loading').join('');",
-
 			"		myDeferred.resolve.apply(this, arguments);",
-			"		if(requestObj.background) {",
-			"			m.endComputation();",
+			//	Need this because of the background request
+			"		if(requestObj.background){",
+			"			m.redraw(true);",
 			"		}",
 			"	});",
 			"	return myDeferred.promise;",
