@@ -14,35 +14,80 @@ module.exports = function(m){
 		return result;
 	};
 	return {
-'find': function(args){
-	if(args.model) {
- 		args.model = getModelData(args.model);
-	}
-	return m.request({
+'find': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/find',
 		data: args
-	});
-},
-'save': function(args){
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
 	if(args.model) {
  		args.model = getModelData(args.model);
 	}
-	return m.request({
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
+},
+'save': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/save',
 		data: args
-	});
-},
-'remove': function(args){
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
 	if(args.model) {
  		args.model = getModelData(args.model);
 	}
-	return m.request({
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
+},
+'remove': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/remove',
 		data: args
-	});
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
 }
 	};
 };

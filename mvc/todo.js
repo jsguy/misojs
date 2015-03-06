@@ -13,7 +13,7 @@ var self = module.exports.index = {
 	controller: function(params) {
 		var ctrl = this;
 
-		db.find({type: 'todo.index.todo'}).then(function(data) {
+		db.find({type: 'todo.index.todo'}, {background: true, initialValue: []}).then(function(data) {
 			ctrl.list = Object.keys(data.result).map(function(key) {
 				return new self.models.todo(data.result[key]);
 			});

@@ -70,21 +70,39 @@ var fs = require('fs'),
 			"}"].join("\n");
 	},
 
-
 	//	Creates client action method
 	makeClientAction = function(action, adaptor, apiPath){
-		return ["function(args){",
-			//	Unwrap the model, so we post data
-			"	if(args.model) {",
-			" 		args.model = getModelData(args.model);",
-			"	}",
-			"	return m.request({",
+		return ["function(args, options){",
+			"	options = options || {};",
+			"	var requestObj = {",
 			"		method:'post', ",
 			"		url: '"+apiPath + "/" + action + "',",
 			"		data: args",
-			"	});",
+			"	};",
+			"	for(var i in options) {if(options.hasOwnProperty(i)){",
+			"		requestObj[i] = options[i];",
+			"	}}",
+			//	Unwrap the model, so we can post the data
+			"	if(args.model) {",
+			" 		args.model = getModelData(args.model);",
+			"	}",
+			//	For background requests, we must use a computation.
+			"	if(requestObj.background) {",
+			"		m.startComputation();",
+			//	Create our own deferred
+			"		var myDeferred = m.deferred();",
+			//	When we're good and ready
+			"		m.request(requestObj).then(function(){",
+			"			myDeferred.resolve.apply(this, arguments);",
+			"			m.endComputation();",
+			"		});",
+			"		return myDeferred.promise;",
+			"	} else {",
+			"		return m.request(requestObj);",
+			"	}",
 			"}"].join("\n");
 	};
+
 
 
 module.exports = function() {

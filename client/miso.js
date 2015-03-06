@@ -639,15 +639,30 @@ module.exports = function(m){
 		return result;
 	};
 	return {
-'photos': function(args){
-	if(args.model) {
- 		args.model = getModelData(args.model);
-	}
-	return m.request({
+'photos': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flickr/photos',
 		data: args
-	});
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
 }
 	};
 };
@@ -891,7 +906,7 @@ var self = module.exports.index = {
 	controller: function(params) {
 		var ctrl = this;
 
-		db.find({type: 'todo.index.todo'}).then(function(data) {
+		db.find({type: 'todo.index.todo'}, {background: true, initialValue: []}).then(function(data) {
 			ctrl.list = Object.keys(data.result).map(function(key) {
 				return new self.models.todo(data.result[key]);
 			});
@@ -1251,13 +1266,13 @@ var m = (function app(window, undefined) {
 	initialize(window);
 
 
-	/*
+	/**
 	 * @typedef {String} Tag
 	 * A string that looks like -> div.classname#id[param=one][param2=two]
 	 * Which describes a DOM node
 	 */
 
-	/*
+	/**
 	 *
 	 * @param {Tag} The DOM node tag
 	 * @param {Object=[]} optional key-value pairs to be mapped to DOM attrs
@@ -1293,7 +1308,9 @@ var m = (function app(window, undefined) {
 		}
 
 		for (var attrName in attrs) {
-			if (attrName === classAttrName) cell.attrs[attrName] = (cell.attrs[attrName] || "") + " " + attrs[attrName];
+			if (attrName === classAttrName) {
+				if (attrs[attrName] !== "") cell.attrs[attrName] = (cell.attrs[attrName] || "") + " " + attrs[attrName];
+			}
 			else cell.attrs[attrName] = attrs[attrName]
 		}
 		return cell
@@ -1389,7 +1406,7 @@ var m = (function app(window, undefined) {
 									action: MOVE,
 									index: i,
 									from: existing[key].index,
-									element: parentElement.childNodes[existing[key].index] || $document.createElement("div")
+									element: cached.nodes[existing[key].index] || $document.createElement("div")
 								}
 							}
 							else unkeyed.push({index: i, element: parentElement.childNodes[i] || $document.createElement("div")})
@@ -1739,8 +1756,8 @@ var m = (function app(window, undefined) {
 			m.redraw.strategy("all");
 			m.startComputation();
 			roots[index] = root;
-			var currentModule = topModule = module;
-			var controller = new module.controller;
+			var currentModule = topModule = module = module || {};
+			var controller = new (module.controller || function() {});
 			//controllers may call m.module recursively (via m.route redirects, for example)
 			//this conditional ensures only the last recursive m.module call is applied
 			if (currentModule === topModule) {
@@ -1768,11 +1785,12 @@ var m = (function app(window, undefined) {
 		}
 	};
 	m.redraw.strategy = m.prop();
+	var blank = function() {return ""}
 	function redraw() {
 		var forceRedraw = m.redraw.strategy() === "all";
 		for (var i = 0, root; root = roots[i]; i++) {
 			if (controllers[i]) {
-				m.render(root, modules[i].view(controllers[i]), forceRedraw)
+				m.render(root, modules[i].view ? modules[i].view(controllers[i]) : blank(), forceRedraw)
 			}
 		}
 		//after rendering within a routed context, we need to scroll back to the top, and fetch the document title for history.pushState
@@ -1824,8 +1842,10 @@ var m = (function app(window, undefined) {
 			};
 			var listener = m.route.mode === "hash" ? "onhashchange" : "onpopstate";
 			window[listener] = function() {
-				if (currentRoute != normalizeRoute($location[m.route.mode])) {
-					redirect($location[m.route.mode])
+				var path = $location[m.route.mode]
+				if (m.route.mode === "pathname") path += $location.search
+				if (currentRoute != normalizeRoute(path)) {
+					redirect(path)
 				}
 			};
 			computePostRedrawHook = setScroll;
@@ -1842,6 +1862,7 @@ var m = (function app(window, undefined) {
 		}
 		//m.route(route, params)
 		else if (type.call(arguments[0]) === STRING) {
+			var oldRoute = currentRoute;
 			currentRoute = arguments[0];
 			var args = arguments[1] || {}
 			var queryIndex = currentRoute.indexOf("?")
@@ -1851,7 +1872,7 @@ var m = (function app(window, undefined) {
 			var currentPath = queryIndex > -1 ? currentRoute.slice(0, queryIndex) : currentRoute
 			if (querystring) currentRoute = currentPath + (currentPath.indexOf("?") === -1 ? "?" : "&") + querystring;
 
-			var shouldReplaceHistoryEntry = (arguments.length === 3 ? arguments[2] : arguments[1]) === true;
+			var shouldReplaceHistoryEntry = (arguments.length === 3 ? arguments[2] : arguments[1]) === true || oldRoute === arguments[0];
 
 			if (window.history.pushState) {
 				computePostRedrawHook = function() {
@@ -1868,7 +1889,9 @@ var m = (function app(window, undefined) {
 		return routeParams[key]
 	};
 	m.route.mode = "search";
-	function normalizeRoute(route) {return route.slice(modes[m.route.mode].length)}
+	function normalizeRoute(route) {
+		return route.slice(modes[m.route.mode].length)
+	}
 	function routeByValue(root, router, path) {
 		routeParams = {};
 
@@ -1914,20 +1937,24 @@ var m = (function app(window, undefined) {
 		var str = [];
 		for(var prop in object) {
 			var key = prefix ? prefix + "[" + prop + "]" : prop, value = object[prop];
-			str.push(value != null && type.call(value) === OBJECT ? buildQueryString(value, key) : encodeURIComponent(key) + "=" + encodeURIComponent(value))
+			var valueType = type.call(value)
+			var pair = value != null && (valueType === OBJECT) ?
+				buildQueryString(value, key) :
+				valueType === ARRAY ?
+					value.map(function(item) {return encodeURIComponent(key + "[]") + "=" + encodeURIComponent(item)}).join("&") :
+					encodeURIComponent(key) + "=" + encodeURIComponent(value)
+			str.push(pair)
 		}
 		return str.join("&")
 	}
+	
 	function parseQueryString(str) {
 		var pairs = str.split("&"), params = {};
 		for (var i = 0, len = pairs.length; i < len; i++) {
 			var pair = pairs[i].split("=");
-			params[decodeSpace(pair[0])] = pair[1] ? decodeSpace(pair[1]) : ""
+			params[decodeURIComponent(pair[0])] = pair[1] ? decodeURIComponent(pair[1]) : ""
 		}
 		return params
-	}
-	function decodeSpace(string) {
-		return decodeURIComponent(string.replace(/\+/g, " "))
 	}
 	function reset(root) {
 		var cacheKey = getCellCacheKey(root);
@@ -2110,7 +2137,7 @@ var m = (function app(window, undefined) {
 			var script = $document.createElement("script");
 
 			window[callbackKey] = function(resp) {
-				$document.body.removeChild(script);
+				script.parentNode.removeChild(script);
 				options.onload({
 					type: "load",
 					target: {
@@ -2121,7 +2148,7 @@ var m = (function app(window, undefined) {
 			};
 
 			script.onerror = function(e) {
-				$document.body.removeChild(script);
+				script.parentNode.removeChild(script);
 
 				options.onerror({
 					type: "error",
@@ -2385,9 +2412,13 @@ module.exports = {
 
     'use strict';
 
-    validator = { version: '3.27.0' };
+    validator = { version: '3.32.0' };
 
-    var email = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
+    var emailAddress = /((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))/;
+    var displayName = /([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~\.]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~\.]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\s)*/;
+
+    var email = new RegExp('^' + emailAddress.source + '$', 'i');
+    var emailWithDisplayName = new RegExp('^' + displayName.source + '<' + emailAddress.source + '>$', 'i');
 
     var creditCard = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
 
@@ -2406,9 +2437,9 @@ module.exports = {
 
     var alpha = /^[a-zA-Z]+$/
       , alphanumeric = /^[a-zA-Z0-9]+$/
-      , numeric = /^-?[0-9]+$/
-      , int = /^(?:-?(?:0|[1-9][0-9]*))$/
-      , float = /^(?:-?(?:[0-9]+))?(?:\.[0-9]*)?(?:[eE][\+\-]?(?:[0-9]+))?$/
+      , numeric = /^[-+]?[0-9]+$/
+      , int = /^(?:[-+]?(?:0|[1-9][0-9]*))$/
+      , float = /^(?:[-+]?(?:[0-9]+))?(?:\.[0-9]*)?(?:[eE][\+\-]?(?:[0-9]+))?$/
       , hexadecimal = /^[0-9a-fA-F]+$/
       , hexcolor = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
@@ -2422,9 +2453,13 @@ module.exports = {
     var base64 = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$/;
 
     var phones = {
-      'zh-CN': /^(\+?0?86\-?)?1[345789][0-9]{9}$/,
-      'en-ZA': /^(\+?27|0)(\d{9})$/,
-      'en-AU': /^(\+?61|0)4(\d{8})/
+      'zh-CN': /^(\+?0?86\-?)?1[345789]\d{9}$/,
+      'en-ZA': /^(\+?27|0)\d{9}$/,
+      'en-AU': /^(\+?61|0)4\d{8}$/,
+      'en-HK': /^(\+?852\-?)?[569]\d{3}\-?\d{4}$/,
+      'fr-FR': /^(\+?33|0)[67]\d{8}$/,
+      'pt-PT': /^(\+351)?9[1236]\d{7}$/,
+      'el-GR' : /^(\+30)?((2\d{9})|(69\d{8}))$/
     };
 
     validator.extend = function (name, fn) {
@@ -2496,8 +2531,14 @@ module.exports = {
         return pattern.test(str);
     };
 
-    validator.isEmail = function (str) {
-        return email.test(str);
+    var default_email_options = {
+        allow_display_name: false
+    };
+
+    validator.isEmail = function (str, options) {
+        options = merge(options, default_email_options);
+
+        return email.test(str) || (options.allow_display_name === true && emailWithDisplayName.test(str));
     };
 
     var default_url_options = {
@@ -2618,7 +2659,7 @@ module.exports = {
         var parts = str.split('.');
         if (options.require_tld) {
             var tld = parts.pop();
-            if (!parts.length || !/^[a-z]{2,}$/i.test(tld)) {
+            if (!parts.length || !/^([a-z\u00a1-\uffff]{2,}|xn[a-z0-9-]{2,})$/i.test(tld)) {
                 return false;
             }
         }
@@ -2866,7 +2907,7 @@ module.exports = {
     };
 
     validator.stripLow = function (str, keep_new_lines) {
-        var chars = keep_new_lines ? '\x00-\x09\x0B\x0C\x0E-\x1F\x7F' : '\x00-\x1F\x7F';
+        var chars = keep_new_lines ? '\\x00-\\x09\\x0B\\x0C\\x0E-\\x1F\\x7F' : '\\x00-\\x1F\\x7F';
         return validator.blacklist(str, chars);
     };
 
@@ -2889,15 +2930,15 @@ module.exports = {
         }
         var parts = email.split('@', 2);
         parts[1] = parts[1].toLowerCase();
-        if (options.lowercase) {
-            parts[0] = parts[0].toLowerCase();
-        }
         if (parts[1] === 'gmail.com' || parts[1] === 'googlemail.com') {
-            if (!options.lowercase) {
-                parts[0] = parts[0].toLowerCase();
+            parts[0] = parts[0].toLowerCase().replace(/\./g, '');
+            if (parts[0][0] === '+') {
+                return false;
             }
-            parts[0] = parts[0].replace(/\./g, '').split('+')[0];
+            parts[0] = parts[0].split('+')[0];
             parts[1] = 'gmail.com';
+        } else if (options.lowercase) {
+            parts[0] = parts[0].toLowerCase();
         }
         return parts.join('@');
     };
@@ -3193,35 +3234,80 @@ module.exports = function(m){
 		return result;
 	};
 	return {
-'find': function(args){
-	if(args.model) {
- 		args.model = getModelData(args.model);
-	}
-	return m.request({
+'find': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/find',
 		data: args
-	});
-},
-'save': function(args){
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
 	if(args.model) {
  		args.model = getModelData(args.model);
 	}
-	return m.request({
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
+},
+'save': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/save',
 		data: args
-	});
-},
-'remove': function(args){
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
 	if(args.model) {
  		args.model = getModelData(args.model);
 	}
-	return m.request({
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
+},
+'remove': function(args, options){
+	options = options || {};
+	var requestObj = {
 		method:'post', 
 		url: '/api/flatfiledb/remove',
 		data: args
-	});
+	};
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
+	if(requestObj.background) {
+		m.startComputation();
+		var myDeferred = m.deferred();
+		m.request(requestObj).then(function(){
+			myDeferred.resolve.apply(this, arguments);
+			m.endComputation();
+		});
+		return myDeferred.promise;
+	} else {
+		return m.request(requestObj);
+	}
 }
 	};
 };
