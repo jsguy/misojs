@@ -67,8 +67,10 @@ module.exports = {
 	},
 
 	//	Get parameters for an action
-	getParam: function(key, params, def){
-		return typeof params[key] !== "undefined"? params[key]: def;
+	getParam: function(key, obj, def){
+		return typeof obj.params[key] !== "undefined"? 
+			obj.params[key]: typeof obj.query[key] !== "undefined"? 
+			obj.query[key]: def;
 	},
 
 	//	Testing ready binder

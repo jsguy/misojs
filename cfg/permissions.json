@@ -8,14 +8,18 @@
 		"COMMENT_hello.edit": {
 			"deny": "*",
 			"allow": ["support"]
+		},
+		"COMMENT_user.edit": {
+			"deny": "*",
+			"allow": ["support"]
 		}
 	},
-	"db": {
+	"api": {
 		"_COMMENT": "Ok, we need to figure out how to secure stuff",
 		"_COMMENT2": " - we now have a generic 'find' method",
 		"_COMMENT3": " - what we really want to do is lock down specific",
 		"_COMMENT4": " models, so let's try to use that...",
-		"/find": {
+		"COMMENT_/find": {
 			"todo.index.todo": {
 				"allow": ["admin", "support"]
 			}

@@ -8,10 +8,10 @@ var fs			= require('fs'),
 	_			= require('lodash'),
 	routes		= {},
 	serverConfig,
-	restrictions = require('../cfg/restrictions.json'),
+	permissions = require('../cfg/permissions.json'),
 	m = require('mithril'),
 	miso = require('../server/miso.util.js'),
-	restrict = require('../server/miso.restrictions.js'),
+	permit = require('../server/miso.permissions.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
 	//templates = require('../server/mithril.templates.node.js'),
@@ -72,6 +72,47 @@ module.exports = function(app, options) {
 
 	var routesPath = __dirname + "/../mvc/",
 		auth = require('../system/auth.js')(app, serverConfig.authKey);
+
+	//	Add any adaptors
+	if(serverConfig.adaptor) {
+		var adaptors = _.isArray(serverConfig.adaptor)? 
+			serverConfig.adaptor: 
+			[serverConfig.adaptor],
+			adaptorRequirePath,
+			apiDir = apiDirectory,
+			myAdaptorPath = adaptorPath;
+
+		_.forOwn(adaptors, function(adaptor){
+
+			//	Check the module adaptor directory first
+			if(fs.existsSync(moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js')) {
+				apiDir = moduleAdaptorDirectory;
+				adaptorRequirePath = "../." + moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js';
+				myAdaptorPath = "../../../system/adaptor/";
+			} else {
+				apiDir = apiDirectory;
+				adaptorRequirePath = undefined;
+				myAdaptorPath = adaptorPath;
+			}
+
+			console.log('Adapt', adaptor);
+
+			//	Create API for configured adaptor (serverConfig.adaptor)
+			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath, adaptorRequirePath);
+
+			//	Client file
+			fs.writeFileSync(apiDir + adaptor + "/" + apiClientFile, render(apiClientView({
+				api: dbApi.client.api
+			}), true));
+
+			//	Server file
+			fs.writeFileSync(apiDir + adaptor + "/" + apiServerFile, render(apiServerView({
+				api: dbApi.server.api,
+				adaptor: adaptor,
+				adaptorPath: myAdaptorPath
+			}), true));
+		});
+	}
 
 	//	Add configured routes
 	if(options.routeConfig) {
@@ -209,20 +250,20 @@ module.exports = function(app, options) {
 				//	Here I need the user roles - let's assume we can
 				//	use the session...
 				//sess=req.session;
-				var restrictObj = restrictions["app"][args.name + "." + args.action],
+				var permitObj = permissions["app"][args.name + "." + args.action],
 					//	TODO: hard coded user should be real
 					user = req.session && req.session.user? req.session.user: {
 						name: "you",
 						roles: ['admin']
 					};
 
-				if(!restrict(restrictObj, user)){
+				if(!permit.app(permitObj, user)){
 					//	ACCESS DENIED - show login page?
 					return res.end(skin(["ACCESS DENIED"],{}));
 				}
 
 				try{
-					var scope = args.route[args.action].controller(req.params),
+					var scope = args.route[args.action].controller({params: req.params, query: req.query}),
 						bindScope = args.route[args.action].controller,
 						mvc = args.route[args.action];
 
@@ -255,7 +296,7 @@ module.exports = function(app, options) {
 
 			//	Apply authentication if specified
 			if(args.authenticate) {
-				console.log('apply auth...');
+				console.log('apply auth...', args.path);
 				app[args.method](args.path, auth(args.authenticate), myRoute);
 			} else {
 				app[args.method](args.path, myRoute);
@@ -292,45 +333,6 @@ module.exports = function(app, options) {
 			a > b;
 	});
 
-	//	Add any adaptors
-	if(serverConfig.adaptor) {
-		var adaptors = _.isArray(serverConfig.adaptor)? 
-			serverConfig.adaptor: 
-			[serverConfig.adaptor],
-			adaptorRequirePath,
-			apiDir = apiDirectory,
-			myAdaptorPath = adaptorPath;
-
-		_.forOwn(adaptors, function(adaptor){
-
-			//	Check the module adaptor directory first
-			if(fs.existsSync(moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js')) {
-				apiDir = moduleAdaptorDirectory;
-				adaptorRequirePath = "../." + moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js';
-				myAdaptorPath = "../../../system/adaptor/";
-			} else {
-				apiDir = apiDirectory;
-				adaptorRequirePath = undefined;
-				myAdaptorPath = adaptorPath;
-			}
-
-			//	Create API for configured adaptor (serverConfig.adaptor)
-			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath, adaptorRequirePath);
-
-			//	Client file
-			fs.writeFileSync(apiDir + adaptor + "/" + apiClientFile, render(apiClientView({
-				api: dbApi.client.api
-			}), true));
-
-			//	Server file
-			fs.writeFileSync(apiDir + adaptor + "/" + apiServerFile, render(apiServerView({
-				api: dbApi.server.api,
-				adaptor: adaptor,
-				adaptorPath: myAdaptorPath
-			}), true));
-		});
-	}
-
 	options.verbose && console.log('');
 	options.verbose && console.log('Miso app route map');
 	options.verbose && console.log('');
@@ -350,7 +352,7 @@ module.exports = function(app, options) {
 	//	Output our main JS file for browserify
 	fs.writeFileSync(mainFile, render(mainView({
 		routes: routeList,
-		restrictions: JSON.stringify(restrictions),
+		permissions: JSON.stringify(permissions),
 		attachmentNodeSelector: attachmentNodeSelector
 	}), true));
 

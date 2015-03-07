@@ -101,7 +101,6 @@ module.exports.new = {
 				ctrl.showErrors = true;
 				console.log('User is not valid');
 			} else {
-				//	TODO: return a proper THEN.
 				api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 					console.log("Added user", arguments);
 					m.route("/users");
@@ -174,11 +173,7 @@ module.exports.edit = {
 		return ctrl;
 	},
 	view: editView
-	/*
 	,
 	//	Any authentication info
-	authenticate: {
-		roles: ['admin', 'support']
-	}
-	*/
+	authenticate: true
 };
