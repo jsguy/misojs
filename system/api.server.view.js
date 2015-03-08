@@ -11,6 +11,7 @@ var m = require('mithril');
 module.exports.index = function(ctrl){
 	return [
 		"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
+    "var m = require('mithril');",
 		"var utils = require('"+ctrl.adaptorPath+"adaptor.js')().utils;",
 		"var miso = require('../../../server/miso.util.js');",
 		"var myAdaptor = require('../" + ctrl.adaptor + "/" + ctrl.adaptor + ".adaptor.js')(utils);",
