@@ -2,7 +2,7 @@
 var m = require('mithril'),
 	miso = require('../server/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
-	ldb = require('../modules/adaptor/login/api.server.js')(m);
+	ldb = require('../modules/adaptor/authentication/api.server.js')(m);
 
 var index = module.exports.index = {
 	models: {
@@ -22,6 +22,7 @@ var index = module.exports.index = {
 			e.preventDefault();
 			ldb.login({type: 'login.index.login', model: ctrl.model}).then(function(data){
 				console.log('response', data);
+				//	if data === true, redirect to the url.
 			});
 			return false;
 		}

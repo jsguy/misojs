@@ -29,7 +29,6 @@ module.exports.index = function(ctrl){
 			//	functionality.
 			"var restrict = function(route, actionName){",
 
-/*
 			//	If authentication is turned on, we can use permissions
 			"	if(route.authenticate){",
 
@@ -62,7 +61,7 @@ module.exports.index = function(ctrl){
 			"		};",
 
 			"	}",
-*/
+
 			"	return route;",
 
 			"};",

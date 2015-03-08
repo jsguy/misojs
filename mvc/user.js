@@ -7,9 +7,8 @@ var miso = require('../server/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
-	api = require('../system/adaptor/flatfiledb/api.server.js')(m);
-
-var self = module.exports;
+	api = require('../modules/adaptor/authentication/api.server.js')(m),
+	self = module.exports;
 
 //	Shared view
 var editView = function(ctrl){
@@ -27,6 +26,12 @@ var editView = function(ctrl){
 					LABEL("Email"), INPUT({value: ctrl.user.email}),
 					DIV({"class": (ctrl.user.isValid('email') == true || !ctrl.showErrors? "valid": "invalid") + " indented" }, [
 						ctrl.user.isValid('email') == true || !ctrl.showErrors? "": ctrl.user.isValid('email').join(", ")
+					])
+				]),
+				DIV([
+					LABEL("Password"), INPUT({value: ctrl.user.password, type: 'password'}),
+					DIV({"class": (ctrl.user.isValid('password') == true || !ctrl.showErrors? "valid": "invalid") + " indented" }, [
+						ctrl.user.isValid('password') == true || !ctrl.showErrors? "": ctrl.user.isValid('password').join(", ")
 					])
 				]),
 				DIV({"class": "indented"},[
@@ -50,7 +55,7 @@ module.exports.index = {
 			}
 		};
 
-		api.find({type: 'user.edit.user'}).then(function(data) {
+		api.findUsers({type: 'user.edit.user'}).then(function(data) {
 			if(data.error) {
 				console.log("Error " + data.error);
 				return;
@@ -101,7 +106,7 @@ module.exports.new = {
 				ctrl.showErrors = true;
 				console.log('User is not valid');
 			} else {
-				api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
+				api.saveUser({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 					console.log("Added user", arguments);
 					m.route("/users");
 				});
@@ -120,12 +125,17 @@ module.exports.edit = {
 		user: function(data){
 			this.name = m.p(data.name||"");
 			this.email = m.p(data.email||"");
+			//	Password is always empty first
+			this.password = m.p(data.password||"");
 			this.id = m.p(data._id||"");
 
 			//	Validate the model
 			this.isValid = validate.bind(this, {
 				name: {
 					isRequired: "You must enter a name"
+				},
+				password: {
+					isRequired: "You must enter a password"
 				},
 				email: {
 					isRequired: "You must enter an email address",
@@ -143,7 +153,7 @@ module.exports.edit = {
 		ctrl.header = "Edit user " + userId;
 
 		//	Load our user
-		api.find({type: 'user.edit.user', query: {_id: userId}}).then(function(data) {
+		api.findUsers({type: 'user.edit.user', query: {_id: userId}}).then(function(data) {
 			var user = data.result;
 			if(user && user.length > 0) {
 				ctrl.user = new self.edit.models.user(user[0]);
@@ -155,10 +165,15 @@ module.exports.edit = {
 		});
 
 		ctrl.save = function(){
-			api.save({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
-				console.log("Saved user", arguments);
-				m.route("/users");
-			});
+			if(ctrl.user.isValid() !== true) {
+				ctrl.showErrors = true;
+				console.log('User is not valid');
+			} else {
+				api.saveUser({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
+					console.log("Saved user", arguments);
+					m.route("/users");
+				});
+			}
 		};
 
 		ctrl.remove = function(){
@@ -173,7 +188,6 @@ module.exports.edit = {
 		return ctrl;
 	},
 	view: editView
-	,
 	//	Any authentication info
-	authenticate: true
+	//, authenticate: true
 };

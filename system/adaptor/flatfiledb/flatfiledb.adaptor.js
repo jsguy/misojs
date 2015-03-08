@@ -1,14 +1,10 @@
 //	Flat-file-db miso adaptor example
 
-//	TODO: Move to /cfg
+//	TODO: Move connection to a /cfg file somewhere...
 var flatfile = require('flat-file-db'),
 	_ = require('lodash'),
 	uuid = require('node-uuid'),
 	db = flatfile.sync('./system/adaptor/flatfiledb/data/flat-data-file.db');
-
-//	Creates a cache for the constructed models 
-//	so we're not creating new ones all the time
-var modelCache = {};
 
 module.exports = function(utils){
 	return {

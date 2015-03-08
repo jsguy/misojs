@@ -41,7 +41,7 @@ module.exports.index = function(ctrl){
 		 		SECTION({id: "footer"}, [
 		 			DIV({"class": 'cw cf'}, m.trust("Copyright &copy; 2015 jsguy"))
 		 		]),
-				SCRIPT({src: '/miso.js'}),
+				SCRIPT({src: '/miso.js' + (ctrl.reload? "?cacheKey=" + (new Date()).getTime(): "")}),
 			 	(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
 			])
 		])]

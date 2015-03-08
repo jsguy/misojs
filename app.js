@@ -28,9 +28,9 @@ var express = require('express'),
 //	Setup session
 //	TODO: Set session store
 //	Fix config: https://github.com/sahat/hackathon-starter/issues/169
-// serverConfig.session.resave = serverConfig.session.resave || false;
-// serverConfig.session.saveUninitialized = serverConfig.session.saveUninitialized || false;
-// app.use(session(serverConfig.session));
+serverConfig.session.resave = serverConfig.session.resave || false;
+serverConfig.session.saveUninitialized = serverConfig.session.saveUninitialized || false;
+app.use(session(serverConfig.session));
 
 //	We parse application/x-www-form-urlencoded and application/json
 //	TODO: Add any further defaults here and make configurable

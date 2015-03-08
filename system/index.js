@@ -95,8 +95,6 @@ module.exports = function(app, options) {
 				myAdaptorPath = adaptorPath;
 			}
 
-			console.log('Adapt', adaptor);
-
 			//	Create API for configured adaptor (serverConfig.adaptor)
 			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath, adaptorRequirePath);
 
