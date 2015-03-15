@@ -73,44 +73,44 @@ module.exports = {
 			obj.query[key]: def;
 	},
 
-	//	Testing ready binder
-	//	NOTE: We somehow need to share this with the createRoute method...
-	readyBinderFactory: function(){
-		var bindings = [],
-			afterBindings = [],
-			myBindings = {
-				bind: function(cb) {
-					bindings.push(cb);
+  //	Testing ready binder
+  //	NOTE: We somehow need to share this with the createRoute method...
+  readyBinderFactory: function(){
+    var bindings = {},
+      afterBindings = [],
+      myBindings = {
+        bind: function(cb) {
+          bindings[_.size(bindings)] = cb;
 
-					//	Return a function that will remove this binding and
-					//	fire the ready function if there are no more bindings
-					return (function(index){
-						return function(){
-							bindings[index]();
-							bindings.splice(index, 1);
-							if(!myBindings.hasBindings()) {
-								myBindings.ready();
-							}
-						};
-					}(bindings.length -1));
-				},
-				bindLast: function(cb) {
-					afterBindings.push(cb);
-				},
-				ready: function(){
-					for(var i = 0; i < bindings.length; i += 1) {
-						bindings[i]();
-					}
-					bindings = [];
-					for(var i = 0; i < afterBindings.length; i += 1) {
-						afterBindings[i]();
-					}
-					afterBindings = [];
-				},
-				hasBindings: function() {
-					return bindings.length > 0;
-				}
-			};
-		return myBindings;
-	}
+          //	Return a function that will remove this binding and
+          //	fire the ready function if there are no more bindings
+          return (function(index){
+            return function(){
+              bindings[index]();
+              delete bindings[index];
+              if(!myBindings.hasBindings()) {
+                myBindings.ready();
+              }
+            };
+          }(_.size(bindings) -1));
+        },
+        bindLast: function(cb) {
+          afterBindings.push(cb);
+        },
+        ready: function(){
+          _.each(bindings, function(binding) {
+            bindings[i]();
+          });
+          bindings = {};
+          for(var i = 0; i < afterBindings.length; i += 1) {
+            afterBindings[i]();
+          }
+          afterBindings = [];
+        },
+        hasBindings: function() {
+          return _.size(bindings) > 0;
+        }
+      };
+    return myBindings;
+  }
 };
