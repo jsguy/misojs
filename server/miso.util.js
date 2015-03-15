@@ -1,6 +1,7 @@
 //	Various utilities that normalise usage between client and server
 //	This is the server version
 //	See /client/miso.util.js for client version
+var _ = require("lodash");
 
 module.exports = {
 	//	Are we on the server?
