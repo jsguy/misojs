@@ -49,3 +49,7 @@ Use one of these methods, if you want to work on improving miso the framework, i
 ## IE8 support
 
 Mithril needs a bunch of polyfills - grab [from here](https://gist.github.com/jsguy/edc7e51ae56e0ab37a5c) if you need to support IE8, and conditionally include it.
+
+## Changelog
+
+Be sure to read [changelog.md](https://github.com/jsguy/misojs/blob/master/changelog.md) for the latest changes and update you might need to be aware of.
