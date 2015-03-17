@@ -16,7 +16,7 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	session = require('express-session'),
 	//	TODO: For dev only
-	reload = require('./server/reload'),
+	reload = require('./modules/reload'),
 	path = require('path'),
 	app = express(),
 	environment = app.get('env'),

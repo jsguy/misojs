@@ -6,7 +6,7 @@ var miso = require('../modules/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	bindings = require('../server/mithril.bindings.node.js')(m),
+	bindings = require('mithril.bindings')(m),
 	api = require('../modules/adaptor/authentication/api.server.js')(m),
 	self = module.exports;
 

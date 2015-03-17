@@ -28,6 +28,7 @@
     "minimist": "^1.1.0",
     "mithril": "*",
     "mithril-node-render": "0.2.2",
+    "mithril.bindings": "0.0.3",
     "mithril.sugartags": "0.0.5",
     "node-uuid": "^1.4.2",
     "nodemon": "^1.3.5",
@@ -44,8 +45,7 @@
     "test": "test"
   },
   "devDependencies": {
-    "mocha": "~2.0.1",
-    "reload": "^0.1.0"
+    "mocha": "~2.0.1"
   },
   "repository": {
     "type": "git",
