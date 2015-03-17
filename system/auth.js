@@ -13,7 +13,7 @@ module.exports = function(app, secret){
 	//	options are passed in from the mvc action, eg: user.edit
 	//	has an example
 	return function(options) {
-		console.log('auth options', options);
+		console.log('auth options', options, 'secret', secret);
 		return function(req, res, next) {
 			var sess = req.session;
 

@@ -11,6 +11,26 @@ This is quite configurable and flexible, and it comes with a few strategies to g
 
 You can configure authentication in `/cfg/server.json`
 
+
+## Sessions
+
+When the user is authenticated, they are provided with a session - this can be used to store data and is accessible via miso.util method: session. You can use it like so in your `mvc` files:
+
+```javascript
+var miso = require('../server/miso.util.js');
+...
+miso.session.get('value');
+```
+
+These are the methods available:
+
+| Method | Purpose |
+|--------|---------|
+| get | Retreives a value from the session |
+| set | Sets a value in the session |
+
+Note: When using set, this will automatically create a request when used on the client, so the session data is stored.
+
 ## Permissions
 
 permissions is the act of limiting access to certain things within the system - in miso, the permissions module can perform the following actions:

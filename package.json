@@ -65,8 +65,7 @@
     "url": "https://github.com/jsguy/misojs/issues"
   },
   "browser": {
-    "./system/api.server.js": "./system/api.client.js",
-    "./server/miso.util.js": "./client/js/miso.util.js"
+    "./system/api.server.js": "./system/api.client.js"
   },
   "homepage": "https://github.com/jsguy/misojs"
 }

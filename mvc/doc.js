@@ -1,5 +1,5 @@
 var m = require('mithril'),
-	miso = require('../server/miso.util.js'),
+	miso = require('../modules/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
 	//	Grab the generated client version...
 	docs = require('../client/miso.documentation.js');

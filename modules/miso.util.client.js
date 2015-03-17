@@ -1,6 +1,5 @@
 //	Various utilities that normalise usage between client and server
-//	This is the client version
-//	See /server/miso.util.js for server version
+//	This is the client version - see miso.util.js for server version
 var m = require('mithril');
 
 module.exports = {
@@ -46,8 +45,27 @@ module.exports = {
 			}
 		};
 	},
+
 	//	Get parameters for an action
 	getParam: function(key, params, def){
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
+	},
+
+	//	Get info for an action from the params
+	routeInfo: function(params){
+		/*
+
+			path: req.path,
+			params: req.params, 
+			query: req.query, 
+			session: session
+
+		*/
+		return {
+			path: m.route(),
+			params: req.params, 
+			query: req.query, 
+			session: session
+		}
 	}
 };

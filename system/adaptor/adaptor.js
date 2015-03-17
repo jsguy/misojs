@@ -9,7 +9,7 @@
 */
 
 var fs = require('fs'),
-	miso = require('../../server/miso.util.js'),
+	miso = require('../../modules/miso.util.js'),
 	_ = require('lodash'),
 	Promiz = require('promiz'),
 

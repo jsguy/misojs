@@ -11,7 +11,7 @@ module.exports = function(utils){
 
 	//	See if we have a user
 	//	TODO: hash password
-	db.login = function(cb, err, args){
+	db.login = function(cb, err, args, session){
 		//	Find matching username
 		db.find(function(data) {
 			if(data.length > 0) {
@@ -21,11 +21,12 @@ module.exports = function(utils){
 						return err(false);
 					}
 				    // res == true 
-				    if(res === true) {
+				    if(res == true) {
 
-				    	//	TODO: We need to create a session here...
-				    	//	Note: this isn't teh right place to do that 
-				    	//	it should be done in the login mvc ... probably?
+				    	//	TODO: We need to notify the ssession here...
+
+				    	//	TODO - use the secret from the server config.
+				    	session.isLoggedIn = true;
 
 				    	cb(true);
 				    } else {
@@ -51,16 +52,18 @@ module.exports = function(utils){
 	//	Load users, excluding the password hash
 	db.findUsers = function(cb, err, args){
 		db.find(function(data){
-				if(data && data.length > 0) {
-					//	remove the password hash
-					_.forOwn(data, function(item){
-						delete item.password;
-					})
-				}
-				cb(data);
-			}, err, {
+			var result = [];
+			if(data && data.length > 0) {
+				//	remove the password hash
+				_.forOwn(data, function(item){
+					result.push(_.assign({},item));
+					delete result[result.length-1].password;
+				});
+			}
+			cb(result);
+		}, err, {
 			type: modelType, 
-			model: args.model
+			query: args.query
 		});
 	};
 
@@ -68,10 +71,10 @@ module.exports = function(utils){
 	//	ref: http://codahale.com/how-to-safely-store-a-password/
 	db.saveUser = function(cb, err, args){
 		//	Get an instance of the model
-		var Model = utils.getModel(args.type), model, validation;
+		var Model = utils.getModel(modelType), model, validation;
 
 		if(!Model) {
-			return err("Model not found " + args.type);
+			return err("Model not found " + modelType);
 		}
 
 		model = new Model(args.model);
@@ -91,7 +94,7 @@ module.exports = function(utils){
 				bcrypt.hash(data.password, salt, function(err, hash) {
 					data.password = hash;
 					db.save(cb, err, {
-						type: args.type, 
+						type: modelType, 
 						model: data
 					});
 				});

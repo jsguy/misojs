@@ -1,6 +1,5 @@
 //	Various utilities that normalise usage between client and server
-//	This is the server version
-//	See /client/miso.util.js for client version
+//	This is the server version - see miso.util.client.js for client version
 
 module.exports = {
 	//	Are we on the server?

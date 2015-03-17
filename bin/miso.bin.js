@@ -31,7 +31,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	//	What to exclude
 	excludeFiles = ['mvc', 'modules', 'documentation', 'skeletons', 'bin', 'README.md', ''],
 	//	What to always copy
-	copyFiles = ['mvc/layout.js'],
+	copyFiles = ['mvc/layout.js', 'modules/adaptor/authentication/authentication.adaptor.js'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {
@@ -84,6 +84,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 		return true;
 	},
 	//	Creates the required package JSON for a new project
+	//	A rather crude, but effective way to do it...
 	createPackage = function(projectName){
 		var myJSON = pjson;
 		myJSON.name = projectName;

@@ -2,7 +2,7 @@
 	This is a sample user management app that uses the
 	multiple url miso pattern.
 */
-var miso = require('../server/miso.util.js'),
+var miso = require('../modules/miso.util.js'),
 	validate = require('validator.modelbinder'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),

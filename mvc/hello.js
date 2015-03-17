@@ -1,5 +1,5 @@
 var m = require('mithril'),
-	miso = require('../server/miso.util.js'),
+	miso = require('../modules/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m);
 
 var edit = module.exports.edit = {

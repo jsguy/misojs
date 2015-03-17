@@ -10,7 +10,7 @@ var fs			= require('fs'),
 	serverConfig,
 	permissions = require('../cfg/permissions.json'),
 	m = require('mithril'),
-	miso = require('../server/miso.util.js'),
+	miso = require('../modules/miso.util.js'),
 	permit = require('../server/miso.permissions.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('../server/mithril.bindings.node.js')(m),
@@ -49,13 +49,33 @@ var fs			= require('fs'),
 		}
 	},
 
+	//	Provider for addition information we expose globaly -
+	//	we can use this to in/exclude any session variable we 
+	//	might want.
+	//	Note: so far we want just the fact they are logged in,
+	//	and their username.
+	//	Note: just to be clear: this function is intended to limit 
+	//	what we expose globally, ie: make sure we don't share
+	//	the session secret, etc...
+	globalProvider = function(obj){
+		return {
+			isLoggedIn: obj.isLoggedIn,
+			userName: obj.userName
+		};
+	},
+
 	//  Puts the lotion on its...
-	skin = function(content) {
-		return render(layoutView({
+	skin = function(content, session) {
+		var obj = {
 			reload: serverConfig.reload,
 			misoAttachmentNode: misoAttachmentNode,
 			content: content
-		}));
+		};
+		//	Add anything we want to expose from the session
+		if(session) {
+			obj.session = globalProvider(session);
+		}
+		return render(layoutView(obj));
 	},
 	getExtension = function(filename) {
 		var ext = path.extname(filename||'').split('.');
@@ -73,7 +93,7 @@ module.exports = function(app, options) {
 	var routesPath = __dirname + "/../mvc/",
 		auth = require('../system/auth.js')(app, serverConfig.authKey);
 
-	//	Add any adaptors
+	//	Add any adaptors configured in the server config
 	if(serverConfig.adaptor) {
 		var adaptors = _.isArray(serverConfig.adaptor)? 
 			serverConfig.adaptor: 
@@ -249,19 +269,30 @@ module.exports = function(app, options) {
 				//	use the session...
 				//sess=req.session;
 				var permitObj = permissions["app"][args.name + "." + args.action],
-					//	TODO: hard coded user should be real
-					user = req.session && req.session.user? req.session.user: {
+					session = req.session || {},
+					//	TODO: hard coded user! Should be real...
+					user = session && session.user? session.user: {
 						name: "you",
 						roles: ['admin']
 					};
 
 				if(!permit.app(permitObj, user)){
-					//	ACCESS DENIED - show login page?
-					return res.end(skin(["ACCESS DENIED"],{}));
+					//	ACCESS DENIED
+					return res.end(skin(["ACCESS DENIED"]));
 				}
 
 				try{
-					var scope = args.route[args.action].controller({params: req.params, query: req.query}),
+
+					//	WIP: Consolidate params and query, session into
+					//	one object "routeInfo", and add the current
+					//	route path, so you can use it to route with.
+
+					var scope = args.route[args.action].controller({
+							path: req.path,
+							params: req.params, 
+							query: req.query, 
+							session: session
+						}),
 						bindScope = args.route[args.action].controller,
 						mvc = args.route[args.action];
 
@@ -273,16 +304,18 @@ module.exports = function(app, options) {
 						//options.verbose && console.log("No blocking binding:", args.action + " - " + args.path);
 						res.end(skin(_.isFunction(mvc.view)? 
 							mvc.view(scope): 
-							mvc.view, 
-						scope));
+							mvc.view,
+							session
+						));
 					} else {
 						//options.verbose && console.log("Blocking binding:", args.action + " - " + args.path);
 						//	Add "last" binding for miso ready event
 						bindScope._misoReadyBinding.bindLast(function() {
 							res.end(skin(_.isFunction(mvc.view)? 
 								mvc.view(scope): 
-								mvc.view, 
-							scope));
+								mvc.view,
+								session
+							));
 						});
 					}
 				} catch(ex){
@@ -291,6 +324,10 @@ module.exports = function(app, options) {
 					next(problem);
 				}
 			};
+
+			//	Ok, args.route.WHATEVER contains the authenticate attribute
+			//	ie: the below is never applied..
+			//console.log('ARRRRRGS', args.route);
 
 			//	Apply authentication if specified
 			if(args.authenticate) {

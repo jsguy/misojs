@@ -16,7 +16,14 @@ module.exports.index = function(ctrl){
 		m.trust("<!doctype html>"),
 		HTML([
 			HEAD([
-			 	LINK({href: '/css/style.css', rel:'stylesheet'})
+			 	LINK({href: '/css/style.css', rel:'stylesheet'}),
+			 	//	Add in the session object...
+			 	//	it will need to automatically communicate 
+			 	//	with the session endpoint in authenticate adaptor...
+			 	(ctrl.session? 
+			 		SCRIPT("var misoSession = "+JSON.stringify(ctrl.session)+";"):
+			 		[]
+			 	)
 			]),
 		 	BODY({"class": 'fixed-header' }, [
 			 	HEADER([
@@ -41,7 +48,8 @@ module.exports.index = function(ctrl){
 		 		SECTION({id: "footer"}, [
 		 			DIV({"class": 'cw cf'}, m.trust("Copyright &copy; 2015 jsguy"))
 		 		]),
-				SCRIPT({src: '/miso.js' + (ctrl.reload? "?cacheKey=" + (new Date()).getTime(): "")}),
+				//SCRIPT({src: '/miso.js' + (ctrl.reload? "?cacheKey=" + (new Date()).getTime(): "")}),
+				SCRIPT({src: '/miso.js'}),
 			 	(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
 			])
 		])]

@@ -29,6 +29,8 @@ module.exports.index = function(ctrl){
 			//	functionality.
 			"var restrict = function(route, actionName){",
 
+//			"	console.log('route.authenticate', route.authenticate);",
+
 			//	If authentication is turned on, we can use permissions
 			"	if(route.authenticate){",
 

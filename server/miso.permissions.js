@@ -1,7 +1,7 @@
 /*	miso permissions
 	Permit users access to controller actions based on roles 
 */
-var miso = require('../server/miso.util.js'),
+var miso = require('../modules/miso.util.js'),
 	hasRole = function(userRoles, roles){
 		var hasRole = false;
 		//	All roles

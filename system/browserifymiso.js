@@ -15,10 +15,11 @@ module.exports = transformTools.makeRequireTransform('browserifymiso', {
 
 		//	Check if we find something
 		if(args && args.length > 0){
+
 			//	Check if it has the word "server" in it
 			if(args[0].indexOf(find) !== -1) {
-				//	If we have the same file with the word "client",
-				//	use it for teh cleitn script
+				//	If we have the same file with "client" where 
+				//	"server" was, use it for the client script.
 				var file = args[0].split(find).join(replace);
 				if(fs.existsSync(baseDir + file) && fs.statSync(baseDir + file).isFile()){
 					done(null, "require(\"" + file + "\")");
@@ -26,7 +27,15 @@ module.exports = transformTools.makeRequireTransform('browserifymiso', {
 					done();
 				}
 			} else {
-				done();
+				//	Check if there is a ".client" file
+				var file = args[0];
+				file = file.substr(0, file.lastIndexOf(".") + 1) + replace + file.substr(file.lastIndexOf("."));
+
+				if(fs.existsSync(baseDir + file) && fs.statSync(baseDir + file).isFile()){
+					done(null, "require(\"" + file + "\")");
+				} else {
+					done();
+				}
 			}
 		} else {
 			done();
