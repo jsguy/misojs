@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //	Static directory for our client-side JS
-app.use(express.static(path.join(__dirname, '/client')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 //	Basic error handling
 //	TODO: make configurable

@@ -1,6 +1,6 @@
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	smoothScroll = require('../client/js/mithril.smoothscroll.js');
+	smoothScroll = require('../public/js/mithril.smoothscroll.js');
 
 //	Home page
 var self = module.exports.index = {

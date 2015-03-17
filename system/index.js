@@ -345,8 +345,8 @@ module.exports = function(app, options) {
 	var routeList = [],
 		mainFile = './system/main.js',
 
-		output = "./client/miso.js",
-		outputMap = "./client/miso.map.json",
+		output = "./public/miso.js",
+		outputMap = "./public/miso.map.json",
 		//	If the server config wants a minified miso.js
 		browserifyCmd = serverConfig.minify? 
 			"browserify -t ./system/browserifymiso " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
