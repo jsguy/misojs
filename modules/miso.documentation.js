@@ -59,7 +59,7 @@ fs.readdirSync(docPath)
 	});
 
 //	Write out client/miso.documentation.js
-fs.writeFileSync("../client/miso.documentation.js", "module.exports = function(){ return " + JSON.stringify(docs) + "; };");
+fs.writeFileSync("../public/miso.documentation.js", "module.exports = function(){ return " + JSON.stringify(docs) + "; };");
 
 module.exports = function(){
 	return docs;
