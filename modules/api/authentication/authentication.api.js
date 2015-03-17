@@ -1,10 +1,10 @@
-//	miso login adaptor example
-var ffdba = require('../../../system/adaptor/flatfiledb/flatfiledb.adaptor.js'),
+//	miso login api example
+var ffdba = require('../../../system/api/flatfiledb/flatfiledb.api.js'),
 	_ = require('lodash'),
 	uuid = require('node-uuid'),
 	bcrypt = require('bcrypt');
 
-//	Extend the flatfiledb adaptor with login-specfic methods
+//	Extend the flatfiledb api with login-specfic methods
 module.exports = function(utils){
 	var db = ffdba(utils),
 		modelType = 'user.edit.user';
@@ -46,7 +46,7 @@ module.exports = function(utils){
 
 
 	//	TODO: We need to ba able to restrict user model access
-	//	by adaptor type.
+	//	by api type.
 
 
 	//	Load users, excluding the password hash

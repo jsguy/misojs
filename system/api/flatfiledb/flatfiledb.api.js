@@ -1,10 +1,10 @@
-//	Flat-file-db miso adaptor example
+//	Flat-file-db miso api example
 
 //	TODO: Move connection to a /cfg file somewhere...
 var flatfile = require('flat-file-db'),
 	_ = require('lodash'),
 	uuid = require('node-uuid'),
-	db = flatfile.sync('./system/adaptor/flatfiledb/data/flat-data-file.db');
+	db = flatfile.sync('./system/api/flatfiledb/data/flat-data-file.db');
 
 module.exports = function(utils){
 	return {

@@ -1,7 +1,7 @@
 var m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
-	flickr = require('../modules/adaptor/flickr/api.server.js')(m);
+	flickr = require('../modules/api/flickr/api.server.js')(m);
 
 var index = module.exports.index = {
 	models: {

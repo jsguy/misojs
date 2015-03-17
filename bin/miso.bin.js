@@ -31,7 +31,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	//	What to exclude
 	excludeFiles = ['mvc', 'modules', 'documentation', 'skeletons', 'bin', 'README.md', ''],
 	//	What to always copy
-	copyFiles = ['mvc/layout.js', 'modules/adaptor/authentication/authentication.adaptor.js'],
+	copyFiles = ['mvc/layout.js', 'modules/api/authentication/authentication.api.js'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {

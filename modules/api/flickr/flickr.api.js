@@ -1,4 +1,4 @@
-//	endpoint adaptor to make http requests via flickr
+//	endpoint api to make http requests via flickr
 var request = require('request'),
 	miso = require('../../../modules/miso.util.js'),
 	//	Parse out the unwanted parts of the json

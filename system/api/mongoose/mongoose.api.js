@@ -1,9 +1,9 @@
 /*
-	Mongoose miso adaptor example
+	Mongoose miso api example
 
 
 
-	To create an adaptor, create a function that can receive a set of utilities, 
+	To create an api, create a function that can receive a set of utilities, 
 	and returns an object with action methods to expose to the api.
 
 	The methods must use the following signature:

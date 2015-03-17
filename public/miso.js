@@ -1,574 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*
-	mithril.animate - Copyright 2014 jsguy
-	MIT Licensed.
-*/
-(function(){
-var mithrilAnimate = function (m) {
-	//	Known prefiex
-	var prefixes = ['Moz', 'Webkit', 'Khtml', 'O', 'ms'],
-	transitionProps = ['TransitionProperty', 'TransitionTimingFunction', 'TransitionDelay', 'TransitionDuration', 'TransitionEnd'],
-	transformProps = ['rotate', 'rotatex', 'rotatey', 'scale', 'skew', 'translate', 'translatex', 'translatey', 'matrix'],
-
-	defaultDuration = 400,
-
-	err = function(msg){
-		(typeof window != "undefined") && window.console && console.error && console.error(msg);
-	},
-	
-	//	Capitalise		
-	cap = function(str){
-		return str.charAt(0).toUpperCase() + str.substr(1);
-	},
-
-	//	For checking what vendor prefixes are native
-	div = document.createElement('div'),
-
-	//	vendor prefix, ie: transitionDuration becomes MozTransitionDuration
-	vp = function (prop) {
-		var pf;
-		//	Handle unprefixed
-		if (prop in div.style) {
-			return prop;
-		}
-
-		//	Handle keyframes
-		if(prop == "@keyframes") {
-			for (var i = 0; i < prefixes.length; i += 1) {
-				//	Testing using transition
-				pf = prefixes[i] + "Transition";
-				if (pf in div.style) {
-					return "@-" + prefixes[i].toLowerCase() + "-keyframes";
-				}
-			}
-			return prop;
-		}
-
-		for (var i = 0; i < prefixes.length; i += 1) {
-			pf = prefixes[i] + cap(prop);
-			if (pf in div.style) {
-				return pf;
-			}
-		}
-		//	Can't find it - return original property.
-		return prop;
-	},
-
-	//	See if we can use native transitions
-	supportsTransitions = function() {
-		var b = document.body || document.documentElement,
-			s = b.style,
-			p = 'transition';
-
-		if (typeof s[p] == 'string') { return true; }
-
-		// Tests for vendor specific prop
-		p = p.charAt(0).toUpperCase() + p.substr(1);
-
-		for (var i=0; i<prefixes.length; i++) {
-			if (typeof s[prefixes[i] + p] == 'string') { return true; }
-		}
-
-		return false;
-	},
-
-	//	Converts CSS transition times to MS
-	getTimeinMS = function(str) {
-		var result = 0, tmp;
-		str += "";
-		str = str.toLowerCase();
-		if(str.indexOf("ms") !== -1) {
-			tmp = str.split("ms");
-			result = Number(tmp[0]);
-		} else if(str.indexOf("s") !== -1) {
-			//	s
-			tmp = str.split("s");
-			result = Number(tmp[0]) * 1000;
-		} else {
-			result = Number(str);
-		}
-
-		return Math.round(result);
-	},
-
-	//	Set style properties
-	setStyleProps = function(obj, props){
-		for(var i in props) {if(props.hasOwnProperty(i)) {
-			obj.style[vp(i)] = props[i];
-		}}
-	},
-
-	//	Set props for transitions and transforms with basic defaults
-	setTransitionProps = function(args){
-		var props = {
-				//	ease, linear, ease-in, ease-out, ease-in-out, cubic-bezier(n,n,n,n) initial, inherit
-				TransitionTimingFunction: "ease",
-				TransitionDuration: defaultDuration + "ms",
-				TransitionProperty: "all"
-			},
-			p, i, tmp, tmp2, found;
-
-		//	Set any allowed properties 
-		for(p in args) { if(args.hasOwnProperty(p)) {
-			tmp = 'Transition' + cap(p);
-			tmp2 = p.toLowerCase();
-			found = false;
-
-			//	Look at transition props
-			for(i = 0; i < transitionProps.length; i += 1) {
-				if(tmp == transitionProps[i]) {
-					props[transitionProps[i]] = args[p];
-					found = true;
-					break;
-				}
-			}
-
-			//	Look at transform props
-			for(i = 0; i < transformProps.length; i += 1) {
-				if(tmp2 == transformProps[i]) {
-					props[vp("transform")] = props[vp("transform")] || "";
-					props[vp("transform")] += " " +p + "(" + args[p] + ")";
-					found = true;
-					break;
-				}
-			}
-
-			if(!found) {
-				props[p] = args[p];
-			}
-		}}
-		return props;
-	},
-
-	//	Fix animatiuon properties
-	//	Normalises transforms, eg: rotate, scale, etc...
-	normaliseTransformProps = function(args){
-		var props = {},
-			tmpProp,
-			p, i, found,
-			normal = function(props, p, value){
-				var tmp = p.toLowerCase(),
-					found = false, i;
-
-				//	Look at transform props
-				for(i = 0; i < transformProps.length; i += 1) {
-					if(tmp == transformProps[i]) {
-						props[vp("transform")] = props[vp("transform")] || "";
-						props[vp("transform")] += " " +p + "(" + value + ")";
-						found = true;
-						break;
-					}
-				}
-
-				if(!found) {
-					props[p] = value;
-				} else {
-					//	Remove transform property
-					delete props[p];
-				}
-			};
-
-		//	Set any allowed properties 
-		for(p in args) { if(args.hasOwnProperty(p)) {
-			//	If we have a percentage, we have a key frame
-			if(p.indexOf("%") !== -1) {
-				for(i in args[p]) { if(args[p].hasOwnProperty(i)) {
-					normal(args[p], i, args[p][i]);
-				}}
-				props[p] = args[p];
-			} else {
-				normal(props, p, args[p]);
-			}
-		}}
-
-		return props;
-	},
-
-
-	//	If an object is empty
-	isEmpty = function(obj) {
-		for(var i in obj) {if(obj.hasOwnProperty(i)) {
-			return false;
-		}}
-		return true; 
-	},
-	//	Creates a hashed name for the animation
-	//	Use to create a unique keyframe animation style rule
-	aniName = function(props){
-		return "ani" + JSON.stringify(props).split(/[{},%":]/).join("");
-	},
-	animations = {},
-
-	//	See if we can use transitions
-	canTrans = supportsTransitions();
-
-	//	IE10+ http://caniuse.com/#search=css-animations
-	m.animateProperties = function(el, args, cb){
-		el.style = el.style || {};
-		var props = setTransitionProps(args), time;
-
-		if(typeof props.TransitionDuration !== 'undefined') {
-			props.TransitionDuration = getTimeinMS(props.TransitionDuration) + "ms";
-		} else {
-			props.TransitionDuration = defaultDuration + "ms";
-		}
-
-		time = getTimeinMS(props.TransitionDuration) || 0;
-
-		//	See if we support transitions
-		if(canTrans) {
-			setStyleProps(el, props);
-		} else {
-			//	Try and fall back to jQuery
-			//	TODO: Switch to use velocity, it is better suited.
-			if(typeof $ !== 'undefined' && $.fn && $.fn.animate) {
-				$(el).animate(props, time);
-			}
-		}
-
-		if(cb){
-			setTimeout(cb, time+1);
-		}
-	};
-
-	//	Trigger a transition animation
-	m.trigger = function(name, value, options, cb){
-		options = options || {};
-		var ani = animations[name];
-		if(!ani) {
-			return err("Animation " + name + " not found.");
-		}
-
-		return function(e){
-			var args = ani.fn(function(){
-				return typeof value == 'function'? value(): value;
-			});
-
-			//	Allow override via options
-			for(i in options) if(options.hasOwnProperty(i)) {{
-				args[i] = options[i];
-			}}
-
-			m.animateProperties(e.target, args, cb);
-		};
-	};
-
-	//	Adds an animation for bindings and so on.
-	m.addAnimation = function(name, fn, options){
-		options = options || {};
-
-		if(animations[name]) {
-			return err("Animation " + name + " already defined.");
-		} else if(typeof fn !== "function") {
-			return err("Animation " + name + " is being added as a transition based animation, and must use a function.");
-		}
-
-		options.duration = options.duration || defaultDuration;
-
-		animations[name] = {
-			options: options,
-			fn: fn
-		};
-
-		//	Add a default binding for the name
-		m.addBinding(name, function(prop){
-			m.bindAnimation(name, this, fn, prop);
-		}, true);
-	};
-
-	m.addKFAnimation = function(name, arg, options){
-		options = options || {};
-
-		if(animations[name]) {
-			return err("Animation " + name + " already defined.");
-		}
-
-		var init = function(props) {
-			var aniId = aniName(props),
-				hasAni = document.getElementById(aniId),
-				kf;
-
-			//	Only insert once
-			if(!hasAni) {
-				animations[name].id = aniId;
-
-				props = normaliseTransformProps(props);
-				//  Create keyframes
-				kf = vp("@keyframes") + " " + aniId + " " + JSON.stringify(props)
-					.split("\"").join("")
-					.split("},").join("}\n")
-					.split(",").join(";")
-					.split("%:").join("% ");
-
-				var s = document.createElement('style');
-				s.setAttribute('id', aniId);
-				s.id = aniId;
-				s.textContent = kf;
-				//  Might not have head?
-				document.head.appendChild(s);
-			}
-
-			animations[name].isInitialised = true;
-			animations[name].options.animateImmediately = true;
-		};
-
-		options.duration = options.duration || defaultDuration;
-		options.animateImmediately = options.animateImmediately || false;
-
-		animations[name] = {
-			init: init,
-			options: options,
-			arg: arg
-		};
-
-		//	Add a default binding for the name
-		m.addBinding(name, function(prop){
-			m.bindAnimation(name, this, arg, prop);
-		}, true);
-	};
-
-
-	/*	Options - defaults - what it does:
-
-		Delay - unedefined - delays the animation
-		Direction - 
-		Duration
-		FillMode - "forward" makes sure it sticks: http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp
-		IterationCount, 
-		Name, PlayState, TimingFunction
-	
-	*/
-
-	//	Useful to know, 'to' and 'from': http://lea.verou.me/2012/12/animations-with-one-keyframe/
-	m.animateKF = function(name, el, options, cb){
-		options = options || {};
-		var ani = animations[name], i, props = {};
-		if(!ani) {
-			return err("Animation " + name + " not found.");
-		}
-
-		//	Allow override via options
-		ani.options = ani.options || {};
-		for(i in options) if(options.hasOwnProperty(i)) {{
-			ani.options[i] = options[i];
-		}}
-
-		if(!ani.isInitialised && ani.init) {
-			ani.init(ani.arg);
-		}
-
-		//	Allow animate overrides
-		for(i in ani.options) if(ani.options.hasOwnProperty(i)) {{
-			props[vp("animation" + cap(i))] = ani.options[i];
-		}}
-
-		//	Set required items and default values for props
-		props[vp("animationName")] = ani.id;
-		props[vp("animationDuration")] = (props[vp("animationDuration")]? props[vp("animationDuration")]: defaultDuration) + "ms";
-		props[vp("animationDelay")] = props[vp("animationDelay")]? props[vp("animationDuration")] + "ms": undefined;
-		props[vp("animationFillMode")] = props[vp("animationFillMode")] || "forwards";
-
-		el.style = el.style || {};
-
-		//	Use for callback
-		var endAni = function(){
-			//	Remove listener
-			el.removeEventListener("animationend", endAni, false);
-			if(cb){
-				cb(el);
-			}
-		};
-
-		//	Remove animation if any
-		el.style[vp("animation")] = "";
-		el.style[vp("animationName")] = "";
-
-		//	Must use two request animation frame calls, for FF to
-		//	work properly, does not seem to have any adverse effects
-		requestAnimationFrame(function(){
-			requestAnimationFrame(function(){
-				//	Apply props
-				for(i in props) if(props.hasOwnProperty(i)) {{
-					el.style[i] = props[i];
-				}}
-
-				el.addEventListener("animationend", endAni, false);
-			});
-		});
-	};
-
-	m.triggerKF = function(name, options){
-		return function(){
-			m.animateKF(name, this, options);
-		};
-	};
-
-	m.bindAnimation = function(name, el, options, prop) {
-		var ani = animations[name];
-
-		if(!ani && !ani.name) {
-			return err("Animation " + name + " not found.");
-		}
-
-		if(ani.fn) {
-			m.animateProperties(el, ani.fn(prop));
-		} else {
-			var oldConfig = el.config;
-			el.config = function(el, isInit){
-				if(!ani.isInitialised && ani.init) {
-					ani.init(options);
-				}
-				if(prop() && isInit) {
-					m.animateKF(name, el, options);
-				}
-				if(oldConfig) {
-					oldConfig.apply(el, arguments);
-				}
-			};
-		}
-	};
-
-
-
-	/* Default transform2d bindings */
-	var basicBindings = ['scale', 'scalex', 'scaley', 'translate', 'translatex', 'translatey', 
-		'matrix', 'backgroundColor', 'backgroundPosition', 'borderBottomColor', 
-		'borderBottomWidth', 'borderLeftColor', 'borderLeftWidth', 'borderRightColor', 
-		'borderRightWidth', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'bottom', 
-		'clip', 'color', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 
-		'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 
-		'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineWidth', 
-		'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 
-		'textShadow', 'top', 'verticalAlign', 'visibility', 'width', 'wordSpacing', 'zIndex'],
-		degBindings = ['rotate', 'rotatex', 'rotatey', 'skewx', 'skewy'], i;
-
-	//	Basic bindings where we pass the prop straight through
-	for(i = 0; i < basicBindings.length; i += 1) {
-		(function(name){
-			m.addAnimation(name, function(prop){
-				var options = {};
-				options[name] = prop();
-				return options;
-			});
-		}(basicBindings[i]));
-	}
-
-	//	Degree based bindings - conditionally postfix with "deg"
-	for(i = 0; i < degBindings.length; i += 1) {
-		(function(name){
-			m.addAnimation(name, function(prop){
-				var options = {}, value = prop();
-				options[name] = isNaN(value)? value: value + "deg";
-				return options;
-			});
-		}(degBindings[i]));
-	}
-
-	//	Attributes that require more than one prop
-	m.addAnimation("skew", function(prop){
-		var value = prop();
-		return {
-			skew: [
-				value[0] + (isNaN(value[0])? "":"deg"), 
-				value[1] + (isNaN(value[1])? "":"deg")
-			]
-		};
-	});
-
-
-
-	//	A few more bindings
-	m = m || {};
-	//	Hide node
-	m.addBinding("hide", function(prop){
-		this.style = {
-			display: m.unwrap(prop)? "none" : ""
-		};
-	}, true);
-
-	//	Toggle boolean value on click
-	m.addBinding('toggle', function(prop){
-		this.onclick = function(){
-			var value = prop();
-			prop(!value);
-		}
-	}, true);
-
-	//	Set hover states, a'la jQuery pattern
-	m.addBinding('hover', function(prop){
-		this.onmouseover = prop[0];
-		if(prop[1]) {
-			this.onmouseout = prop[1];
-		}
-	}, true );
-
-
-};
-
-
-
-
-
-
-
-if (typeof module != "undefined" && module !== null && module.exports) {
-	module.exports = mithrilAnimate;
-} else if (typeof define === "function" && define.amd) {
-	define(function() {
-		return mithrilAnimate;
-	});
-} else {
-	mithrilAnimate(typeof window != "undefined"? window.m || {}: {});
-}
-
-}());
-},{}],2:[function(require,module,exports){
-//  Smooth scrolling for links
-//  Usage:      A({config: smoothScroll(ctrl), href: "#top"}, "Back to top")
-module.exports = function(ctrl){
-	//var root = (typeof document !== 'undefined')? document.body || document.documentElement: this,
-	var root = (typeof navigator !== 'undefined')? /firefox|trident/i.test(navigator.userAgent) ? document.documentElement : document.body: null,
-		easeInOutSine = function (t, b, c, d) {
-			//  http://gizma.com/easing/
-			return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-		};
-
-	return function(element, isInitialized) {
-		if(!isInitialized) {
-			element.addEventListener("click", function(e) {
-				var startTime,
-					startPos = root.scrollTop,
-					endPos = document.getElementById(/[^#]+$/.exec(this.href)[0]).getBoundingClientRect().top,
-					hash = this.href.substr(this.href.lastIndexOf("#")),
-					maxScroll = root.scrollHeight - window.innerHeight,
-					scrollEndValue = (startPos + endPos < maxScroll)? endPos: maxScroll - startPos,
-					duration = typeof ctrl.duration !== 'undefined'? ctrl.duration: 1500,
-					scrollFunc = function(timestamp) {
-						startTime = startTime || timestamp;
-						var elapsed = timestamp - startTime,
-							progress = easeInOutSine(elapsed, startPos, scrollEndValue, duration);
-						root.scrollTop = progress;
-						if(elapsed < duration) {
-							requestAnimationFrame(scrollFunc);
-						} else {
-							if(history.pushState) {
-								history.pushState(null, null, hash);
-							} else {
-								location.hash = hash;
-							}
-
-						}
-					};
-
-				requestAnimationFrame(scrollFunc)
-				e.preventDefault();
-			});
-		}
-	};
-};
-},{}],3:[function(require,module,exports){
-module.exports = function(){ return {"Creating-a-todo-app.md":"<p>In this article we will create a fully functional todo app, complete with details of how to use the database API and persisting/loading your data. We recommend you first read the [Getting started] article, and understand the miso fundamentals such as where to place models and how to creating a miso controller. Please do that first, it only takes 2 minutes.</p>\n<h2><a name=\"todo-app\" class=\"anchor\" href=\"#todo-app\"><span class=\"header-link\">Todo app</span></a></h2><p>We will now create a new app using the <a href=\"/doc/Patterns#single-url-mvc.md\">single url pattern</a>, which means it handles all actions autonomously, plus looks a lot like a normal mithril app.</p>\n<p>In <code>/mvc</code> save a new file as <code>todo.js</code> with the following content: </p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;);\n\nvar self = module.exports.index = {\n    models: {},\n    controller: function(params) {\n        return this;\n    },\n    view: function(ctrl) {\n        return &quot;TODO&quot;;\n    }\n};\n</code></pre>\n<p>Now open: <a href=\"/doc/todos.md\">http://localhost:6476/todos</a> and you&#39;ll see the word &quot;TODO&quot;. You&#39;ll notice that the url is &quot;/todos&quot; with an &#39;s&#39; on the end - as we are using <a href=\"/doc/How-miso-works#route-by-convention.md\">route by convention</a> to map our route.</p>\n<p>Next let&#39;s create the model for our todos - change the <code>models</code> attribute to the following:</p>\n<pre><code class=\"lang-javascript\">models: {\n    //    Our todo model\n    todo: function(data){\n        this.text = data.text;\n        this.done = m.p(data.done == &quot;false&quot;? false: data.done);\n        this._id = data._id;\n    }\n},\n</code></pre>\n<p>Each line in the model does the following:</p>\n<ul>\n<li><code>this.text</code> - The text that is shown on the todo</li>\n<li><code>this.data</code> - This represents if the todo has been completed - we ensure that we handle the &quot;false&quot; values correctly, as ajax responses are always strings.</li>\n<li><code>this._id</code> - The key for the todo - you must use <code>_id</code> for this</li>\n</ul>\n<p>The model can now be used to store and retreive todos - miso automatically picks up any objects on the <code>models</code> attribute of your mvc file, and maps it in the API. We will soon see how that works. Next add the following code as the controller:</p>\n<pre><code class=\"lang-javascript\">controller: function(params) {\n    var myTodos = [{text: &quot;Learn miso&quot;}, {text: &quot;Build miso app&quot;}];\n    this.list = Object.keys(myTodos).map(function(key) {\n        return new self.models.todo(myTodos[key]);\n    });\n    return this;\n},\n</code></pre>\n<p>This does the following:</p>\n<ul>\n<li>Creates <code>myTodos</code> which is a list of objects that represents todos</li>\n<li><code>this.list</code> - creates a list of todo model objects by using <code>new self.models.todo(...</code> on each myTodos object.</li>\n<li><code>return this</code> must be done in all controllers, it makes sure that miso can correctly get access to the controller object.</li>\n</ul>\n<p>Now update the view like so:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    return m(&quot;UL&quot;, [\n        ctrl.list.map(function(todo){\n            return m(&quot;LI&quot;, todo.text)\n        })\n    ]);\n}\n</code></pre>\n<p>This will iterate on your newly created list of todo model objects and display the on screen. Your complete program should look like this:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;);\n\nvar self = module.exports.index = {\n    models: {\n        //    Our todo model\n        todo: function(data){\n            this.text = data.text;\n            this.done = m.p(data.done == &quot;false&quot;? false: data.done);\n            this._id = data._id;\n        }\n    },\n    controller: function(params) {\n        var myTodos = [{text: &quot;Learn miso&quot;}, {text: &quot;Build miso app&quot;}];\n        this.list = Object.keys(myTodos).map(function(key) {\n            return new self.models.todo(myTodos[key]);\n        });\n        return this;\n    },\n    view: function(ctrl) {\n        return m(&quot;UL&quot;, [\n            ctrl.list.map(function(todo){\n                return m(&quot;LI&quot;, todo.text)\n            })\n        ]);\n    }\n};\n</code></pre>\n<blockquote>\nSo far we have only used pure mithril to create our app - miso did do some of the grunt-work behind the scenes, but we can do much more.\n</blockquote>\n\n\n<p>Let us add some useful libraries, change the top section to:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m),\n    bindings = require(&#39;../server/mithril.bindings.node.js&#39;)(m),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    api = require(&#39;../system/api.server.js&#39;)(m, this);\n</code></pre>\n<p>This will include the following libraries:</p>\n<ul>\n<li><a href=\"/doc/mithril.sugartags.md\">mithril.sugartags</a> - allows rendering HTML using tags that look a little more like HTML than standard mithril</li>\n<li><a href=\"/doc/mithril.bindings.md\">mithril.bindings</a> Bi-directional data bindings for richer models</li>\n<li>miso utilities - isomorphic abstraction for common tasks</li>\n<li>api - the configured database adaptor</li>\n</ul>\n<p>Let us start with the sugar tags, update the view to read:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return UL([\n            ctrl.list.map(function(todo){\n                return LI(todo.text)\n            })\n        ])\n    };\n}\n</code></pre>\n<p>So using sugartags allows us to write more concise views, that look more like natural HTML.</p>\n<p>Next let us update the functionality a little - add the following method to the controller:</p>\n<pre><code class=\"lang-javascript\">this.done = function(todo){\n    return function() {\n        todo.done(!todo.done());\n    }\n};\n</code></pre>\n<p>This method will return a function that toggles the <code>done</code> attribute on the passed in todo. Next change the view to:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return [\n            STYLE(&quot;.done{text-decoration: line-through;}&quot;),\n            UL([\n                ctrl.list.map(function(todo){\n                    return LI({ class: todo.done()? &quot;done&quot;: &quot;&quot;, onclick: ctrl.done(todo) }, todo.text);\n                })\n            ])\n        ]\n    };\n}\n</code></pre>\n<p>This will make the list of todos clickable, and put a strike-through the todo when it is set to &quot;done&quot;.</p>\n","Getting-started.md":"<p>This guide will take you through making your first miso app, it is assumed that you know the basics of how to use nodejs and mithril.</p>\n<h2><a name=\"installation\" class=\"anchor\" href=\"#installation\"><span class=\"header-link\">Installation</span></a></h2><p>To install miso, use npm:</p>\n<pre><code class=\"lang-javascript\">npm install misojs -g\n</code></pre>\n<p>To create and run a miso app in a new directory:</p>\n<pre><code class=\"lang-javascript\">miso -n myapp\ncd myapp\nmiso run\n</code></pre>\n<p>You should now see something like:</p>\n<pre><code>Miso is listening at http://localhost:6476 in development mode\n</code></pre><p>Open your browser at <code>http://localhost:6476</code> and you will see the default miso screen</p>\n<h2><a name=\"hello-world-app\" class=\"anchor\" href=\"#hello-world-app\"><span class=\"header-link\">Hello world app</span></a></h2><p>Create a new file <code>hello.js</code> in <code>myapp/mvc</code> like so:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m);\n\nvar edit = module.exports.edit = {\n    models: {\n        hello: function(data){\n            this.who = m.prop(data.who);\n        }\n    },\n    controller: function(params) {\n        var who = miso.getParam(&#39;hello_id&#39;, params);\n        this.model = new edit.models.hello({who: who});\n        return this;\n    },\n    view: function(ctrl) {\n        with(sugartags) {\n            return DIV(&quot;Hello &quot; + ctrl.model.who());\n        }\n    }\n};\n</code></pre>\n<p>Then open <a href=\"/doc/YOURNAME.md\">http://localhost:6476/hello/YOURNAME</a> and you should see &quot;Hello YOURNAME&quot;. Change the url to have your actual name instead of YOURNAME, you now know miso :)</p>\n<p>Let us take a look at what each piece of the code is actually doing:</p>\n<h3><a name=\"includes\" class=\"anchor\" href=\"#includes\"><span class=\"header-link\">Includes</span></a></h3><blockquote>\nSummary: Mithril is the only required library when apps, but using other included libraries is very useful\n</blockquote>\n\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m);\n</code></pre>\n<p>Here we grab mithril, then miso utilities and sugar tags - technically speaking, we really only need mithril, but the other libraries are very useful as well as we will see.</p>\n<h3><a name=\"models\" class=\"anchor\" href=\"#models\"><span class=\"header-link\">Models</span></a></h3><blockquote>\nSummary: Use the automatic routing when you can, always put models on the &#39;models&#39; attribute of your mvc file\n</blockquote>\n\n<pre><code class=\"lang-javascript\">var edit = module.exports.edit = {\n    models: {\n        hello: function(data){\n            this.who = m.prop(data.who);\n        }\n    },\n</code></pre>\n<p>Here a few important things are going on:</p>\n<ul>\n<li><p>By placing our <code>mvc</code> object on <code>module.exports.edit</code>, automatic routing is applied by miso - you can read more about <a href=\"/doc/How-miso-works#route-by-convention.md\">how the automatic routing works here</a>. </p>\n</li>\n<li><p>Placing our <code>hello</code> model on the <code>models</code> attribute of the object ensures that miso can figure out what your models are, and will create a persistence API automatically for you when the server starts up, so that you can save your models into the database.</p>\n</li>\n</ul>\n<h3><a name=\"controller\" class=\"anchor\" href=\"#controller\"><span class=\"header-link\">Controller</span></a></h3><blockquote>\nSummary: DO NOT forget to &#39;return this;&#39; in the controller, it is vital!\n</blockquote>\n\n<pre><code class=\"lang-javascript\">controller: function(params) {\n    var who = miso.getParam(&#39;hello_id&#39;, params);\n    this.model = new edit.models.hello({who: who});\n    return this;\n},\n</code></pre>\n<p>The controller uses <code>miso.getParam</code> to retreive the parameter - this is so that it can work seamlessly on both the server and client side. We create a new model, and very importantly <code>return this</code> ensures that miso can get access to the controller correctly.</p>\n<h3><a name=\"view\" class=\"anchor\" href=\"#view\"><span class=\"header-link\">View</span></a></h3><blockquote>\nSummary: Use sugartags to make the view look more like HTML\n</blockquote>\n\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return DIV(&quot;Hello &quot; + ctrl.model.who());\n    }\n}\n</code></pre>\n<p>The view is simply a javascript function that returns a structure. Here we use the <code>sugartags</code> library to render the DIV tag - this is strictly not required, but I find that people tend to understand the sugartags syntax better than pure mithril, as it looks a little more like HTML, though of course you could use standard mithril syntax if you prefer.</p>\n<h3><a name=\"next\" class=\"anchor\" href=\"#next\"><span class=\"header-link\">Next</span></a></h3><p>You now have a complete hello world app, and understand the fundamentals of the structure of a miso mvc application.</p>\n<p>We have only just scraped the surface of what miso is capable of, so next we recommend you read:</p>\n<p><a href=\"/doc/Creating-a-todo-app.md\">Creating a todo app</a></p>\n","Goals.md":"<h1><a name=\"primary-goals\" class=\"anchor\" href=\"#primary-goals\"><span class=\"header-link\">Primary goals</span></a></h1><ul>\n<li>Easy setup of <a href=\"/doc/.md\">isomorphic</a> application based on <a href=\"/doc/mithril.js.md\">mithril</a></li>\n<li>Skeleton / scaffold / Boilerplate to allow users to very quickly get up and running.</li>\n<li>minimal core</li>\n<li>easy extendible</li>\n<li>DB agnostic (e. G. plugins for different ORM/ODM)</li>\n</ul>\n<h1><a name=\"components\" class=\"anchor\" href=\"#components\"><span class=\"header-link\">Components</span></a></h1><ul>\n<li>Routing</li>\n<li>View rendering</li>\n<li>i18n/l10n</li>\n<li>Rest-API (could use restify: <a href=\"/doc/.md\">http://mcavage.me/node-restify/</a>)</li>\n<li>optional Websockets (could use restify: <a href=\"/doc/.md\">http://mcavage.me/node-restify/</a>)</li>\n<li>easy testing (headless and Browser-Tests)</li>\n<li>login/session handling</li>\n<li>models with validation</li>\n</ul>\n<h1><a name=\"useful-libs\" class=\"anchor\" href=\"#useful-libs\"><span class=\"header-link\">Useful libs</span></a></h1><p>Here are some libraries we are considering using, (in no particular order):</p>\n<ul>\n<li>leveldb</li>\n<li>mithril-query</li>\n<li>translate.js</li>\n<li>i18next</li>\n</ul>\n<p>And some that we&#39;re already using:</p>\n<ul>\n<li>express</li>\n<li>browserify</li>\n<li>mocha/expect</li>\n<li>mithril-node-render</li>\n<li>mithril-sugartags</li>\n<li>mithril-bindings</li>\n<li>mithril-animate</li>\n<li>lodash</li>\n<li>validator</li>\n</ul>\n","Home.md":"<p>Welcome to the misojs wiki!</p>\n<h1><a name=\"getting-started\" class=\"anchor\" href=\"#getting-started\"><span class=\"header-link\">Getting started</span></a></h1><p>See the <a href=\"/doc/misojs#install.md\">install guide</a>.\nRead <a href=\"/doc/How-miso-works.md\">how miso works</a>, and check out <a href=\"/doc/Patterns.md\">the patterns</a>, then create something cool!</p>\n","How-miso-works.md":"<h2><a name=\"models-views-controllers\" class=\"anchor\" href=\"#models-views-controllers\"><span class=\"header-link\">Models, views, controllers</span></a></h2><p>When creating a route, you must assign a controller and a view to it - this is achieved by creating a file in the <code>/mvc</code> directory - by convention, you should name it as per the path you want, (see the <a href=\"/doc/#routing.md\">routing section</a> for details).</p>\n<p>Here is a minimal example using the sugartags, and getting a parameter:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nmodule.exports.index = {\n    controller: function(params) {\n        this.who = miso.getParam(&#39;who&#39;, params, &#39;world&#39;);\n        return this;\n    },\n    view: function(ctrl){\n        with(sugartags) {\n            return DIV(&#39;Hello &#39; + ctrl.who);\n        }\n    }\n};\n</code></pre>\n<p>Save this into a file <code>/mvc/hello.js</code>, and open <a href=\"/doc/hellos.md\">http://localhost/hellos</a>, this will show &quot;Hello world&quot;. Note the &#39;s&#39; on the end - this is due to how the <a href=\"/doc/#route-by-convention.md\">route by convention</a> works.</p>\n<p>Now open <code>/cfg/routes.json</code>, and add the following routes:</p>\n<pre><code class=\"lang-javascript\">    &quot;/hello&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;hello&quot;, &quot;action&quot;: &quot;index&quot; },\n    &quot;/hello/:who&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;hello&quot;, &quot;action&quot;: &quot;index&quot; }\n</code></pre>\n<p>Save the file, and go back to the browser, and you&#39;ll see an error! This is because we have now overridden the automatic route. Open <a href=\"/doc/hello.md\">http://localhost/hello</a>, and you&#39;ll see our action. Now open <a href=\"/doc/YOURNAME.md\">http://localhost/hello/YOURNAME</a>, and you&#39;ll see it getting the first parameter, and greeting you!</p>\n<h2><a name=\"routing\" class=\"anchor\" href=\"#routing\"><span class=\"header-link\">Routing</span></a></h2><p>The routing can be defined in one of two ways</p>\n<h3><a name=\"route-by-convention\" class=\"anchor\" href=\"#route-by-convention\"><span class=\"header-link\">Route by convention</span></a></h3><p>You can use a naming convention as follows:</p>\n<table>\n<thead>\n<tr>\n<th>Action</th>\n<th>Method</th>\n<th>URL</th>\n<th>Description</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>index</td>\n<td>GET</td>\n<td>[controller] + &#39;s&#39;</td>\n<td>List the items</td>\n</tr>\n<tr>\n<td>edit</td>\n<td>GET</td>\n<td>[controller]/[id]</td>\n<td>Display a form to edit the item</td>\n</tr>\n<tr>\n<td>new</td>\n<td>GET</td>\n<td>[controller] + &#39;s&#39; + &#39;/new&#39;</td>\n<td>Display a form to add a new item</td>\n</tr>\n</tbody>\n</table>\n<p>Say you have a mvc file named &quot;user.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.index = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/users&quot;.<br>Now say you have a mvc file named &quot;user.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.edit = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/user/:user_id&quot;, so that users can access via a route such as &quot;/user/27&quot; for use with ID of 27. <em>Note:</em> You can get the user_id using a miso utility: <code>var userId = miso.getParam(&#39;user_id&#39;, params);</code>.</p>\n<h3><a name=\"route-by-configuration\" class=\"anchor\" href=\"#route-by-configuration\"><span class=\"header-link\">Route by configuration</span></a></h3><p>By using <code>/cfg/routes.json</code> config file:</p>\n<pre><code class=\"lang-javascript\">{\n    &quot;[Pattern]&quot;: { &quot;method&quot;: &quot;[Method]&quot;, &quot;name&quot;: &quot;[Route name]&quot;, &quot;action&quot;: &quot;[Action]&quot; }\n}\n</code></pre>\n<p>Where:</p>\n<ul>\n<li><strong>Pattern</strong> - the <a href=\"/doc/#routing-patterns.md\">route pattern</a> we want, including any parameters</li>\n<li><strong>Method</strong> - one of &#39;GET&#39;, &#39;POST&#39;, &#39;PUT&#39;, &#39;DELETE&#39;</li>\n<li><strong>Route</strong> name - name of your route file from /mvc</li>\n<li><strong>Action</strong> - name of the action to call on your route file from /mvc</li>\n</ul>\n<p><strong>Example</strong></p>\n<pre><code class=\"lang-javascript\">{\n    &quot;/&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;home&quot;, &quot;action&quot;: &quot;index&quot; }\n}\n</code></pre>\n<p>This will map a &quot;GET&quot; to the root of the URL for the <code>index</code> action in <code>home.js</code></p>\n<p><strong>Note:</strong> The routing config will override any automatically defined routes, so if you need multiple routes to point to the same action, you must manually define them. For example, if you have a mvc file named &quot;term.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.index = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/terms&quot;. Now, if you want to map it also to &quot;/AGB&quot;, you will need to add two entries in the routes config:</p>\n<pre><code class=\"lang-javascript\">{\n    &quot;/terms&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;terms&quot;, &quot;action&quot;: &quot;index&quot; },\n    &quot;/AGB&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;terms&quot;, &quot;action&quot;: &quot;index&quot; }\n}\n</code></pre>\n<p>This is because Miso assumes that if you override the defaulted routes, you actually want to replace them, not just override them. <em>Note:</em> this is correct behaviour, as it minority case is when you want more than one route pointing to the same action.</p>\n<h3><a name=\"routing-patterns\" class=\"anchor\" href=\"#routing-patterns\"><span class=\"header-link\">Routing patterns</span></a></h3><table>\n<thead>\n<tr>\n<th>Type</th>\n<th>Example</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Path</td>\n<td>&quot;/abcd&quot; - match paths starting with /abcd</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/abc?d&quot; - match paths starting with /abcd and /abd</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/ab+cd&quot; - match paths starting with /abcd, /abbcd, /abbbbbcd and so on</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/ab*cd&quot; - match paths starting with /abcd, /abxcd, /abFOOcd, /abbArcd and so on</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/a(bc)?d&quot; - will match paths starting with /ad and /abcd</td>\n</tr>\n<tr>\n<td>Regular Expression</td>\n<td>/\\/abc&#124;\\/xyz/ - will match paths starting with /abc and /xyz</td>\n</tr>\n<tr>\n<td>Array</td>\n<td>[&quot;/abcd&quot;, &quot;/xyza&quot;, /\\/lmn&#124;\\/pqr/] - match paths starting with /abcd, /xyza, /lmn, and /pqr</td>\n</tr>\n</tbody>\n</table>\n<h3><a name=\"links\" class=\"anchor\" href=\"#links\"><span class=\"header-link\">Links</span></a></h3><p>When you create links, in order to get the app to work as an SPA, you must pass in m.route as a config, so that the history will be updated correctly, for example:</p>\n<pre><code class=\"lang-javascript\">A({href:&quot;/users/new&quot;, config: m.route}, &quot;Add new user&quot;)\n</code></pre>\n<p>This will correctly work as a SPA. If you leave out <code>config: m.route</code>, the app will still work, but the page will reload every time the link is followed.</p>\n<ul>\n<li>Lightweight footprint</li>\n<li>Full-stack isomorphic framework</li>\n<li>SPA that renders the initial page server side</li>\n<li>Data models with isomorphic validation</li>\n<li>Auto-reload browser on changes</li>\n</ul>\n<h2><a name=\"data-models\" class=\"anchor\" href=\"#data-models\"><span class=\"header-link\">Data models</span></a></h2><p>Data models are progressively enhanced mithril models - you simply create your model as usual, then add validation and type information as it becomes pertinent.\nFor example, say you have a model like so:</p>\n<pre><code class=\"lang-javascript\">var userModel = function(data){\n    this.name = m.p(data.name||&quot;&quot;);\n    this.email = m.p(data.email||&quot;&quot;);\n    this.id = m.p(data._id||&quot;&quot;);\n    return this;\n}\n</code></pre>\n<p>In order to make it validatable, add the validator module:</p>\n<pre><code class=\"lang-javascript\">var validate = require(&#39;validator.modelbinder&#39;);\n</code></pre>\n<p>Then add a <code>isValid</code> validation method to your model, with any declarations based on <a href=\"/doc/validator.js#validators.md\">node validator</a>:</p>\n<pre><code class=\"lang-javascript\">var userModel = function(data){\n    this.name = m.p(data.name||&quot;&quot;);\n    this.email = m.p(data.email||&quot;&quot;);\n    this.id = m.p(data._id||&quot;&quot;);\n\n    //    Validate the model        \n    this.isValid = validate.bind(this, {\n        name: {\n            isRequired: &quot;You must enter a name&quot;\n        },\n        email: {\n            isRequired: &quot;You must enter an email address&quot;,\n            isEmail: &quot;Must be a valid email address&quot;\n        }\n    });\n\n    return this;\n};\n</code></pre>\n<p>This creates a method that the miso database adaptor can use to validate your model.\nYou get full access to the validation info as well, so you can show an error message near your field, for example:</p>\n<pre><code class=\"lang-javascript\">user.isValid(&#39;email&#39;)\n</code></pre>\n<p>Will return <code>true</code> if the <code>email</code> property of your user model is valid, or a list of errors messages if it is invalid:</p>\n<pre><code class=\"lang-javascript\">[&quot;You must enter an email address&quot;, &quot;Must be a valid email address&quot;]\n</code></pre>\n<p>So you can for example add a class name to a div surrounding your field like so:</p>\n<pre><code class=\"lang-javascript\">DIV({class: (ctrl.user.isValid(&#39;email&#39;) == true? &quot;valid&quot;: &quot;invalid&quot;)}, [...\n</code></pre>\n<p>And show the error messages like so:</p>\n<pre><code class=\"lang-javascript\">SPAN(ctrl.user.isValid(&#39;email&#39;) == true? &quot;&quot;: ctrl.user.isValid(&#39;email&#39;).join(&quot;, &quot;))\n</code></pre>\n<h2><a name=\"database-adaptor-api-and-model-interaction\" class=\"anchor\" href=\"#database-adaptor-api-and-model-interaction\"><span class=\"header-link\">Database adaptor, api and model interaction</span></a></h2><p>Miso uses the model definitions that you declare in your <code>mvc</code> file to build up a set of models that the API can use, the model definitions work like this:</p>\n<ul>\n<li>On the models attribute of the mvc, we  define a standard mithril data model, (ie: a javascript object where properties can be either standard javascript data types, or a function that works as a getter/setter, eg: <code>m.prop</code>)</li>\n<li>On server startup, miso reads this and creates a cache of the model objects, including the name space of the model, eg: &quot;hello.edit.hello&quot;</li>\n<li>Models can optionally include data validation information, and the database adaptor will get access to this.</li>\n</ul>\n<p>Assuming we have a model in the hello.models object like so:</p>\n<pre><code class=\"lang-javascript\">hello: function(data){\n    this.who = m.prop(data.who);\n    this.isValid = validate.bind(this, {\n        who: {\n            isRequired: &quot;You must know who you are talking to&quot;\n        }\n    });\n}\n</code></pre>\n<p>The API works like this:</p>\n<ul>\n<li>We create an endpoint at <code>/api</code> where each we load whatever adaptor is configured in <code>/cfg/server.json</code>, and expose each method. For example <code>/api/save</code> is available for the default <code>flatfiledb</code> adaptor.</li>\n<li>Next we create a set of API files - one for client, (/system/api.client.js), and one for server (/system/api.server.js) - each have the same methods, but do vastly different things:<ul>\n<li>api.client.js is a thin wrapper that uses mithril&#39;s m.request to create an ajax request to the server API, it simply passes messages back and forth (in JSON RPC 2.0 format).</li>\n<li>api.server.js calls the database adaptor methods, which in turn handles models and validation so for example when a request is made and a <code>type</code> and <code>model</code> is included, we can re-construct the data model based on this info, for example you might send: {type: &#39;hello.edit.hello&#39;, model: {who: &#39;Dave&#39;}}, this can then be cast back into a model that we can call the <code>isValid</code> method on.</li>\n</ul>\n</li>\n</ul>\n<p><strong>Now, the important bit:</strong> The reason for all this functionality is that mithril internally delays rendering to the DOM whilst a request is going on, so we need to handle this within miso - in order to be able to render things on the server - so we have a binding system that delays rendering whilst an async request is still being executed. That means mithril-like code like this:</p>\n<pre><code class=\"lang-javascript\">controller: function(){\n    var ctrl = this;\n    api.find({type: &#39;hello.index.hello&#39;}).then(function(data) {\n        var list = Object.keys(data.result).map(function(key) {\n            var myHello = data.result[key];\n            return new self.models.hello(myHello);\n        });\n        ctrl.model = new ctrl.vm.todoList(list);\n    });\n    return ctrl;\n}\n</code></pre>\n<p>Will still work. Note: the magic here is that there is absolutely nothing in the code above that runs a callback to let mithril know the data is ready - this is a design feature of mithril to delay rendering automatically whilst an <code>m.request</code> is in progress, so we cater for this to have the ability to render the page server-side first, so that SEO works out of the box.</p>\n<h2><a name=\"client-vs-server-code\" class=\"anchor\" href=\"#client-vs-server-code\"><span class=\"header-link\">Client vs server code</span></a></h2><p>In miso, you include files using the standard nodejs <code>require</code> function. When you need to do something that works differently in the browser than the server, there are a few ways you can achieve it:</p>\n<ul>\n<li>The recommended way is to create and require a file in the <code>server/</code> directory, and then create the same file in the <code>client/</code> directory, and miso will automatically load that file for you on the client side.</li>\n<li>If this is not to your liking, another option is to use <code>miso.util</code> - you can use <code>miso.util.isServer()</code> to test if you&#39;re on the server or not, though it is better practice to use the server/client directory method.</li>\n</ul>\n<h2><a name=\"requiring-files\" class=\"anchor\" href=\"#requiring-files\"><span class=\"header-link\">Requiring files</span></a></h2><p>When requiring files, be sure to do so in a static manner so that browserify is able to compile the client side script. Always use:</p>\n<pre><code class=\"lang-javascript\">var miso = require(&#39;../server/miso.util.js&#39;);\n</code></pre>\n<p>NEVER DO ANY OF THESE:</p>\n<pre><code class=\"lang-javascript\">//  DON&#39;T DO THIS!\nvar miso = new require(&#39;../server/miso.util.js&#39;);\n</code></pre>\n<p>This will create an object, which means <a href=\"/doc/824.md\">browserify cannot resolve it statically</a>, and will ignore it.</p>\n<pre><code class=\"lang-javascript\">//  DON&#39;T DO THIS!\nvar thing = &#39;miso&#39;;\nvar miso = require(&#39;../server/&#39;+thing+&#39;.util.js&#39;);\n</code></pre>\n<p>This will create an expression, which means <a href=\"/doc/824.md\">browserify cannot resolve it statically</a>, and will ignore it.</p>\n","Patterns.md":"<p>There are several ways you can write your app and miso is not opinionated about how you go about this so it is important that you choose a pattern that suits your needs. Below are a few suggested patterns to follow when developing apps.</p>\n<p><strong>Note:</strong> miso is a single page app that loads server rendered HTML from any URL, so that SEO works out of the box.</p>\n<h2><a name=\"single-url-mvc\" class=\"anchor\" href=\"#single-url-mvc\"><span class=\"header-link\">Single url mvc</span></a></h2><p>In this pattern everything that your mvc needs to do is done on a single url for all the associated actions. The advantage for this style of development is that you have everything in one mvc container, and you don&#39;t need to map any routes - of course the downside being that there are no routes for the user to bookmark. This is pattern works well for smaller entities where there are not too many interactions that the user can do - this is essentially how most mithril apps are written - self-contained, and at a single url.</p>\n<p>Here is a &quot;hello world&quot; example using the single url pattern</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nvar self = module.exports.index = {\n    models: {\n        //    Our model\n        hello: function(data){\n            this.who = m.p(data.who);\n        }\n    },\n    controller: function(params) {\n        this.model = new self.models.hello({who: &quot;world&quot;});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who())\n            ];\n        }\n    }\n};\n</code></pre>\n<p>This would expose a url /hellos (note: the &#39;s&#39;), and would display &quot;Hello world&quot;. (You can change the route using custom routing)</p>\n<h2><a name=\"multi-url-mvc\" class=\"anchor\" href=\"#multi-url-mvc\"><span class=\"header-link\">Multi url mvc</span></a></h2><p>In this pattern we expose multiple mvc routes that in turn translate to multiple URLs. This is useful for splitting up your app, and ensuring each mvc has its own sets of concerns.</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nvar index = module.exports.index = {\n    models: {\n        //    Our model\n        hello: function(data){\n            this.who = m.p(data.who);\n        }\n    },\n    controller: function(params) {\n        this.model = new index.models.hello({who: &quot;world&quot;});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who()),\n                A({href: &quot;/hello/Leo&quot;, config: m.route}, &quot;Click me for the edit action&quot;)\n            ];\n        }\n    }\n};\n\nvar edit = module.exports.edit = {\n    controller: function(params) {\n        var who = miso.getParam(&#39;hello_id&#39;, params);\n        this.model = new index.models.hello({who: who});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who())\n            ];\n        }\n    }\n};\n</code></pre>\n<p>Here we also expose a &quot;/hello/[NAME]&quot; url, that will show your name when you visit /hello/[YOUR NAME], so there are now multiple urls for our SPA:</p>\n<ul>\n<li><strong>/hellos</strong> - this is intended to be an index page that lists all your &quot;hellos&quot;</li>\n<li><strong>/hello/[NAME]</strong> - this is intended to be an edit page where you can edit your &quot;hellos&quot;</li>\n</ul>\n<p>Note that the anchor tag has <code>config: m.route</code> in it&#39;s options - this is so that we can route automatically though mithril</p>\n"}; };
-},{}],4:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -737,7 +167,7 @@ module.exports = function(m){
 }
 	};
 };
-},{}],5:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
 	var getModelData = function(model){
@@ -781,7 +211,7 @@ module.exports = function(m){
 }
 	};
 };
-},{}],6:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /*	miso permissions
 	Permit users access to controller actions based on roles 
 */
@@ -852,7 +282,7 @@ module.exports.api = function(permissions, actionName, userRoles){
 
 	return pass;
 };
-},{"../modules/miso.util.client.js":7}],7:[function(require,module,exports){
+},{"../modules/miso.util.client.js":4}],4:[function(require,module,exports){
 //	Various utilities that normalise usage between client and server
 //	This is the client version - see miso.util.js for server version
 var m = require('mithril');
@@ -924,12 +354,12 @@ module.exports = {
 		}
 	}
 };
-},{"mithril":17}],8:[function(require,module,exports){
+},{"mithril":14}],5:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require("../modules/miso.util.client.js"),
 	sugartags = require('mithril.sugartags')(m),
 	//	Grab the generated client version...
-	docs = require('../client/miso.documentation.js');
+	docs = require('../public/miso.documentation.js');
 
 var index = module.exports.index = {
 	models: {
@@ -998,11 +428,11 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../client/miso.documentation.js":3,"../modules/miso.util.client.js":7,"mithril":17,"mithril.sugartags":16}],9:[function(require,module,exports){
+},{"../modules/miso.util.client.js":4,"../public/miso.documentation.js":19,"mithril":14,"mithril.sugartags":13}],6:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require("../modules/miso.util.client.js"),
 	sugartags = require('mithril.sugartags')(m),
-	flickr = require("../modules/adaptor/flickr/api.client.js")(m);
+	flickr = require("../modules/api/flickr/api.client.js")(m);
 
 var index = module.exports.index = {
 	models: {
@@ -1028,7 +458,7 @@ var index = module.exports.index = {
 		}
 	}
 };
-},{"../modules/adaptor/flickr/api.client.js":5,"../modules/miso.util.client.js":7,"mithril":17,"mithril.sugartags":16}],10:[function(require,module,exports){
+},{"../modules/api/flickr/api.client.js":2,"../modules/miso.util.client.js":4,"mithril":14,"mithril.sugartags":13}],7:[function(require,module,exports){
 var m = require('mithril'),
 	miso = require("../modules/miso.util.client.js"),
 	sugartags = require('mithril.sugartags')(m);
@@ -1050,10 +480,10 @@ var edit = module.exports.edit = {
 		}
 	}
 };
-},{"../modules/miso.util.client.js":7,"mithril":17,"mithril.sugartags":16}],11:[function(require,module,exports){
+},{"../modules/miso.util.client.js":4,"mithril":14,"mithril.sugartags":13}],8:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	smoothScroll = require('../client/js/mithril.smoothscroll.js');
+	smoothScroll = require('../public/js/mithril.smoothscroll.js');
 
 //	Home page
 var self = module.exports.index = {
@@ -1148,12 +578,12 @@ var self = module.exports.index = {
 	}
 };
 
-},{"../client/js/mithril.smoothscroll.js":2,"mithril":17,"mithril.sugartags":16}],12:[function(require,module,exports){
+},{"../public/js/mithril.smoothscroll.js":18,"mithril":14,"mithril.sugartags":13}],9:[function(require,module,exports){
 /* Example login mvc */
 var m = require('mithril'),
 	miso = require("../modules/miso.util.client.js"),
 	sugartags = require('mithril.sugartags')(m),
-	ldb = require("../modules/adaptor/authentication/api.client.js")(m);
+	ldb = require("../modules/api/authentication/api.client.js")(m);
 
 var index = module.exports.index = {
 	models: {
@@ -1173,7 +603,7 @@ var index = module.exports.index = {
 		//	the server.
 		//	Now, how to we get it to the client?
 		//
-		//	Idea: use an adaptor endpoint 
+		//	Idea: use an api endpoint 
 		//	that can be used to store/get session
 		//	info. We need to load the session info
 		//	when the page is loaded, so we need a way 
@@ -1218,10 +648,10 @@ var index = module.exports.index = {
 		}
 	}
 };
-},{"../modules/adaptor/authentication/api.client.js":4,"../modules/miso.util.client.js":7,"mithril":17,"mithril.sugartags":16}],13:[function(require,module,exports){
+},{"../modules/api/authentication/api.client.js":1,"../modules/miso.util.client.js":4,"mithril":14,"mithril.sugartags":13}],10:[function(require,module,exports){
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	db = require("../system/adaptor/flatfiledb/api.client.js")(m);
+	db = require("../system/api/flatfiledb/api.client.js")(m);
 
 var self = module.exports.index = {
 	models: {
@@ -1312,7 +742,7 @@ var self = module.exports.index = {
 	//	Test authenticate
 	//,authenticate: true
 };
-},{"../system/adaptor/flatfiledb/api.client.js":20,"mithril":17,"mithril.sugartags":16}],14:[function(require,module,exports){
+},{"../system/api/flatfiledb/api.client.js":20,"mithril":14,"mithril.sugartags":13}],11:[function(require,module,exports){
 /*
 	This is a sample user management app that uses the
 	multiple url miso pattern.
@@ -1322,7 +752,7 @@ var miso = require("../modules/miso.util.client.js"),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
-	api = require("../modules/adaptor/authentication/api.client.js")(m),
+	api = require("../modules/api/authentication/api.client.js")(m),
 	self = module.exports;
 
 //	Shared view
@@ -1507,7 +937,7 @@ module.exports.edit = {
 	//, authenticate: true
 };
 
-},{"../modules/adaptor/authentication/api.client.js":4,"../modules/miso.util.client.js":7,"mithril":17,"mithril.bindings":15,"mithril.sugartags":16,"validator.modelbinder":18}],15:[function(require,module,exports){
+},{"../modules/api/authentication/api.client.js":1,"../modules/miso.util.client.js":4,"mithril":14,"mithril.bindings":12,"mithril.sugartags":13,"validator.modelbinder":15}],12:[function(require,module,exports){
 //	Mithril bindings.
 //	Copyright (C) 2014 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -1725,7 +1155,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],16:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 //	Mithril sugar tags.
 //	Copyright (C) 2015 jsguy (Mikkel Bergmann)
 //	MIT licensed
@@ -1804,7 +1234,7 @@ if (typeof module != "undefined" && module !== null && module.exports) {
 }
 
 }());
-},{}],17:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var m = (function app(window, undefined) {
 	var OBJECT = "[object Object]", ARRAY = "[object Array]", STRING = "[object String]", FUNCTION = "function";
 	var type = {}.toString;
@@ -2833,7 +2263,7 @@ var m = (function app(window, undefined) {
 if (typeof module != "undefined" && module !== null && module.exports) module.exports = m;
 else if (typeof define === "function" && define.amd) define(function() {return m});
 
-},{}],18:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var validator = require('validator');
 
 /* 	This binder allows you to create a validation method on a model, (plain 
@@ -2938,7 +2368,7 @@ module.exports = {
 		}
 	}
 };
-},{"validator":19}],19:[function(require,module,exports){
+},{"validator":16}],16:[function(require,module,exports){
 /*!
  * Copyright (c) 2014 Chris O'Hara <cohara87@gmail.com>
  *
@@ -3507,6 +2937,576 @@ module.exports = {
 
 });
 
+},{}],17:[function(require,module,exports){
+/*
+	mithril.animate - Copyright 2014 jsguy
+	MIT Licensed.
+*/
+(function(){
+var mithrilAnimate = function (m) {
+	//	Known prefiex
+	var prefixes = ['Moz', 'Webkit', 'Khtml', 'O', 'ms'],
+	transitionProps = ['TransitionProperty', 'TransitionTimingFunction', 'TransitionDelay', 'TransitionDuration', 'TransitionEnd'],
+	transformProps = ['rotate', 'rotatex', 'rotatey', 'scale', 'skew', 'translate', 'translatex', 'translatey', 'matrix'],
+
+	defaultDuration = 400,
+
+	err = function(msg){
+		(typeof window != "undefined") && window.console && console.error && console.error(msg);
+	},
+	
+	//	Capitalise		
+	cap = function(str){
+		return str.charAt(0).toUpperCase() + str.substr(1);
+	},
+
+	//	For checking what vendor prefixes are native
+	div = document.createElement('div'),
+
+	//	vendor prefix, ie: transitionDuration becomes MozTransitionDuration
+	vp = function (prop) {
+		var pf;
+		//	Handle unprefixed
+		if (prop in div.style) {
+			return prop;
+		}
+
+		//	Handle keyframes
+		if(prop == "@keyframes") {
+			for (var i = 0; i < prefixes.length; i += 1) {
+				//	Testing using transition
+				pf = prefixes[i] + "Transition";
+				if (pf in div.style) {
+					return "@-" + prefixes[i].toLowerCase() + "-keyframes";
+				}
+			}
+			return prop;
+		}
+
+		for (var i = 0; i < prefixes.length; i += 1) {
+			pf = prefixes[i] + cap(prop);
+			if (pf in div.style) {
+				return pf;
+			}
+		}
+		//	Can't find it - return original property.
+		return prop;
+	},
+
+	//	See if we can use native transitions
+	supportsTransitions = function() {
+		var b = document.body || document.documentElement,
+			s = b.style,
+			p = 'transition';
+
+		if (typeof s[p] == 'string') { return true; }
+
+		// Tests for vendor specific prop
+		p = p.charAt(0).toUpperCase() + p.substr(1);
+
+		for (var i=0; i<prefixes.length; i++) {
+			if (typeof s[prefixes[i] + p] == 'string') { return true; }
+		}
+
+		return false;
+	},
+
+	//	Converts CSS transition times to MS
+	getTimeinMS = function(str) {
+		var result = 0, tmp;
+		str += "";
+		str = str.toLowerCase();
+		if(str.indexOf("ms") !== -1) {
+			tmp = str.split("ms");
+			result = Number(tmp[0]);
+		} else if(str.indexOf("s") !== -1) {
+			//	s
+			tmp = str.split("s");
+			result = Number(tmp[0]) * 1000;
+		} else {
+			result = Number(str);
+		}
+
+		return Math.round(result);
+	},
+
+	//	Set style properties
+	setStyleProps = function(obj, props){
+		for(var i in props) {if(props.hasOwnProperty(i)) {
+			obj.style[vp(i)] = props[i];
+		}}
+	},
+
+	//	Set props for transitions and transforms with basic defaults
+	setTransitionProps = function(args){
+		var props = {
+				//	ease, linear, ease-in, ease-out, ease-in-out, cubic-bezier(n,n,n,n) initial, inherit
+				TransitionTimingFunction: "ease",
+				TransitionDuration: defaultDuration + "ms",
+				TransitionProperty: "all"
+			},
+			p, i, tmp, tmp2, found;
+
+		//	Set any allowed properties 
+		for(p in args) { if(args.hasOwnProperty(p)) {
+			tmp = 'Transition' + cap(p);
+			tmp2 = p.toLowerCase();
+			found = false;
+
+			//	Look at transition props
+			for(i = 0; i < transitionProps.length; i += 1) {
+				if(tmp == transitionProps[i]) {
+					props[transitionProps[i]] = args[p];
+					found = true;
+					break;
+				}
+			}
+
+			//	Look at transform props
+			for(i = 0; i < transformProps.length; i += 1) {
+				if(tmp2 == transformProps[i]) {
+					props[vp("transform")] = props[vp("transform")] || "";
+					props[vp("transform")] += " " +p + "(" + args[p] + ")";
+					found = true;
+					break;
+				}
+			}
+
+			if(!found) {
+				props[p] = args[p];
+			}
+		}}
+		return props;
+	},
+
+	//	Fix animatiuon properties
+	//	Normalises transforms, eg: rotate, scale, etc...
+	normaliseTransformProps = function(args){
+		var props = {},
+			tmpProp,
+			p, i, found,
+			normal = function(props, p, value){
+				var tmp = p.toLowerCase(),
+					found = false, i;
+
+				//	Look at transform props
+				for(i = 0; i < transformProps.length; i += 1) {
+					if(tmp == transformProps[i]) {
+						props[vp("transform")] = props[vp("transform")] || "";
+						props[vp("transform")] += " " +p + "(" + value + ")";
+						found = true;
+						break;
+					}
+				}
+
+				if(!found) {
+					props[p] = value;
+				} else {
+					//	Remove transform property
+					delete props[p];
+				}
+			};
+
+		//	Set any allowed properties 
+		for(p in args) { if(args.hasOwnProperty(p)) {
+			//	If we have a percentage, we have a key frame
+			if(p.indexOf("%") !== -1) {
+				for(i in args[p]) { if(args[p].hasOwnProperty(i)) {
+					normal(args[p], i, args[p][i]);
+				}}
+				props[p] = args[p];
+			} else {
+				normal(props, p, args[p]);
+			}
+		}}
+
+		return props;
+	},
+
+
+	//	If an object is empty
+	isEmpty = function(obj) {
+		for(var i in obj) {if(obj.hasOwnProperty(i)) {
+			return false;
+		}}
+		return true; 
+	},
+	//	Creates a hashed name for the animation
+	//	Use to create a unique keyframe animation style rule
+	aniName = function(props){
+		return "ani" + JSON.stringify(props).split(/[{},%":]/).join("");
+	},
+	animations = {},
+
+	//	See if we can use transitions
+	canTrans = supportsTransitions();
+
+	//	IE10+ http://caniuse.com/#search=css-animations
+	m.animateProperties = function(el, args, cb){
+		el.style = el.style || {};
+		var props = setTransitionProps(args), time;
+
+		if(typeof props.TransitionDuration !== 'undefined') {
+			props.TransitionDuration = getTimeinMS(props.TransitionDuration) + "ms";
+		} else {
+			props.TransitionDuration = defaultDuration + "ms";
+		}
+
+		time = getTimeinMS(props.TransitionDuration) || 0;
+
+		//	See if we support transitions
+		if(canTrans) {
+			setStyleProps(el, props);
+		} else {
+			//	Try and fall back to jQuery
+			//	TODO: Switch to use velocity, it is better suited.
+			if(typeof $ !== 'undefined' && $.fn && $.fn.animate) {
+				$(el).animate(props, time);
+			}
+		}
+
+		if(cb){
+			setTimeout(cb, time+1);
+		}
+	};
+
+	//	Trigger a transition animation
+	m.trigger = function(name, value, options, cb){
+		options = options || {};
+		var ani = animations[name];
+		if(!ani) {
+			return err("Animation " + name + " not found.");
+		}
+
+		return function(e){
+			var args = ani.fn(function(){
+				return typeof value == 'function'? value(): value;
+			});
+
+			//	Allow override via options
+			for(i in options) if(options.hasOwnProperty(i)) {{
+				args[i] = options[i];
+			}}
+
+			m.animateProperties(e.target, args, cb);
+		};
+	};
+
+	//	Adds an animation for bindings and so on.
+	m.addAnimation = function(name, fn, options){
+		options = options || {};
+
+		if(animations[name]) {
+			return err("Animation " + name + " already defined.");
+		} else if(typeof fn !== "function") {
+			return err("Animation " + name + " is being added as a transition based animation, and must use a function.");
+		}
+
+		options.duration = options.duration || defaultDuration;
+
+		animations[name] = {
+			options: options,
+			fn: fn
+		};
+
+		//	Add a default binding for the name
+		m.addBinding(name, function(prop){
+			m.bindAnimation(name, this, fn, prop);
+		}, true);
+	};
+
+	m.addKFAnimation = function(name, arg, options){
+		options = options || {};
+
+		if(animations[name]) {
+			return err("Animation " + name + " already defined.");
+		}
+
+		var init = function(props) {
+			var aniId = aniName(props),
+				hasAni = document.getElementById(aniId),
+				kf;
+
+			//	Only insert once
+			if(!hasAni) {
+				animations[name].id = aniId;
+
+				props = normaliseTransformProps(props);
+				//  Create keyframes
+				kf = vp("@keyframes") + " " + aniId + " " + JSON.stringify(props)
+					.split("\"").join("")
+					.split("},").join("}\n")
+					.split(",").join(";")
+					.split("%:").join("% ");
+
+				var s = document.createElement('style');
+				s.setAttribute('id', aniId);
+				s.id = aniId;
+				s.textContent = kf;
+				//  Might not have head?
+				document.head.appendChild(s);
+			}
+
+			animations[name].isInitialised = true;
+			animations[name].options.animateImmediately = true;
+		};
+
+		options.duration = options.duration || defaultDuration;
+		options.animateImmediately = options.animateImmediately || false;
+
+		animations[name] = {
+			init: init,
+			options: options,
+			arg: arg
+		};
+
+		//	Add a default binding for the name
+		m.addBinding(name, function(prop){
+			m.bindAnimation(name, this, arg, prop);
+		}, true);
+	};
+
+
+	/*	Options - defaults - what it does:
+
+		Delay - unedefined - delays the animation
+		Direction - 
+		Duration
+		FillMode - "forward" makes sure it sticks: http://www.w3schools.com/cssref/css3_pr_animation-fill-mode.asp
+		IterationCount, 
+		Name, PlayState, TimingFunction
+	
+	*/
+
+	//	Useful to know, 'to' and 'from': http://lea.verou.me/2012/12/animations-with-one-keyframe/
+	m.animateKF = function(name, el, options, cb){
+		options = options || {};
+		var ani = animations[name], i, props = {};
+		if(!ani) {
+			return err("Animation " + name + " not found.");
+		}
+
+		//	Allow override via options
+		ani.options = ani.options || {};
+		for(i in options) if(options.hasOwnProperty(i)) {{
+			ani.options[i] = options[i];
+		}}
+
+		if(!ani.isInitialised && ani.init) {
+			ani.init(ani.arg);
+		}
+
+		//	Allow animate overrides
+		for(i in ani.options) if(ani.options.hasOwnProperty(i)) {{
+			props[vp("animation" + cap(i))] = ani.options[i];
+		}}
+
+		//	Set required items and default values for props
+		props[vp("animationName")] = ani.id;
+		props[vp("animationDuration")] = (props[vp("animationDuration")]? props[vp("animationDuration")]: defaultDuration) + "ms";
+		props[vp("animationDelay")] = props[vp("animationDelay")]? props[vp("animationDuration")] + "ms": undefined;
+		props[vp("animationFillMode")] = props[vp("animationFillMode")] || "forwards";
+
+		el.style = el.style || {};
+
+		//	Use for callback
+		var endAni = function(){
+			//	Remove listener
+			el.removeEventListener("animationend", endAni, false);
+			if(cb){
+				cb(el);
+			}
+		};
+
+		//	Remove animation if any
+		el.style[vp("animation")] = "";
+		el.style[vp("animationName")] = "";
+
+		//	Must use two request animation frame calls, for FF to
+		//	work properly, does not seem to have any adverse effects
+		requestAnimationFrame(function(){
+			requestAnimationFrame(function(){
+				//	Apply props
+				for(i in props) if(props.hasOwnProperty(i)) {{
+					el.style[i] = props[i];
+				}}
+
+				el.addEventListener("animationend", endAni, false);
+			});
+		});
+	};
+
+	m.triggerKF = function(name, options){
+		return function(){
+			m.animateKF(name, this, options);
+		};
+	};
+
+	m.bindAnimation = function(name, el, options, prop) {
+		var ani = animations[name];
+
+		if(!ani && !ani.name) {
+			return err("Animation " + name + " not found.");
+		}
+
+		if(ani.fn) {
+			m.animateProperties(el, ani.fn(prop));
+		} else {
+			var oldConfig = el.config;
+			el.config = function(el, isInit){
+				if(!ani.isInitialised && ani.init) {
+					ani.init(options);
+				}
+				if(prop() && isInit) {
+					m.animateKF(name, el, options);
+				}
+				if(oldConfig) {
+					oldConfig.apply(el, arguments);
+				}
+			};
+		}
+	};
+
+
+
+	/* Default transform2d bindings */
+	var basicBindings = ['scale', 'scalex', 'scaley', 'translate', 'translatex', 'translatey', 
+		'matrix', 'backgroundColor', 'backgroundPosition', 'borderBottomColor', 
+		'borderBottomWidth', 'borderLeftColor', 'borderLeftWidth', 'borderRightColor', 
+		'borderRightWidth', 'borderSpacing', 'borderTopColor', 'borderTopWidth', 'bottom', 
+		'clip', 'color', 'fontSize', 'fontWeight', 'height', 'left', 'letterSpacing', 
+		'lineHeight', 'marginBottom', 'marginLeft', 'marginRight', 'marginTop', 'maxHeight', 
+		'maxWidth', 'minHeight', 'minWidth', 'opacity', 'outlineColor', 'outlineWidth', 
+		'paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop', 'right', 'textIndent', 
+		'textShadow', 'top', 'verticalAlign', 'visibility', 'width', 'wordSpacing', 'zIndex'],
+		degBindings = ['rotate', 'rotatex', 'rotatey', 'skewx', 'skewy'], i;
+
+	//	Basic bindings where we pass the prop straight through
+	for(i = 0; i < basicBindings.length; i += 1) {
+		(function(name){
+			m.addAnimation(name, function(prop){
+				var options = {};
+				options[name] = prop();
+				return options;
+			});
+		}(basicBindings[i]));
+	}
+
+	//	Degree based bindings - conditionally postfix with "deg"
+	for(i = 0; i < degBindings.length; i += 1) {
+		(function(name){
+			m.addAnimation(name, function(prop){
+				var options = {}, value = prop();
+				options[name] = isNaN(value)? value: value + "deg";
+				return options;
+			});
+		}(degBindings[i]));
+	}
+
+	//	Attributes that require more than one prop
+	m.addAnimation("skew", function(prop){
+		var value = prop();
+		return {
+			skew: [
+				value[0] + (isNaN(value[0])? "":"deg"), 
+				value[1] + (isNaN(value[1])? "":"deg")
+			]
+		};
+	});
+
+
+
+	//	A few more bindings
+	m = m || {};
+	//	Hide node
+	m.addBinding("hide", function(prop){
+		this.style = {
+			display: m.unwrap(prop)? "none" : ""
+		};
+	}, true);
+
+	//	Toggle boolean value on click
+	m.addBinding('toggle', function(prop){
+		this.onclick = function(){
+			var value = prop();
+			prop(!value);
+		}
+	}, true);
+
+	//	Set hover states, a'la jQuery pattern
+	m.addBinding('hover', function(prop){
+		this.onmouseover = prop[0];
+		if(prop[1]) {
+			this.onmouseout = prop[1];
+		}
+	}, true );
+
+
+};
+
+
+
+
+
+
+
+if (typeof module != "undefined" && module !== null && module.exports) {
+	module.exports = mithrilAnimate;
+} else if (typeof define === "function" && define.amd) {
+	define(function() {
+		return mithrilAnimate;
+	});
+} else {
+	mithrilAnimate(typeof window != "undefined"? window.m || {}: {});
+}
+
+}());
+},{}],18:[function(require,module,exports){
+//  Smooth scrolling for links
+//  Usage:      A({config: smoothScroll(ctrl), href: "#top"}, "Back to top")
+module.exports = function(ctrl){
+	//var root = (typeof document !== 'undefined')? document.body || document.documentElement: this,
+	var root = (typeof navigator !== 'undefined')? /firefox|trident/i.test(navigator.userAgent) ? document.documentElement : document.body: null,
+		easeInOutSine = function (t, b, c, d) {
+			//  http://gizma.com/easing/
+			return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+		};
+
+	return function(element, isInitialized) {
+		if(!isInitialized) {
+			element.addEventListener("click", function(e) {
+				var startTime,
+					startPos = root.scrollTop,
+					endPos = document.getElementById(/[^#]+$/.exec(this.href)[0]).getBoundingClientRect().top,
+					hash = this.href.substr(this.href.lastIndexOf("#")),
+					maxScroll = root.scrollHeight - window.innerHeight,
+					scrollEndValue = (startPos + endPos < maxScroll)? endPos: maxScroll - startPos,
+					duration = typeof ctrl.duration !== 'undefined'? ctrl.duration: 1500,
+					scrollFunc = function(timestamp) {
+						startTime = startTime || timestamp;
+						var elapsed = timestamp - startTime,
+							progress = easeInOutSine(elapsed, startPos, scrollEndValue, duration);
+						root.scrollTop = progress;
+						if(elapsed < duration) {
+							requestAnimationFrame(scrollFunc);
+						} else {
+							if(history.pushState) {
+								history.pushState(null, null, hash);
+							} else {
+								location.hash = hash;
+							}
+
+						}
+					};
+
+				requestAnimationFrame(scrollFunc)
+				e.preventDefault();
+			});
+		}
+	};
+};
+},{}],19:[function(require,module,exports){
+module.exports = function(){ return {"Creating-a-todo-app.md":"<p>In this article we will create a fully functional todo app, complete with details of how to use the database API and persisting/loading your data. We recommend you first read the [Getting started] article, and understand the miso fundamentals such as where to place models and how to creating a miso controller. Please do that first, it only takes 2 minutes.</p>\n<h2><a name=\"todo-app\" class=\"anchor\" href=\"#todo-app\"><span class=\"header-link\">Todo app</span></a></h2><p>We will now create a new app using the <a href=\"/doc/Patterns#single-url-mvc.md\">single url pattern</a>, which means it handles all actions autonomously, plus looks a lot like a normal mithril app.</p>\n<p>In <code>/mvc</code> save a new file as <code>todo.js</code> with the following content: </p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;);\n\nvar self = module.exports.index = {\n    models: {},\n    controller: function(params) {\n        return this;\n    },\n    view: function(ctrl) {\n        return &quot;TODO&quot;;\n    }\n};\n</code></pre>\n<p>Now open: <a href=\"/doc/todos.md\">http://localhost:6476/todos</a> and you&#39;ll see the word &quot;TODO&quot;. You&#39;ll notice that the url is &quot;/todos&quot; with an &#39;s&#39; on the end - as we are using <a href=\"/doc/How-miso-works#route-by-convention.md\">route by convention</a> to map our route.</p>\n<p>Next let&#39;s create the model for our todos - change the <code>models</code> attribute to the following:</p>\n<pre><code class=\"lang-javascript\">models: {\n    //    Our todo model\n    todo: function(data){\n        this.text = data.text;\n        this.done = m.p(data.done == &quot;false&quot;? false: data.done);\n        this._id = data._id;\n    }\n},\n</code></pre>\n<p>Each line in the model does the following:</p>\n<ul>\n<li><code>this.text</code> - The text that is shown on the todo</li>\n<li><code>this.data</code> - This represents if the todo has been completed - we ensure that we handle the &quot;false&quot; values correctly, as ajax responses are always strings.</li>\n<li><code>this._id</code> - The key for the todo - you must use <code>_id</code> for this</li>\n</ul>\n<p>The model can now be used to store and retreive todos - miso automatically picks up any objects on the <code>models</code> attribute of your mvc file, and maps it in the API. We will soon see how that works. Next add the following code as the controller:</p>\n<pre><code class=\"lang-javascript\">controller: function(params) {\n    var myTodos = [{text: &quot;Learn miso&quot;}, {text: &quot;Build miso app&quot;}];\n    this.list = Object.keys(myTodos).map(function(key) {\n        return new self.models.todo(myTodos[key]);\n    });\n    return this;\n},\n</code></pre>\n<p>This does the following:</p>\n<ul>\n<li>Creates <code>myTodos</code> which is a list of objects that represents todos</li>\n<li><code>this.list</code> - creates a list of todo model objects by using <code>new self.models.todo(...</code> on each myTodos object.</li>\n<li><code>return this</code> must be done in all controllers, it makes sure that miso can correctly get access to the controller object.</li>\n</ul>\n<p>Now update the view like so:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    return m(&quot;UL&quot;, [\n        ctrl.list.map(function(todo){\n            return m(&quot;LI&quot;, todo.text)\n        })\n    ]);\n}\n</code></pre>\n<p>This will iterate on your newly created list of todo model objects and display the on screen. Your complete program should look like this:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;);\n\nvar self = module.exports.index = {\n    models: {\n        //    Our todo model\n        todo: function(data){\n            this.text = data.text;\n            this.done = m.p(data.done == &quot;false&quot;? false: data.done);\n            this._id = data._id;\n        }\n    },\n    controller: function(params) {\n        var myTodos = [{text: &quot;Learn miso&quot;}, {text: &quot;Build miso app&quot;}];\n        this.list = Object.keys(myTodos).map(function(key) {\n            return new self.models.todo(myTodos[key]);\n        });\n        return this;\n    },\n    view: function(ctrl) {\n        return m(&quot;UL&quot;, [\n            ctrl.list.map(function(todo){\n                return m(&quot;LI&quot;, todo.text)\n            })\n        ]);\n    }\n};\n</code></pre>\n<blockquote>\nSo far we have only used pure mithril to create our app - miso did do some of the grunt-work behind the scenes, but we can do much more.\n</blockquote>\n\n\n<p>Let us add some useful libraries, change the top section to:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m),\n    bindings = require(&#39;../server/mithril.bindings.node.js&#39;)(m),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    api = require(&#39;../system/api.server.js&#39;)(m, this);\n</code></pre>\n<p>This will include the following libraries:</p>\n<ul>\n<li><a href=\"/doc/mithril.sugartags.md\">mithril.sugartags</a> - allows rendering HTML using tags that look a little more like HTML than standard mithril</li>\n<li><a href=\"/doc/mithril.bindings.md\">mithril.bindings</a> Bi-directional data bindings for richer models</li>\n<li>miso utilities - isomorphic abstraction for common tasks</li>\n<li>api - the configured database adaptor</li>\n</ul>\n<p>Let us start with the sugar tags, update the view to read:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return UL([\n            ctrl.list.map(function(todo){\n                return LI(todo.text)\n            })\n        ])\n    };\n}\n</code></pre>\n<p>So using sugartags allows us to write more concise views, that look more like natural HTML.</p>\n<p>Next let us update the functionality a little - add the following method to the controller:</p>\n<pre><code class=\"lang-javascript\">this.done = function(todo){\n    return function() {\n        todo.done(!todo.done());\n    }\n};\n</code></pre>\n<p>This method will return a function that toggles the <code>done</code> attribute on the passed in todo. Next change the view to:</p>\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return [\n            STYLE(&quot;.done{text-decoration: line-through;}&quot;),\n            UL([\n                ctrl.list.map(function(todo){\n                    return LI({ class: todo.done()? &quot;done&quot;: &quot;&quot;, onclick: ctrl.done(todo) }, todo.text);\n                })\n            ])\n        ]\n    };\n}\n</code></pre>\n<p>This will make the list of todos clickable, and put a strike-through the todo when it is set to &quot;done&quot;.</p>\n","Getting-started.md":"<p>This guide will take you through making your first miso app, it is assumed that you know the basics of how to use nodejs and mithril.</p>\n<h2><a name=\"installation\" class=\"anchor\" href=\"#installation\"><span class=\"header-link\">Installation</span></a></h2><p>To install miso, use npm:</p>\n<pre><code class=\"lang-javascript\">npm install misojs -g\n</code></pre>\n<p>To create and run a miso app in a new directory:</p>\n<pre><code class=\"lang-javascript\">miso -n myapp\ncd myapp\nmiso run\n</code></pre>\n<p>You should now see something like:</p>\n<pre><code>Miso is listening at http://localhost:6476 in development mode\n</code></pre><p>Open your browser at <code>http://localhost:6476</code> and you will see the default miso screen</p>\n<h2><a name=\"hello-world-app\" class=\"anchor\" href=\"#hello-world-app\"><span class=\"header-link\">Hello world app</span></a></h2><p>Create a new file <code>hello.js</code> in <code>myapp/mvc</code> like so:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m);\n\nvar edit = module.exports.edit = {\n    models: {\n        hello: function(data){\n            this.who = m.prop(data.who);\n        }\n    },\n    controller: function(params) {\n        var who = miso.getParam(&#39;hello_id&#39;, params);\n        this.model = new edit.models.hello({who: who});\n        return this;\n    },\n    view: function(ctrl) {\n        with(sugartags) {\n            return DIV(&quot;Hello &quot; + ctrl.model.who());\n        }\n    }\n};\n</code></pre>\n<p>Then open <a href=\"/doc/YOURNAME.md\">http://localhost:6476/hello/YOURNAME</a> and you should see &quot;Hello YOURNAME&quot;. Change the url to have your actual name instead of YOURNAME, you now know miso :)</p>\n<p>Let us take a look at what each piece of the code is actually doing:</p>\n<h3><a name=\"includes\" class=\"anchor\" href=\"#includes\"><span class=\"header-link\">Includes</span></a></h3><blockquote>\nSummary: Mithril is the only required library when apps, but using other included libraries is very useful\n</blockquote>\n\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;mithril.sugartags&#39;)(m);\n</code></pre>\n<p>Here we grab mithril, then miso utilities and sugar tags - technically speaking, we really only need mithril, but the other libraries are very useful as well as we will see.</p>\n<h3><a name=\"models\" class=\"anchor\" href=\"#models\"><span class=\"header-link\">Models</span></a></h3><blockquote>\nSummary: Use the automatic routing when you can, always put models on the &#39;models&#39; attribute of your mvc file\n</blockquote>\n\n<pre><code class=\"lang-javascript\">var edit = module.exports.edit = {\n    models: {\n        hello: function(data){\n            this.who = m.prop(data.who);\n        }\n    },\n</code></pre>\n<p>Here a few important things are going on:</p>\n<ul>\n<li><p>By placing our <code>mvc</code> object on <code>module.exports.edit</code>, automatic routing is applied by miso - you can read more about <a href=\"/doc/How-miso-works#route-by-convention.md\">how the automatic routing works here</a>. </p>\n</li>\n<li><p>Placing our <code>hello</code> model on the <code>models</code> attribute of the object ensures that miso can figure out what your models are, and will create a persistence API automatically for you when the server starts up, so that you can save your models into the database.</p>\n</li>\n</ul>\n<h3><a name=\"controller\" class=\"anchor\" href=\"#controller\"><span class=\"header-link\">Controller</span></a></h3><blockquote>\nSummary: DO NOT forget to &#39;return this;&#39; in the controller, it is vital!\n</blockquote>\n\n<pre><code class=\"lang-javascript\">controller: function(params) {\n    var who = miso.getParam(&#39;hello_id&#39;, params);\n    this.model = new edit.models.hello({who: who});\n    return this;\n},\n</code></pre>\n<p>The controller uses <code>miso.getParam</code> to retreive the parameter - this is so that it can work seamlessly on both the server and client side. We create a new model, and very importantly <code>return this</code> ensures that miso can get access to the controller correctly.</p>\n<h3><a name=\"view\" class=\"anchor\" href=\"#view\"><span class=\"header-link\">View</span></a></h3><blockquote>\nSummary: Use sugartags to make the view look more like HTML\n</blockquote>\n\n<pre><code class=\"lang-javascript\">view: function(ctrl) {\n    with(sugartags) {\n        return DIV(&quot;Hello &quot; + ctrl.model.who());\n    }\n}\n</code></pre>\n<p>The view is simply a javascript function that returns a structure. Here we use the <code>sugartags</code> library to render the DIV tag - this is strictly not required, but I find that people tend to understand the sugartags syntax better than pure mithril, as it looks a little more like HTML, though of course you could use standard mithril syntax if you prefer.</p>\n<h3><a name=\"next\" class=\"anchor\" href=\"#next\"><span class=\"header-link\">Next</span></a></h3><p>You now have a complete hello world app, and understand the fundamentals of the structure of a miso mvc application.</p>\n<p>We have only just scraped the surface of what miso is capable of, so next we recommend you read:</p>\n<p><a href=\"/doc/Creating-a-todo-app.md\">Creating a todo app</a></p>\n","Goals.md":"<h1><a name=\"primary-goals\" class=\"anchor\" href=\"#primary-goals\"><span class=\"header-link\">Primary goals</span></a></h1><ul>\n<li>Easy setup of <a href=\"/doc/.md\">isomorphic</a> application based on <a href=\"/doc/mithril.js.md\">mithril</a></li>\n<li>Skeleton / scaffold / Boilerplate to allow users to very quickly get up and running.</li>\n<li>minimal core</li>\n<li>easy extendible</li>\n<li>DB agnostic (e. G. plugins for different ORM/ODM)</li>\n</ul>\n<h1><a name=\"components\" class=\"anchor\" href=\"#components\"><span class=\"header-link\">Components</span></a></h1><ul>\n<li>Routing</li>\n<li>View rendering</li>\n<li>i18n/l10n</li>\n<li>Rest-API (could use restify: <a href=\"/doc/.md\">http://mcavage.me/node-restify/</a>)</li>\n<li>optional Websockets (could use restify: <a href=\"/doc/.md\">http://mcavage.me/node-restify/</a>)</li>\n<li>easy testing (headless and Browser-Tests)</li>\n<li>login/session handling</li>\n<li>models with validation</li>\n</ul>\n<h1><a name=\"useful-libs\" class=\"anchor\" href=\"#useful-libs\"><span class=\"header-link\">Useful libs</span></a></h1><p>Here are some libraries we are considering using, (in no particular order):</p>\n<ul>\n<li>leveldb</li>\n<li>mithril-query</li>\n<li>translate.js</li>\n<li>i18next</li>\n</ul>\n<p>And some that we&#39;re already using:</p>\n<ul>\n<li>express</li>\n<li>browserify</li>\n<li>mocha/expect</li>\n<li>mithril-node-render</li>\n<li>mithril-sugartags</li>\n<li>mithril-bindings</li>\n<li>mithril-animate</li>\n<li>lodash</li>\n<li>validator</li>\n</ul>\n","Home.md":"<p>Welcome to the misojs wiki!</p>\n<h1><a name=\"getting-started\" class=\"anchor\" href=\"#getting-started\"><span class=\"header-link\">Getting started</span></a></h1><p>See the <a href=\"/doc/misojs#install.md\">install guide</a>.\nRead <a href=\"/doc/How-miso-works.md\">how miso works</a>, and check out <a href=\"/doc/Patterns.md\">the patterns</a>, then create something cool!</p>\n","How-miso-works.md":"<h2><a name=\"models-views-controllers\" class=\"anchor\" href=\"#models-views-controllers\"><span class=\"header-link\">Models, views, controllers</span></a></h2><p>When creating a route, you must assign a controller and a view to it - this is achieved by creating a file in the <code>/mvc</code> directory - by convention, you should name it as per the path you want, (see the <a href=\"/doc/#routing.md\">routing section</a> for details).</p>\n<p>Here is a minimal example using the sugartags, and getting a parameter:</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nmodule.exports.index = {\n    controller: function(params) {\n        this.who = miso.getParam(&#39;who&#39;, params, &#39;world&#39;);\n        return this;\n    },\n    view: function(ctrl){\n        with(sugartags) {\n            return DIV(&#39;Hello &#39; + ctrl.who);\n        }\n    }\n};\n</code></pre>\n<p>Save this into a file <code>/mvc/hello.js</code>, and open <a href=\"/doc/hellos.md\">http://localhost/hellos</a>, this will show &quot;Hello world&quot;. Note the &#39;s&#39; on the end - this is due to how the <a href=\"/doc/#route-by-convention.md\">route by convention</a> works.</p>\n<p>Now open <code>/cfg/routes.json</code>, and add the following routes:</p>\n<pre><code class=\"lang-javascript\">    &quot;/hello&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;hello&quot;, &quot;action&quot;: &quot;index&quot; },\n    &quot;/hello/:who&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;hello&quot;, &quot;action&quot;: &quot;index&quot; }\n</code></pre>\n<p>Save the file, and go back to the browser, and you&#39;ll see an error! This is because we have now overridden the automatic route. Open <a href=\"/doc/hello.md\">http://localhost/hello</a>, and you&#39;ll see our action. Now open <a href=\"/doc/YOURNAME.md\">http://localhost/hello/YOURNAME</a>, and you&#39;ll see it getting the first parameter, and greeting you!</p>\n<h2><a name=\"routing\" class=\"anchor\" href=\"#routing\"><span class=\"header-link\">Routing</span></a></h2><p>The routing can be defined in one of two ways</p>\n<h3><a name=\"route-by-convention\" class=\"anchor\" href=\"#route-by-convention\"><span class=\"header-link\">Route by convention</span></a></h3><p>You can use a naming convention as follows:</p>\n<table>\n<thead>\n<tr>\n<th>Action</th>\n<th>Method</th>\n<th>URL</th>\n<th>Description</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>index</td>\n<td>GET</td>\n<td>[controller] + &#39;s&#39;</td>\n<td>List the items</td>\n</tr>\n<tr>\n<td>edit</td>\n<td>GET</td>\n<td>[controller]/[id]</td>\n<td>Display a form to edit the item</td>\n</tr>\n<tr>\n<td>new</td>\n<td>GET</td>\n<td>[controller] + &#39;s&#39; + &#39;/new&#39;</td>\n<td>Display a form to add a new item</td>\n</tr>\n</tbody>\n</table>\n<p>Say you have a mvc file named &quot;user.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.index = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/users&quot;.<br>Now say you have a mvc file named &quot;user.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.edit = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/user/:user_id&quot;, so that users can access via a route such as &quot;/user/27&quot; for use with ID of 27. <em>Note:</em> You can get the user_id using a miso utility: <code>var userId = miso.getParam(&#39;user_id&#39;, params);</code>.</p>\n<h3><a name=\"route-by-configuration\" class=\"anchor\" href=\"#route-by-configuration\"><span class=\"header-link\">Route by configuration</span></a></h3><p>By using <code>/cfg/routes.json</code> config file:</p>\n<pre><code class=\"lang-javascript\">{\n    &quot;[Pattern]&quot;: { &quot;method&quot;: &quot;[Method]&quot;, &quot;name&quot;: &quot;[Route name]&quot;, &quot;action&quot;: &quot;[Action]&quot; }\n}\n</code></pre>\n<p>Where:</p>\n<ul>\n<li><strong>Pattern</strong> - the <a href=\"/doc/#routing-patterns.md\">route pattern</a> we want, including any parameters</li>\n<li><strong>Method</strong> - one of &#39;GET&#39;, &#39;POST&#39;, &#39;PUT&#39;, &#39;DELETE&#39;</li>\n<li><strong>Route</strong> name - name of your route file from /mvc</li>\n<li><strong>Action</strong> - name of the action to call on your route file from /mvc</li>\n</ul>\n<p><strong>Example</strong></p>\n<pre><code class=\"lang-javascript\">{\n    &quot;/&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;home&quot;, &quot;action&quot;: &quot;index&quot; }\n}\n</code></pre>\n<p>This will map a &quot;GET&quot; to the root of the URL for the <code>index</code> action in <code>home.js</code></p>\n<p><strong>Note:</strong> The routing config will override any automatically defined routes, so if you need multiple routes to point to the same action, you must manually define them. For example, if you have a mvc file named &quot;term.js&quot;, and you define an action like so:</p>\n<pre><code class=\"lang-javascript\">module.exports.index = {...\n</code></pre>\n<p>Miso will automatically map a &quot;GET&quot; to &quot;/terms&quot;. Now, if you want to map it also to &quot;/AGB&quot;, you will need to add two entries in the routes config:</p>\n<pre><code class=\"lang-javascript\">{\n    &quot;/terms&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;terms&quot;, &quot;action&quot;: &quot;index&quot; },\n    &quot;/AGB&quot;: { &quot;method&quot;: &quot;get&quot;, &quot;name&quot;: &quot;terms&quot;, &quot;action&quot;: &quot;index&quot; }\n}\n</code></pre>\n<p>This is because Miso assumes that if you override the defaulted routes, you actually want to replace them, not just override them. <em>Note:</em> this is correct behaviour, as it minority case is when you want more than one route pointing to the same action.</p>\n<h3><a name=\"routing-patterns\" class=\"anchor\" href=\"#routing-patterns\"><span class=\"header-link\">Routing patterns</span></a></h3><table>\n<thead>\n<tr>\n<th>Type</th>\n<th>Example</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Path</td>\n<td>&quot;/abcd&quot; - match paths starting with /abcd</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/abc?d&quot; - match paths starting with /abcd and /abd</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/ab+cd&quot; - match paths starting with /abcd, /abbcd, /abbbbbcd and so on</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/ab*cd&quot; - match paths starting with /abcd, /abxcd, /abFOOcd, /abbArcd and so on</td>\n</tr>\n<tr>\n<td>Path Pattern</td>\n<td>&quot;/a(bc)?d&quot; - will match paths starting with /ad and /abcd</td>\n</tr>\n<tr>\n<td>Regular Expression</td>\n<td>/\\/abc&#124;\\/xyz/ - will match paths starting with /abc and /xyz</td>\n</tr>\n<tr>\n<td>Array</td>\n<td>[&quot;/abcd&quot;, &quot;/xyza&quot;, /\\/lmn&#124;\\/pqr/] - match paths starting with /abcd, /xyza, /lmn, and /pqr</td>\n</tr>\n</tbody>\n</table>\n<h3><a name=\"links\" class=\"anchor\" href=\"#links\"><span class=\"header-link\">Links</span></a></h3><p>When you create links, in order to get the app to work as an SPA, you must pass in m.route as a config, so that the history will be updated correctly, for example:</p>\n<pre><code class=\"lang-javascript\">A({href:&quot;/users/new&quot;, config: m.route}, &quot;Add new user&quot;)\n</code></pre>\n<p>This will correctly work as a SPA. If you leave out <code>config: m.route</code>, the app will still work, but the page will reload every time the link is followed.</p>\n<ul>\n<li>Lightweight footprint</li>\n<li>Full-stack isomorphic framework</li>\n<li>SPA that renders the initial page server side</li>\n<li>Data models with isomorphic validation</li>\n<li>Auto-reload browser on changes</li>\n</ul>\n<h2><a name=\"data-models\" class=\"anchor\" href=\"#data-models\"><span class=\"header-link\">Data models</span></a></h2><p>Data models are progressively enhanced mithril models - you simply create your model as usual, then add validation and type information as it becomes pertinent.\nFor example, say you have a model like so:</p>\n<pre><code class=\"lang-javascript\">var userModel = function(data){\n    this.name = m.p(data.name||&quot;&quot;);\n    this.email = m.p(data.email||&quot;&quot;);\n    this.id = m.p(data._id||&quot;&quot;);\n    return this;\n}\n</code></pre>\n<p>In order to make it validatable, add the validator module:</p>\n<pre><code class=\"lang-javascript\">var validate = require(&#39;validator.modelbinder&#39;);\n</code></pre>\n<p>Then add a <code>isValid</code> validation method to your model, with any declarations based on <a href=\"/doc/validator.js#validators.md\">node validator</a>:</p>\n<pre><code class=\"lang-javascript\">var userModel = function(data){\n    this.name = m.p(data.name||&quot;&quot;);\n    this.email = m.p(data.email||&quot;&quot;);\n    this.id = m.p(data._id||&quot;&quot;);\n\n    //    Validate the model        \n    this.isValid = validate.bind(this, {\n        name: {\n            isRequired: &quot;You must enter a name&quot;\n        },\n        email: {\n            isRequired: &quot;You must enter an email address&quot;,\n            isEmail: &quot;Must be a valid email address&quot;\n        }\n    });\n\n    return this;\n};\n</code></pre>\n<p>This creates a method that the miso database adaptor can use to validate your model.\nYou get full access to the validation info as well, so you can show an error message near your field, for example:</p>\n<pre><code class=\"lang-javascript\">user.isValid(&#39;email&#39;)\n</code></pre>\n<p>Will return <code>true</code> if the <code>email</code> property of your user model is valid, or a list of errors messages if it is invalid:</p>\n<pre><code class=\"lang-javascript\">[&quot;You must enter an email address&quot;, &quot;Must be a valid email address&quot;]\n</code></pre>\n<p>So you can for example add a class name to a div surrounding your field like so:</p>\n<pre><code class=\"lang-javascript\">DIV({class: (ctrl.user.isValid(&#39;email&#39;) == true? &quot;valid&quot;: &quot;invalid&quot;)}, [...\n</code></pre>\n<p>And show the error messages like so:</p>\n<pre><code class=\"lang-javascript\">SPAN(ctrl.user.isValid(&#39;email&#39;) == true? &quot;&quot;: ctrl.user.isValid(&#39;email&#39;).join(&quot;, &quot;))\n</code></pre>\n<h2><a name=\"database-adaptor-api-and-model-interaction\" class=\"anchor\" href=\"#database-adaptor-api-and-model-interaction\"><span class=\"header-link\">Database adaptor, api and model interaction</span></a></h2><p>Miso uses the model definitions that you declare in your <code>mvc</code> file to build up a set of models that the API can use, the model definitions work like this:</p>\n<ul>\n<li>On the models attribute of the mvc, we  define a standard mithril data model, (ie: a javascript object where properties can be either standard javascript data types, or a function that works as a getter/setter, eg: <code>m.prop</code>)</li>\n<li>On server startup, miso reads this and creates a cache of the model objects, including the name space of the model, eg: &quot;hello.edit.hello&quot;</li>\n<li>Models can optionally include data validation information, and the database adaptor will get access to this.</li>\n</ul>\n<p>Assuming we have a model in the hello.models object like so:</p>\n<pre><code class=\"lang-javascript\">hello: function(data){\n    this.who = m.prop(data.who);\n    this.isValid = validate.bind(this, {\n        who: {\n            isRequired: &quot;You must know who you are talking to&quot;\n        }\n    });\n}\n</code></pre>\n<p>The API works like this:</p>\n<ul>\n<li>We create an endpoint at <code>/api</code> where each we load whatever adaptor is configured in <code>/cfg/server.json</code>, and expose each method. For example <code>/api/save</code> is available for the default <code>flatfiledb</code> adaptor.</li>\n<li>Next we create a set of API files - one for client, (/system/api.client.js), and one for server (/system/api.server.js) - each have the same methods, but do vastly different things:<ul>\n<li>api.client.js is a thin wrapper that uses mithril&#39;s m.request to create an ajax request to the server API, it simply passes messages back and forth (in JSON RPC 2.0 format).</li>\n<li>api.server.js calls the database adaptor methods, which in turn handles models and validation so for example when a request is made and a <code>type</code> and <code>model</code> is included, we can re-construct the data model based on this info, for example you might send: {type: &#39;hello.edit.hello&#39;, model: {who: &#39;Dave&#39;}}, this can then be cast back into a model that we can call the <code>isValid</code> method on.</li>\n</ul>\n</li>\n</ul>\n<p><strong>Now, the important bit:</strong> The reason for all this functionality is that mithril internally delays rendering to the DOM whilst a request is going on, so we need to handle this within miso - in order to be able to render things on the server - so we have a binding system that delays rendering whilst an async request is still being executed. That means mithril-like code like this:</p>\n<pre><code class=\"lang-javascript\">controller: function(){\n    var ctrl = this;\n    api.find({type: &#39;hello.index.hello&#39;}).then(function(data) {\n        var list = Object.keys(data.result).map(function(key) {\n            var myHello = data.result[key];\n            return new self.models.hello(myHello);\n        });\n        ctrl.model = new ctrl.vm.todoList(list);\n    });\n    return ctrl;\n}\n</code></pre>\n<p>Will still work. Note: the magic here is that there is absolutely nothing in the code above that runs a callback to let mithril know the data is ready - this is a design feature of mithril to delay rendering automatically whilst an <code>m.request</code> is in progress, so we cater for this to have the ability to render the page server-side first, so that SEO works out of the box.</p>\n<h2><a name=\"client-vs-server-code\" class=\"anchor\" href=\"#client-vs-server-code\"><span class=\"header-link\">Client vs server code</span></a></h2><p>In miso, you include files using the standard nodejs <code>require</code> function. When you need to do something that works differently in the browser than the server, there are a few ways you can achieve it:</p>\n<ul>\n<li>The recommended way is to create and require a file in the <code>server/</code> directory, and then create the same file in the <code>client/</code> directory, and miso will automatically load that file for you on the client side.</li>\n<li>If this is not to your liking, another option is to use <code>miso.util</code> - you can use <code>miso.util.isServer()</code> to test if you&#39;re on the server or not, though it is better practice to use the server/client directory method.</li>\n</ul>\n<h2><a name=\"requiring-files\" class=\"anchor\" href=\"#requiring-files\"><span class=\"header-link\">Requiring files</span></a></h2><p>When requiring files, be sure to do so in a static manner so that browserify is able to compile the client side script. Always use:</p>\n<pre><code class=\"lang-javascript\">var miso = require(&#39;../server/miso.util.js&#39;);\n</code></pre>\n<p>NEVER DO ANY OF THESE:</p>\n<pre><code class=\"lang-javascript\">//  DON&#39;T DO THIS!\nvar miso = new require(&#39;../server/miso.util.js&#39;);\n</code></pre>\n<p>This will create an object, which means <a href=\"/doc/824.md\">browserify cannot resolve it statically</a>, and will ignore it.</p>\n<pre><code class=\"lang-javascript\">//  DON&#39;T DO THIS!\nvar thing = &#39;miso&#39;;\nvar miso = require(&#39;../server/&#39;+thing+&#39;.util.js&#39;);\n</code></pre>\n<p>This will create an expression, which means <a href=\"/doc/824.md\">browserify cannot resolve it statically</a>, and will ignore it.</p>\n","Patterns.md":"<p>There are several ways you can write your app and miso is not opinionated about how you go about this so it is important that you choose a pattern that suits your needs. Below are a few suggested patterns to follow when developing apps.</p>\n<p><strong>Note:</strong> miso is a single page app that loads server rendered HTML from any URL, so that SEO works out of the box.</p>\n<h2><a name=\"single-url-mvc\" class=\"anchor\" href=\"#single-url-mvc\"><span class=\"header-link\">Single url mvc</span></a></h2><p>In this pattern everything that your mvc needs to do is done on a single url for all the associated actions. The advantage for this style of development is that you have everything in one mvc container, and you don&#39;t need to map any routes - of course the downside being that there are no routes for the user to bookmark. This is pattern works well for smaller entities where there are not too many interactions that the user can do - this is essentially how most mithril apps are written - self-contained, and at a single url.</p>\n<p>Here is a &quot;hello world&quot; example using the single url pattern</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nvar self = module.exports.index = {\n    models: {\n        //    Our model\n        hello: function(data){\n            this.who = m.p(data.who);\n        }\n    },\n    controller: function(params) {\n        this.model = new self.models.hello({who: &quot;world&quot;});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who())\n            ];\n        }\n    }\n};\n</code></pre>\n<p>This would expose a url /hellos (note: the &#39;s&#39;), and would display &quot;Hello world&quot;. (You can change the route using custom routing)</p>\n<h2><a name=\"multi-url-mvc\" class=\"anchor\" href=\"#multi-url-mvc\"><span class=\"header-link\">Multi url mvc</span></a></h2><p>In this pattern we expose multiple mvc routes that in turn translate to multiple URLs. This is useful for splitting up your app, and ensuring each mvc has its own sets of concerns.</p>\n<pre><code class=\"lang-javascript\">var m = require(&#39;mithril&#39;),\n    miso = require(&#39;../server/miso.util.js&#39;),\n    sugartags = require(&#39;../server/mithril.sugartags.node.js&#39;)(m);\n\nvar index = module.exports.index = {\n    models: {\n        //    Our model\n        hello: function(data){\n            this.who = m.p(data.who);\n        }\n    },\n    controller: function(params) {\n        this.model = new index.models.hello({who: &quot;world&quot;});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who()),\n                A({href: &quot;/hello/Leo&quot;, config: m.route}, &quot;Click me for the edit action&quot;)\n            ];\n        }\n    }\n};\n\nvar edit = module.exports.edit = {\n    controller: function(params) {\n        var who = miso.getParam(&#39;hello_id&#39;, params);\n        this.model = new index.models.hello({who: who});\n        return this;\n    },\n    view: function(ctrl) {\n        var model = ctrl.model;\n        with(sugartags) {\n            return [\n                DIV(&quot;Hello &quot; + model.who())\n            ];\n        }\n    }\n};\n</code></pre>\n<p>Here we also expose a &quot;/hello/[NAME]&quot; url, that will show your name when you visit /hello/[YOUR NAME], so there are now multiple urls for our SPA:</p>\n<ul>\n<li><strong>/hellos</strong> - this is intended to be an index page that lists all your &quot;hellos&quot;</li>\n<li><strong>/hello/[NAME]</strong> - this is intended to be an edit page where you can edit your &quot;hellos&quot;</li>\n</ul>\n<p>Note that the anchor tag has <code>config: m.route</code> in it&#39;s options - this is so that we can route automatically though mithril</p>\n"}; };
 },{}],20:[function(require,module,exports){
 /* NOTE: This is a generated file, please do not modify it, your changes will be lost */
 module.exports = function(m){
@@ -3645,7 +3645,7 @@ module.exports = function(app, secret){
 var m = require('mithril');
 var sugartags = require('mithril.sugartags')(m);
 var bindings = require('mithril.bindings')(m);
-var animate = require('../client/js/mithril.animate.js')(m);
+var animate = require('../public/js/mithril.animate.js')(m);
 var restrictions = require('../modules/miso.permissions.js');
 var auth = require('../system/auth.js');
 var restrict = function(route, actionName){
@@ -3697,4 +3697,4 @@ m.route(document.getElementById('misoAttachmentNode'), '/', {
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')
 });
-},{"../client/js/mithril.animate.js":1,"../modules/miso.permissions.js":6,"../mvc/doc.js":8,"../mvc/flickr.js":9,"../mvc/hello.js":10,"../mvc/home.js":11,"../mvc/login.js":12,"../mvc/todo.js":13,"../mvc/user.js":14,"../system/auth.js":21,"mithril":17,"mithril.bindings":15,"mithril.sugartags":16}]},{},[22]);
+},{"../modules/miso.permissions.js":3,"../mvc/doc.js":5,"../mvc/flickr.js":6,"../mvc/hello.js":7,"../mvc/home.js":8,"../mvc/login.js":9,"../mvc/todo.js":10,"../mvc/user.js":11,"../public/js/mithril.animate.js":17,"../system/auth.js":21,"mithril":14,"mithril.bindings":12,"mithril.sugartags":13}]},{},[22]);

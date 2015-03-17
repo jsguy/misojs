@@ -1,5 +1,5 @@
 /*
-	The concept for the adaptors is that we can create an api for
+	The concept for the apis is that we can create an api for
 	any action, with arbitrary arguments, and the framework will
 	pass those arguments to the same serverside action
 
@@ -14,17 +14,17 @@ var fs = require('fs'),
 	Promiz = require('promiz'),
 
 	//	Creates actions for use on the server
-	makeServerAction = function(action, adaptor){
+	makeServerAction = function(action, api){
 		return function(){
 			//	Create an array for the arguments
 			var args = Array.prototype.slice.call(arguments, 0),
-				method = adaptor[action];
+				method = api[action];
 
 			return new Promiz(function(cb, err){
 				//	Add model, cb, err at the front of the 
 				args.unshift(cb, err);
 				//	Run the method
-				method.apply(adaptor, args);
+				method.apply(api, args);
 			});
 		};
 	},
@@ -32,7 +32,7 @@ var fs = require('fs'),
 
 	//	Creates actions for use in the server generated code
 	//	Note: cannot use a real promise here, as mithril breaks...
-	makeServerGenerateAction = function(action, adaptor){
+	makeServerGenerateAction = function(action, api){
 		return ["function(){",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
 			"		errResult,",
@@ -43,7 +43,7 @@ var fs = require('fs'),
 			"		doneFunc = function(){isReady = true;};",
 			"	",
 			"	args.unshift(successFunc, errFunc);",
-			"	result = myAdaptor['"+action+"'].apply(this, args);",
+			"	result = myApi['"+action+"'].apply(this, args);",
 			//	Add a binding object, so we can block till ready
 			"	var bindScope = arguments.callee.caller;",
 			"	bindScope._misoReadyBinding = miso.readyBinderFactory();",
@@ -66,7 +66,7 @@ var fs = require('fs'),
 	},
 
 	//	Creates client action method
-	makeClientAction = function(action, adaptor, apiPath){
+	makeClientAction = function(action, api, apiPath){
 		return ["function(args, options){",
 			"	options = options || {};",
 			"	var requestObj = {",
@@ -135,7 +135,7 @@ module.exports = function() {
 	
 			//	We always use a JSON RPC 2.0 response
 			//
-			//	Note: this is applied in the api.js file.
+			//	Note: this is applied in the api_endpoint.js file.
 			//
 			response: function(result, err, id){
 				var res = {
@@ -155,12 +155,12 @@ module.exports = function() {
 			}
 		},
 
-		//	Server adaptor creates actions
-		create: function(adaptor, utils) {
+		//	Server api creates actions
+		create: function(api, utils) {
 			var obj = {}
 
-			for(var i in adaptor) {
-				obj[i] = makeServerAction(i, adaptor);
+			for(var i in api) {
+				obj[i] = makeServerAction(i, api);
 			}
 
 			return {
@@ -170,12 +170,12 @@ module.exports = function() {
 		},
 
 
-		//	Server adaptor - makes calls to the actual adaptor
-		createServer: function(adaptor, utils) {
+		//	Server api - makes calls to the actual api
+		createServer: function(api, utils) {
 			var obj = {}
 
-			for(var i in adaptor) {
-				obj[i] = makeServerGenerateAction(i, adaptor);
+			for(var i in api) {
+				obj[i] = makeServerGenerateAction(i, api);
 			}
 
 			return {
@@ -185,12 +185,12 @@ module.exports = function() {
 		},
 
 
-		//	Client adaptor - remote calls with a serialised model
-		createClient: function(adaptor, utils, apiPath) {
+		//	Client api - remote calls with a serialised model
+		createClient: function(api, utils, apiPath) {
 			var obj = {};
 			
-			for(var i in adaptor) {
-				obj[i] = makeClientAction(i, adaptor, apiPath);
+			for(var i in api) {
+				obj[i] = makeClientAction(i, api, apiPath);
 			}
 
 			return {

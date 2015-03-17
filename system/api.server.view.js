@@ -11,9 +11,9 @@ var m = require('mithril');
 module.exports.index = function(ctrl){
 	return [
 		"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
-		"var utils = require('"+ctrl.adaptorPath+"adaptor.js')().utils;",
+		"var utils = require('"+ctrl.apiPath+"api.js')().utils;",
 		"var miso = require('../../../modules/miso.util.js');",
-		"var myAdaptor = require('../" + ctrl.adaptor + "/" + ctrl.adaptor + ".adaptor.js')(utils);",
+		"var myApi = require('../" + ctrl.api_endpoint + "/" + ctrl.api_endpoint + ".api.js')(utils);",
 		"module.exports = function(m){",
 		"	return {",
 		//	Grab our api action methods

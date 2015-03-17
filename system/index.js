@@ -30,11 +30,11 @@ var fs			= require('fs'),
 	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
-	adaptorPath = "../",
+	apiPath = "../",
 	//	Where we put our API files
-	apiDirectory = './system/adaptor/',
-	//	Where we put adaptor override files
-	moduleAdaptorDirectory = './modules/adaptor/',
+	apiDirectory = './system/api/',
+	//	Where we put api override files
+	moduleApiDirectory = './modules/api/',
 
 	apiClientFile = 'api.client.js',
 	apiServerFile = 'api.server.js',
@@ -93,41 +93,41 @@ module.exports = function(app, options) {
 	var routesPath = __dirname + "/../mvc/",
 		auth = require('../system/auth.js')(app, serverConfig.authKey);
 
-	//	Add any adaptors configured in the server config
-	if(serverConfig.adaptor) {
-		var adaptors = _.isArray(serverConfig.adaptor)? 
-			serverConfig.adaptor: 
-			[serverConfig.adaptor],
-			adaptorRequirePath,
+	//	Add any apis configured in the server config
+	if(serverConfig.api) {
+		var apis = _.isArray(serverConfig.api)? 
+			serverConfig.api: 
+			[serverConfig.api],
+			apiRequirePath,
 			apiDir = apiDirectory,
-			myAdaptorPath = adaptorPath;
+			myApiPath = apiPath;
 
-		_.forOwn(adaptors, function(adaptor){
+		_.forOwn(apis, function(api){
 
-			//	Check the module adaptor directory first
-			if(fs.existsSync(moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js')) {
-				apiDir = moduleAdaptorDirectory;
-				adaptorRequirePath = "../." + moduleAdaptorDirectory + adaptor + '/' + adaptor + '.adaptor.js';
-				myAdaptorPath = "../../../system/adaptor/";
+			//	Check the module api directory first
+			if(fs.existsSync(moduleApiDirectory + api + '/' + api + '.api.js')) {
+				apiDir = moduleApiDirectory;
+				apiRequirePath = "../." + moduleApiDirectory + api + '/' + api + '.api.js';
+				myApiPath = "../../../system/api/";
 			} else {
 				apiDir = apiDirectory;
-				adaptorRequirePath = undefined;
-				myAdaptorPath = adaptorPath;
+				apiRequirePath = undefined;
+				myApiPath = apiPath;
 			}
 
-			//	Create API for configured adaptor (serverConfig.adaptor)
-			var dbApi = require('./adaptor/api.js')(app, adaptor, serverConfig.apiPath, adaptorRequirePath);
+			//	Create API for configured api (serverConfig.api)
+			var dbApi = require('./api/api_endpoint.js')(app, api, serverConfig.apiPath, apiRequirePath);
 
 			//	Client file
-			fs.writeFileSync(apiDir + adaptor + "/" + apiClientFile, render(apiClientView({
+			fs.writeFileSync(apiDir + api + "/" + apiClientFile, render(apiClientView({
 				api: dbApi.client.api
 			}), true));
 
 			//	Server file
-			fs.writeFileSync(apiDir + adaptor + "/" + apiServerFile, render(apiServerView({
+			fs.writeFileSync(apiDir + api + "/" + apiServerFile, render(apiServerView({
 				api: dbApi.server.api,
-				adaptor: adaptor,
-				adaptorPath: myAdaptorPath
+				api_endpoint: api,
+				apiPath: myApiPath
 			}), true));
 		});
 	}

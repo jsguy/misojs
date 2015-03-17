@@ -1,6 +1,6 @@
 var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
-	db = require('../system/adaptor/flatfiledb/api.server.js')(m);
+	db = require('../system/api/flatfiledb/api.server.js')(m);
 
 var self = module.exports.index = {
 	models: {

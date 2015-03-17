@@ -2,7 +2,7 @@
 var m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
-	ldb = require('../modules/adaptor/authentication/api.server.js')(m);
+	ldb = require('../modules/api/authentication/api.server.js')(m);
 
 var index = module.exports.index = {
 	models: {
@@ -22,7 +22,7 @@ var index = module.exports.index = {
 		//	the server.
 		//	Now, how to we get it to the client?
 		//
-		//	Idea: use an adaptor endpoint 
+		//	Idea: use an api endpoint 
 		//	that can be used to store/get session
 		//	info. We need to load the session info
 		//	when the page is loaded, so we need a way 

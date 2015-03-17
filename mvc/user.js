@@ -7,7 +7,7 @@ var miso = require('../modules/miso.util.js'),
 	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
-	api = require('../modules/adaptor/authentication/api.server.js')(m),
+	api = require('../modules/api/authentication/api.server.js')(m),
 	self = module.exports;
 
 //	Shared view

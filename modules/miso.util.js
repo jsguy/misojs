@@ -46,7 +46,7 @@ module.exports = {
 	},
 
 	/*	Use a JSON RPC 2.0 response
-		this is used by the server response in the adaptor.
+		this is used by the server response in the api.
 	*/
 	response: function(result, err, id){
 		var res = {
