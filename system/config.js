@@ -9,12 +9,14 @@ module.exports = function(environment) {
 		envCfgFile = __dirname + '/../cfg/server.' + environment +'.json';
 
 		if(fs.existsSync(envCfgFile) && fs.statSync(envCfgFile).isFile()){
-			envCfg = require(envCfgFile);
-			serverConfig = _.assign(serverConfig, envCfg);
+			serverConfig = _.assign(serverConfig, require(envCfgFile));
 		}
 	}
 
 	serverConfig.environment = environment;
+
+	//	Expose this to the whole app
+	GLOBAL.serverConfig = serverConfig;
 
 	return serverConfig;
 };
