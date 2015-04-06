@@ -68,6 +68,7 @@ var fs = require('fs'),
 	//	Creates client action method
 	makeClientAction = function(action, api, apiPath){
 		return ["function(args, options){",
+			"	args = args || {};",
 			"	options = options || {};",
 			"	var requestObj = {",
 			"			method:'post', ",
@@ -133,26 +134,8 @@ module.exports = function() {
 				return st;
 			},
 	
-			//	We always use a JSON RPC 2.0 response
-			//
-			//	Note: this is applied in the api_endpoint.js file.
-			//
-			response: function(result, err, id){
-				var res = {
-					jsonrpc: "2.0",
-					id: null
-				};
-
-				//	Can't have both result and error
-				//	Favour error
-				if(err) {
-					res.error = err;
-				} else {
-					res.result = result;
-				}
-
-				return res;
-			}
+			//	Use mis response type - this is applied in the api_endpoint.js file.
+			response: miso.response
 		},
 
 		//	Server api creates actions

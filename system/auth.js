@@ -10,28 +10,23 @@
 //
 //
 module.exports = function(app, secret){
+	var loginUrlPattern = GLOBAL.serverConfig.authentication.loginUrlPattern;
 	//	options are passed in from the mvc action, eg: user.edit
 	//	has an example
 	return function(options) {
-		console.log('auth options', options, 'secret', secret);
 		return function(req, res, next) {
-			var sess = req.session;
+			if(typeof secret === "undefined") {
+				throw "authenticationSecret not defined in serverConfig";
+			}
 
-			console.log('authing...', sess);
-
-			//	We are authenticated
-			if(sess && sess.authenticated === secret) {
+			//	Check if we are authenticated
+			if(req.session.authenticationSecret === secret) {
+				//	Let the client know we're logged in
+				req.session.isLoggedIn = true;
 				return next();
 			} else {
-
-				console.log('not auth', req.originalUrl);
-
-				if(options.requestType == "JSON") {
-					//	Respond with JSON RPC 2.0
-				} else {
-					//	Redirect to login action, pass in req.originalUrl so the user can do somethign with it
-					return res.redirect("/login?url=" + req.originalUrl);
-				}
+				//	TODO: Add ability to respond with JSON RPC 2.0
+				return res.redirect(loginUrlPattern.split("[ORIGINALURL]").join(req.originalUrl));
 			}
 		};
 	};

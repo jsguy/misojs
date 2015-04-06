@@ -1,17 +1,20 @@
-//	miso login api example
+//	Miso authentication api example
+//
+//	This example uses bcrypt to encode/decode passwords, 
+//
 var ffdba = require('../../../system/api/flatfiledb/flatfiledb.api.js'),
 	_ = require('lodash'),
 	uuid = require('node-uuid'),
-	bcrypt = require('bcrypt');
+	bcrypt = require('bcrypt'),
+	secret = GLOBAL.serverConfig.authentication.secret;
 
 //	Extend the flatfiledb api with login-specfic methods
 module.exports = function(utils){
 	var db = ffdba(utils),
 		modelType = 'user.edit.user';
 
-	//	See if we have a user
-	//	TODO: hash password
-	db.login = function(cb, err, args, session){
+	//	Login a user
+	db.login = function(cb, err, args, req){
 		//	Find matching username
 		db.find(function(data) {
 			if(data.length > 0) {
@@ -20,22 +23,19 @@ module.exports = function(utils){
 					if(error) {
 						return err(false);
 					}
-				    // res == true 
 				    if(res == true) {
-
-				    	//	TODO: We need to notify the ssession here...
-
-				    	//	TODO - use the secret from the server config.
-				    	session.isLoggedIn = true;
-
-				    	cb(true);
+				    	//	Set the authSecret - this is the only place 
+				    	//	where this should happen.
+				    	req.session.authenticationSecret = secret;
+				    	req.session.userName = data[0].name;
+				    	cb({isLoggedIn: true, userName: data[0].name});
 				    } else {
-				    	cb(false);
+				    	cb({isLoggedIn: false});
 				    }
 				});
 
 			} else {
-				cb(false);
+				cb({isLoggedIn: false});
 			}
 		}, err, {
 			type: modelType, query: { 
@@ -44,10 +44,11 @@ module.exports = function(utils){
 		});
 	};
 
-
-	//	TODO: We need to ba able to restrict user model access
-	//	by api type.
-
+	//	Log out a user
+	db.logout = function(cb, err, args, req){
+		delete req.session.authenticationSecret;
+		cb({isLoggedIn: false});
+	};
 
 	//	Load users, excluding the password hash
 	db.findUsers = function(cb, err, args){

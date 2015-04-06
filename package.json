@@ -1,6 +1,6 @@
 {
   "name": "misojs",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "private": false,
   "scripts": {
     "development": "touch -t 197804100000.00 system/main.js && nodemon -e js,css,json --watch package.json --watch modules/ --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
@@ -36,6 +36,7 @@
     "promiz": "^1.0.3",
     "request": "^2.53.0",
     "sockjs": "0.3.12",
+    "sqlite3": "^3.0.5",
     "validator": "^3.27.0",
     "validator.modelbinder": "0.0.2"
   },

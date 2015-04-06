@@ -104,11 +104,15 @@ getScrollTop = function(){
 //	Reload when we can get a connection again
 (function () {
 	var sock = new SockJS(window.location.origin + '/misoreload'),
-		timeDelay = 100,
+		timeDelay = 200,
 		scrollY = cookie.get("reloadScroll");
 
 		
-	//	When socket is closed, we set an interval to watch for socket open
+	//	When socket is closed, we set an interval to watch for 
+	//	socket open.
+	//	TODO: It would be nice to have a decaying delay, when there 
+	//	is a longer wait, for example: after 2 seconds, wait 400ms, 
+	//	after 5 seconds 1000ms, etc...
 	sock.onclose = function() {
 		var inter = setInterval(function() {
 			var newSock = new SockJS(window.location.origin + '/misoreload');
@@ -126,7 +130,9 @@ getScrollTop = function(){
 		}, 20);
 	}
 
-	//	Capture scroll offset, so we go back to roughly where we were at
+	//	Capture scroll offset, so we go back to roughly where we were at.
+	//	If you have several tabs open, this might look a little weird
+	//	TODO: Maybe add a cookie per URL instead?
 	window.onscroll = function(){
 		cookie.set("reloadScroll", getScrollTop());
 	};

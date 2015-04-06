@@ -72,7 +72,7 @@ var self = module.exports.index = {
 	},
 	view: function(ctrl) {
 		with(sugartags) {
-			return [
+			return DIV({"class": "cw cf"}, [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
 				BUTTON({ onclick: ctrl.archive }, "Archive"),
@@ -85,9 +85,9 @@ var self = module.exports.index = {
 					INPUT({ type: "text", value: ctrl.vm.input, placeholder: "Add todo"}),
 					BUTTON({ type: "submit"}, "Add")
 				])
-			]
-		};
+			]);
+		}
 	}
 	//	Test authenticate
-	//,authenticate: true
+	,authenticate: true
 };

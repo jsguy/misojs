@@ -13,6 +13,8 @@ var self = module.exports.index = {
 	controller: function(params) {
 		var ctrl = this;
 
+		ctrl.list = [];
+
 		db.find({type: 'todo.index.todo'}, {background: true, initialValue: []}).then(function(data) {
 			ctrl.list = Object.keys(data.result).map(function(key) {
 				return new self.models.todo(data.result[key]);
@@ -70,7 +72,7 @@ var self = module.exports.index = {
 	},
 	view: function(ctrl) {
 		with(sugartags) {
-			return [
+			return DIV({"class": "cw cf"}, [
 				STYLE(".done{text-decoration: line-through;}"),
 				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
 				BUTTON({ onclick: ctrl.archive }, "Archive"),
@@ -83,7 +85,7 @@ var self = module.exports.index = {
 					INPUT({ type: "text", value: ctrl.vm.input, placeholder: "Add todo"}),
 					BUTTON({ type: "submit"}, "Add")
 				])
-			]
-		};
+			]);
+		}
 	}
 };

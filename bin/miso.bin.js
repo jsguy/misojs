@@ -4,11 +4,6 @@
 
 	TODO:
 
-	. Add skeleton directory for various apps, including:
-		- Default (Empty project)
-		- User admin (current thing)
-		- [future] SPA (Single Page App)
-	. Only copy the required files for each skeleton type
 	. Add scaffolding for mvc
 
 */
@@ -18,6 +13,9 @@ var argv = require('minimist')(process.argv.slice(2)),
 	npm = require('npm'),
 	_ = require("lodash"),
 	pjson = require('../package.json'),
+	serverConfigFile = 'cfg/server.json',
+	serverConfig = require('../' + serverConfigFile),
+	routesConfigFile = 'cfg/routes.json',
 	environment = process.env.NODE_ENV || "development",
 	name = pjson.name,
 	version = pjson.version,
@@ -26,12 +24,15 @@ var argv = require('minimist')(process.argv.slice(2)),
 	print = function(){
 		console.log.apply(console, arguments);
 	},
+	error = function(){
+		console.error.apply(console, arguments);
+	},
 	createdProject = false,
 	projectPath,
 	//	What to exclude
-	excludeFiles = ['mvc', 'modules', 'documentation', 'skeletons', 'bin', 'README.md', ''],
+	excludeFiles = ['mvc', 'documentation', 'skeletons', 'bin', 'README.md'],
 	//	What to always copy
-	copyFiles = ['mvc/layout.js', 'modules/api/authentication/authentication.api.js'],
+	copyFiles = ['mvc/layout.js', 'modules'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {
@@ -76,10 +77,10 @@ var argv = require('minimist')(process.argv.slice(2)),
 			//	Create package
 			fs.writeFileSync(projectPath +"/package.json", createPackage(projectName));
 
-			print("Project successfully created.");
+			print("* Project successfully created.");
 			createdProject = true;
 		} else {
-			print("Project directory already exists:", projectName, ", remove it before creating project");
+			error("Project directory already exists:", projectName, ", remove it before creating project");
 		}
 		return true;
 	},
@@ -105,12 +106,12 @@ var argv = require('minimist')(process.argv.slice(2)),
 		if(fs.existsSync(skeletonPath)) {
 			if(fs.existsSync(projectPath)) {
 				fs.copySync(skeletonPath, projectPath);
-				print("Added '" + type + "' skeleton to " + projectName);
+				print("* Added '" + type + "' skeleton to " + projectName);
 			} else {
-				print("Project not found: " + projectPath);
+				error("Project not found: " + projectPath);
 			}
 		} else {
-			print("Skeleton not found: " + type);
+			error("Skeleton not found: " + type);
 		}
 	};
 
@@ -166,15 +167,30 @@ try {
 			projectPath = argv.n;
 		}
 
+
+		//	Add any files required for authentication here
+		if(argv.a) {
+			copyFiles.push('mvc/login.js');
+			copyFiles.push('mvc/user.js');
+		}
+
 		//	See if it worked, then check if we're also creating a skeleton.
 		if(createProject(projectPath, argv.n)) {
+			//	Apply specified or default skeleton
+			addSkeleton(argv.s? argv.s: "default", projectPath, argv.n);
 
-			//	We can also apply a skeleton when creating a new project
-			if(argv.s) {
-				addSkeleton(argv.s, projectPath, argv.n);
-			} else {
-				//	Apply default skeleton
-				addSkeleton("default", projectPath, argv.n);
+			//	Update settings and routes
+			if(argv.a) {
+				serverConfig.authentication = serverConfig.authentication ||{};
+				serverConfig.authentication.enabled = true;
+				fs.writeFileSync(projectPath + "/" + serverConfigFile, JSON.stringify(serverConfig, undefined, 2), {encoding: 'utf8'});
+
+				var routesConfig = require(projectPath + "/" + routesConfigFile);
+				routesConfig = routesConfig || {};
+				routesConfig["/login"] = { "method": "get", "name": "login", "action": "index" };
+				fs.writeFileSync(projectPath + "/" + routesConfigFile, JSON.stringify(routesConfig, undefined, 2), {encoding: 'utf8'});
+
+				print("* Added authentication support");
 			}
 		}
 
@@ -187,7 +203,8 @@ try {
 			"Commands:",
 			"  -?                  Shows help for a particular command, eg: '"+name+" -? n' shows help for creating a new project",
 			"  -n                  Create a new project",
-			"  -s                  Add a skeleton to a new app",
+			"  -s                  Add a skeleton to your new app",
+			"  -a                  Add authentication capability to your new app",
 			"  run                 Runs the project in the current directory"
 		];
 		_.each(helpText, function(txt){
@@ -195,7 +212,7 @@ try {
 		});
 	}
 } catch(ex) {
-	print("Error:", ex);
+	error("Exception:", ex);
 }
 
 if(createdProject) {

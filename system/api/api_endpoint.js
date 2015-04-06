@@ -3,10 +3,9 @@
 //
 //	TODO: 
 //
-//	* Guard against XSS
-//	* Safeguard against abuse
-//	* Check role based access
-//	* Anything else?
+//	* Guard against XSS and do what you can to safeguard against abuse
+//		ref: https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet
+//	* Role based access permissions
 //
 //
 
@@ -29,7 +28,7 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 			data = req.body,
 			respond = function(){
 
-				//	TODO: req.session to be pushed in...
+				//	TODO: we want to expose responseType
 
 				//console.log('respond', responseType, req.session, arguments);
 
@@ -38,7 +37,7 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 
 		if(action){
 			//api.api[action](data).then(respond, respond);
-			api.api[action](data, req.session).then(respond, respond);
+			api.api[action](data, req, res).then(respond, respond);
 		} else {
 			res[responseType](apiInstance.utils.response.apply(null, [null, "No action specified"]));
 		}

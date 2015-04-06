@@ -1,9 +1,15 @@
 {
 	"port": 3001,
 	"session": {
-		"secret": "im-so-miso"
+		"secret": "session-cookie-signing-secret"
 	},
-	"authKey": "secretauthkey",
+	"authentication": {
+		"enabled": false,
+		"all": false,
+		"secret": "im-so-miso",
+		"strategy": "default",
+		"loginUrlPattern": "/login?url=[ORIGINALURL]"
+	},
 	"apiPath": "/api",
 	"COMMENT_api": "mongoose",
 	"api": "flatfiledb",

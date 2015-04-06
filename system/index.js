@@ -11,7 +11,7 @@ var fs			= require('fs'),
 	permissions = require('../cfg/permissions.json'),
 	m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
-	permit = require('../modules/miso.permissions.js'),
+	permit = require('../system/miso.permissions.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
 	//templates = require('../server/mithril.templates.node.js'),
@@ -25,7 +25,7 @@ var fs			= require('fs'),
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
-	layoutView = require('../mvc/layout.js').index,
+	layout = require('../mvc/layout.js'),
 	mainView = require('../system/main.view.js').index,
 	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
@@ -71,11 +71,23 @@ var fs			= require('fs'),
 			misoAttachmentNode: misoAttachmentNode,
 			content: content
 		};
-		//	Add anything we want to expose from the session
-		if(session) {
-			obj.session = globalProvider(session);
+
+		//	If we have header content
+		if(layout.headerContent){
+			obj.headerContent = layout.headerContent;
 		}
-		return render(layoutView(obj));
+
+		//	HERE: Add misoGlobal.authEnable
+		obj.misoGlobal = {
+			authenticationEnabled: serverConfig.authentication.enabled
+		};
+
+		//	Add anything we want to expose from the session
+		//	to the misoGlobal object
+		if(session) {
+			_.extend(obj.misoGlobal, globalProvider(session));
+		}
+		return render(layout.view(obj));
 	},
 	getExtension = function(filename) {
 		var ext = path.extname(filename||'').split('.');
@@ -91,7 +103,7 @@ module.exports = function(app, options) {
 	serverConfig = require('../system/config.js')(app.get('environment'));
 
 	var routesPath = __dirname + "/../mvc/",
-		auth = require('../system/auth.js')(app, serverConfig.authKey);
+		auth = require('../system/auth.js')(app, serverConfig.authentication.secret, serverConfig.authentication.timeout);
 
 	//	Add any apis configured in the server config
 	if(serverConfig.api) {
@@ -149,7 +161,7 @@ module.exports = function(app, options) {
 				name: routeObj.name,
 				action: routeObj.action,
 				path: routePath,
-				authenticate: route[routeObj.action].authenticate,
+				authenticate: serverConfig.authentication.enabled && route[routeObj.action].authenticate,
 				file: file,
 				stats: routeStats
 			});
@@ -324,15 +336,13 @@ module.exports = function(app, options) {
 					next(problem);
 				}
 			};
-
-			//	Ok, args.route.WHATEVER contains the authenticate attribute
-			//	ie: the below is never applied..
-			//console.log('ARRRRRGS', args.route);
-
-			//	Apply authentication if specified
-			if(args.authenticate) {
-				console.log('apply auth...', args.path);
-				app[args.method](args.path, auth(args.authenticate), myRoute);
+			//	Apply authentication if enabled and specified
+			if(serverConfig.authentication.enabled && (typeof args.route[args.action].authenticate !== "undefined")?
+				args.route[args.action].authenticate: 
+				serverConfig.authentication.all) {
+				//	TODO: Ability to pass in { requestType: "JSON" } to auth
+				//	if you expect a JSON RPC 2.0 response.
+				app[args.method](args.path, auth({}), myRoute);
 			} else {
 				app[args.method](args.path, myRoute);
 			}
@@ -395,8 +405,14 @@ module.exports = function(app, options) {
 	//	We use exec to run it - this gives us a little more flexibility
 	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
+
+		options.verbose && console.log('\nBrowserifying...');
+		var startBrowserify = (new Date()).getTime();
+
 		cp.execSync(browserifyCmd);
 		process.nextTick(function(){
+			var endBrowserify = (new Date()).getTime() - startBrowserify;
+			options.verbose && console.log('Done browserifying in ' + endBrowserify + "ms");
 			app.set("MISOREADY", true);
 		});
 	} else {
