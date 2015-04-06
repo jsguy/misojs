@@ -3,5 +3,5 @@
 	"minify": false,
 	"pretty": true,
 	"reload": true,
-	"api": "flatfiledb"
+	"api": ["flatfiledb"]
 }

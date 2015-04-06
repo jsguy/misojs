@@ -12,9 +12,6 @@ var m = require('mithril'),
 module.exports.index = function(ctrl){
 	var usedRoute = {};
 
-
-	console.log('GLOBAL.serverConfig.authentication.enabled', GLOBAL.serverConfig.authentication.enabled);
-
 	with(sugartags) {
 		return [
 			"/* NOTE: This is a generated file, please do not modify it, your changes will be lost */",
@@ -34,9 +31,6 @@ module.exports.index = function(ctrl){
 			//	TODO: Need user roles here, then copy index.js
 			//	functionality.
 			"var restrict = function(route, actionName){",
-
-
-
 
 			(GLOBAL.serverConfig.authentication.enabled? [
 
@@ -81,11 +75,6 @@ module.exports.index = function(ctrl){
 				"	}"
 
 			]: ""),
-
-
-
-
-
 
 			"	return route;",
 

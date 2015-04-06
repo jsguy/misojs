@@ -25,7 +25,7 @@ var fs			= require('fs'),
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
-	layout = require('../mvc/layout.js'),
+	layout,
 	mainView = require('../system/main.view.js').index,
 	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
@@ -257,6 +257,8 @@ module.exports = function(app, options) {
 				}
 			});
 		});
+
+	layout = require('../mvc/layout.js');
 
 	var routeMap = {},
 		//	route, name, path, method, action

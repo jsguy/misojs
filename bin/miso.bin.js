@@ -183,6 +183,9 @@ try {
 			if(argv.a) {
 				serverConfig.authentication = serverConfig.authentication ||{};
 				serverConfig.authentication.enabled = true;
+				serverConfig.api = serverConfig.api || [];
+				serverConfig.api.push("session");
+				serverConfig.api.push("authentication");
 				fs.writeFileSync(projectPath + "/" + serverConfigFile, JSON.stringify(serverConfig, undefined, 2), {encoding: 'utf8'});
 
 				var routesConfig = require(projectPath + "/" + routesConfigFile);

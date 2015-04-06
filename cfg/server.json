@@ -12,7 +12,7 @@
 	},
 	"apiPath": "/api",
 	"COMMENT_api": "mongoose",
-	"api": "flatfiledb",
+	"api": ["flatfiledb"],
 	"minify": true,
 	"pretty": false
 }
