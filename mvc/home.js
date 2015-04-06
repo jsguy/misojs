@@ -88,7 +88,7 @@ var self = module.exports.index = {
 						LI(A({ href: '/users', config: m.route}, "Users example (multiple url SPA)"))
 					]),
 					H2({name: "documentation", "class": "heading"}, "Documentation"),
-					A({href:"https://github.com/jsguy/misojs/wiki", target: "_blank"}, "Documentation can be found on the wiki")
+					A({href:"/docs"}, "Documentation can be found here")
 				])
 			]);
 		}
