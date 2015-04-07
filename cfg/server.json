@@ -8,8 +8,10 @@
 		"all": false,
 		"secret": "im-so-miso",
 		"strategy": "default",
-		"loginUrlPattern": "/login?url=[ORIGINALURL]"
+		"loginUrlPattern": "/login?url=[ORIGINALURL]",
+		"middleware": "../system/auth_middle"
 	},
+	"routeMiddleware": [],
 	"apiPath": "/api",
 	"COMMENT_api": "mongoose",
 	"api": ["flatfiledb", "session", "authentication"],

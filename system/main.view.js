@@ -22,7 +22,6 @@ module.exports.index = function(ctrl){
 			"var bindings = require('mithril.bindings')(m);",
 			"var animate = require('../public/js/mithril.animate.js')(m);",
 			"var permissions = require('../system/miso.permissions.js');",
-			"var auth = require('../system/auth.js');",
 			
 			//	Grab the header so we can re-render
 			"var layout = require('../mvc/layout.js');",

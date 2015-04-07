@@ -519,7 +519,7 @@ var self = module.exports.index = {
 		}
 	}
 	//	Test authenticate
-	,authenticate: true
+	//,authenticate: true
 };
 },{"../system/api/flatfiledb/api.client.js":18,"mithril":11,"mithril.sugartags":10}],8:[function(require,module,exports){
 /*
@@ -3656,41 +3656,7 @@ module.exports = function(m){
 	};
 };
 },{}],20:[function(require,module,exports){
-//	Setup authentication
-//
-//	TODO:
-//	
-//	* Ability to redirect to login page
-//	* Ability to send JSON RPC 2.0 response
-//	* NOTE: Need to:
-//		- setup JSON RPC 2.0 for all API calls
-//		- create a generic message handler
-//
-//
-module.exports = function(app, secret){
-	var loginUrlPattern = GLOBAL.serverConfig.authentication.loginUrlPattern;
-	//	options are passed in from the mvc action, eg: user.edit
-	//	has an example
-	return function(options) {
-		return function(req, res, next) {
-			if(typeof secret === "undefined") {
-				throw "authenticationSecret not defined in serverConfig";
-			}
-
-			//	Check if we are authenticated
-			if(req.session.authenticationSecret === secret) {
-				//	Let the client know we're logged in
-				req.session.isLoggedIn = true;
-				return next();
-			} else {
-				//	TODO: Add ability to respond with JSON RPC 2.0
-				return res.redirect(loginUrlPattern.split("[ORIGINALURL]").join(req.originalUrl));
-			}
-		};
-	};
-};
-},{}],21:[function(require,module,exports){
-/* NOTE: This is a generated file, please do not modify it, your changes will be lost */var m = require('mithril');var sugartags = require('mithril.sugartags')(m);var bindings = require('mithril.bindings')(m);var animate = require('../public/js/mithril.animate.js')(m);var permissions = require('../system/miso.permissions.js');var auth = require('../system/auth.js');var layout = require('../mvc/layout.js');var restrict = function(route, actionName){	return route;};var permissionObj = {};var user = require('../mvc/user.js');
+/* NOTE: This is a generated file, please do not modify it, your changes will be lost */var m = require('mithril');var sugartags = require('mithril.sugartags')(m);var bindings = require('mithril.bindings')(m);var animate = require('../public/js/mithril.animate.js')(m);var permissions = require('../system/miso.permissions.js');var layout = require('../mvc/layout.js');var restrict = function(route, actionName){	return route;};var permissionObj = {};var user = require('../mvc/user.js');
 var home = require('../mvc/home.js');
 var doc = require('../mvc/doc.js');
 
@@ -3707,7 +3673,7 @@ if(typeof window !== 'undefined') {	window.m = m;}	m.route.mode = 'pathname';m.r
 '/todos': restrict(todo.index, 'todo.index'),
 '/user/:user_id': restrict(user.edit, 'user.edit'),
 '/users': restrict(user.index, 'user.index')});misoGlobal.renderHeader = function(obj){	m.render(document.getElementById('misoHeaderNode'), layout.headerContent({misoGlobal: obj || misoGlobal}));};misoGlobal.renderHeader();
-},{"../mvc/doc.js":2,"../mvc/hello.js":3,"../mvc/home.js":4,"../mvc/layout.js":5,"../mvc/login.js":6,"../mvc/todo.js":7,"../mvc/user.js":8,"../public/js/mithril.animate.js":14,"../system/auth.js":20,"../system/miso.permissions.js":22,"mithril":11,"mithril.bindings":9,"mithril.sugartags":10}],22:[function(require,module,exports){
+},{"../mvc/doc.js":2,"../mvc/hello.js":3,"../mvc/home.js":4,"../mvc/layout.js":5,"../mvc/login.js":6,"../mvc/todo.js":7,"../mvc/user.js":8,"../public/js/mithril.animate.js":14,"../system/miso.permissions.js":21,"mithril":11,"mithril.bindings":9,"mithril.sugartags":10}],21:[function(require,module,exports){
 /*	miso permissions
 	Permit users access to controller actions based on roles 
 */
@@ -3778,4 +3744,4 @@ module.exports.api = function(permissions, actionName, userRoles){
 
 	return pass;
 };
-},{"../modules/miso.util.client.js":1}]},{},[21]);
+},{"../modules/miso.util.client.js":1}]},{},[20]);

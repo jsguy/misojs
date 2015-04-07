@@ -6,6 +6,7 @@
 var fs			= require('fs'),
 	path		= require('path'),
 	_			= require('lodash'),
+	async		= require('async'),
 	routes		= {},
 	serverConfig,
 	permissions = require('../cfg/permissions.json'),
@@ -93,8 +94,30 @@ var fs			= require('fs'),
 		var ext = path.extname(filename||'').split('.');
 		return ext[ext.length - 1];
 	}, 
-	hasMappedRouteActions = {};
+	hasMappedRouteActions = {},
+	//	Apply any route middleware
+	middlewareList,
+	applyMiddleware = function(args){
+		if(!middlewareList) {
+			if(serverConfig.authentication && serverConfig.authentication.enabled && serverConfig.authentication.middleware) {
+				middlewareList = [require(serverConfig.authentication.middleware)];
+			} else {
+				middlewareList = [];
+			}
+			if(serverConfig.routeMiddleware) {
+				_.each(serverConfig.routeMiddleware, function(middleware){
+					middlewareList.push(require(middleware));
+				})
+			}
+		}
 
+		//	Run each middleware in order
+		return function(req, res, next) {
+			async.applyEachSeries(middlewareList, args, req, res, function(){
+				next();
+			});
+		};
+	};
 
 //	Map the routes for the controllers
 //	This generates the client side code from our routes/controller/views
@@ -102,8 +125,8 @@ module.exports = function(app, options) {
 
 	serverConfig = require('../system/config.js')(app.get('environment'));
 
-	var routesPath = __dirname + "/../mvc/",
-		auth = require('../system/auth.js')(app, serverConfig.authentication.secret, serverConfig.authentication.timeout);
+	//	Where we keep our routes
+	var routesPath = __dirname + "/../mvc/";
 
 	//	Add any apis configured in the server config
 	if(serverConfig.api) {
@@ -258,6 +281,8 @@ module.exports = function(app, options) {
 			});
 		});
 
+	//	Load layout here, as it now includes authentication, 
+	//	and the authentication api must be generated first.
 	layout = require('../mvc/layout.js');
 
 	var routeMap = {},
@@ -338,16 +363,9 @@ module.exports = function(app, options) {
 					next(problem);
 				}
 			};
-			//	Apply authentication if enabled and specified
-			if(serverConfig.authentication.enabled && (typeof args.route[args.action].authenticate !== "undefined")?
-				args.route[args.action].authenticate: 
-				serverConfig.authentication.all) {
-				//	TODO: Ability to pass in { requestType: "JSON" } to auth
-				//	if you expect a JSON RPC 2.0 response.
-				app[args.method](args.path, auth({}), myRoute);
-			} else {
-				app[args.method](args.path, myRoute);
-			}
+
+			//	Apply route, and any middleware
+			app[args.method](args.path, applyMiddleware(args), myRoute);
 
 			options.verbose && console.log('    %s %s -> %s.%s', args.method.toUpperCase(), args.path, args.name, args.action);
 			routeMap[args.path] = args;
