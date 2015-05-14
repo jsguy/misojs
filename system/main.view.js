@@ -34,7 +34,7 @@ module.exports.index = function(ctrl){
 			(GLOBAL.serverConfig.authentication.enabled? [
 
 				//	If authentication is turned on, we can use permissions
-				"	if(route.authenticate){",
+				"	if(typeof route.authenticate !== 'undefined'? route.authenticate: "+GLOBAL.serverConfig.all+"){",
 
 				//	Hardcoded user for now
 				//	TODO: need real user for permissions!

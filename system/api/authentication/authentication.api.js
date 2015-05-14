@@ -106,5 +106,8 @@ module.exports = function(utils){
 		}
 	};
 
+	db.authenticate = db.authenticate || [];
+	db.authenticate.push("saveUser");
+
 	return db;
 };

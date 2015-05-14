@@ -25,9 +25,9 @@ var express = require('express'),
 
 	mvc = require('./system');
 
-//	Setup session
 //	TODO: Set session store
-//	Fix config: https://github.com/sahat/hackathon-starter/issues/169
+//	Setup session
+//	These settings fix the config: https://github.com/sahat/hackathon-starter/issues/169
 serverConfig.session.resave = serverConfig.session.resave || false;
 serverConfig.session.saveUninitialized = serverConfig.session.saveUninitialized || false;
 app.use(session(serverConfig.session));
@@ -67,7 +67,7 @@ var server = app.listen(serverConfig.port, function () {
 	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, environment);
 	console.log('');
 
-	//	For dev only - auto reloading, TODO: environment support
+	//	For dev-eyes only
 	if(environment !== 'production') {
 		reload(server, app);
 	}

@@ -7,14 +7,14 @@
 		"enabled": false,
 		"all": false,
 		"secret": "im-so-miso",
-		"strategy": "default",
 		"loginUrlPattern": "/login?url=[ORIGINALURL]",
 		"middleware": "../system/auth_middle"
 	},
-	"routeMiddleware": [],
+	"routeMiddleware": ["../system/default_middle"],
 	"apiPath": "/api",
 	"COMMENT_api": "mongoose",
 	"api": ["flatfiledb", "session", "authentication"],
 	"minify": true,
+	"sourceMap": true,
 	"pretty": false
 }

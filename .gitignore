@@ -28,8 +28,8 @@ node_modules
 .lock-wscript
 
 # Various generated files
-client/miso.js
-client/miso.map.json
+public/miso.js
+public/miso.map.json
 system/main.js
 system/api/flatfiledb/data/flat-data-file.db
 system/api/*/api.client.js
@@ -37,3 +37,9 @@ system/api/*/api.server.js
 modules/api/*/api.client.js
 modules/api/*/api.server.js
 documentation/misojs.wiki/
+
+# Personal file
+worklog.md
+
+# Webstorm project file
+.idea

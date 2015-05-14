@@ -75,6 +75,9 @@ module.exports = function(utils){
 					}
 				});
 			}
-		}
+		},
+		//	Test auth...
+		//	Can be "true" for all, or list of methods to auth.
+		authenticate: ['save']
 	};
 };

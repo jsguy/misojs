@@ -3381,6 +3381,32 @@ module.exports = function(m){
 	});
 	return myDeferred.promise;
 },
+'authenticate': function(args, options){
+	args = args || {};
+	options = options || {};
+	var requestObj = {
+			method:'post', 
+			url: '/api/authentication/authenticate',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
+	rootNode.className += ' loading';
+	var myDeferred = m.deferred();
+	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
+		myDeferred.resolve.apply(this, arguments);
+		if(requestObj.background){
+			m.redraw(true);
+		}
+	});
+	return myDeferred.promise;
+},
 'login': function(args, options){
 	args = args || {};
 	options = options || {};
@@ -3562,6 +3588,32 @@ module.exports = function(m){
 	var requestObj = {
 			method:'post', 
 			url: '/api/flatfiledb/remove',
+			data: args
+		},
+		rootNode = document.documentElement || document.body;
+	for(var i in options) {if(options.hasOwnProperty(i)){
+		requestObj[i] = options[i];
+	}}
+	if(args.model) {
+ 		args.model = getModelData(args.model);
+	}
+	rootNode.className += ' loading';
+	var myDeferred = m.deferred();
+	m.request(requestObj).then(function(){
+		rootNode.className = rootNode.className.split(' loading').join('');
+		myDeferred.resolve.apply(this, arguments);
+		if(requestObj.background){
+			m.redraw(true);
+		}
+	});
+	return myDeferred.promise;
+},
+'authenticate': function(args, options){
+	args = args || {};
+	options = options || {};
+	var requestObj = {
+			method:'post', 
+			url: '/api/flatfiledb/authenticate',
 			data: args
 		},
 		rootNode = document.documentElement || document.body;

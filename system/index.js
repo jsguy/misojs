@@ -7,19 +7,22 @@ var fs			= require('fs'),
 	path		= require('path'),
 	_			= require('lodash'),
 	async		= require('async'),
-	routes		= {},
-	serverConfig,
 	permissions = require('../cfg/permissions.json'),
 	m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
 	permit = require('../system/miso.permissions.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
-	//templates = require('../server/mithril.templates.node.js'),
 	vm = require('vm'),
 	cp = require('child_process'),
 	mithrilRender = require('mithril-node-render'),
 	beautify_html = require('js-beautify').html,
+	mainView = require('../system/main.view.js').index,
+	//	View for API files
+	apiClientView = require('../system/api.client.view.js').index,
+	apiServerView = require('../system/api.server.view.js').index,
+	routes		= {},
+	serverConfig,
 	//	Force the browserify process to run
 	forceBrowserify = false,
 	//	What node we attach our app to in the layout
@@ -27,10 +30,6 @@ var fs			= require('fs'),
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
 	layout,
-	mainView = require('../system/main.view.js').index,
-	//	View for API files
-	apiClientView = require('../system/api.client.view.js').index,
-	apiServerView = require('../system/api.server.view.js').index,
 	apiPath = "../",
 	//	Where we put our API files
 	apiDirectory = './system/api/',
@@ -378,6 +377,10 @@ module.exports = function(app, options) {
 		output = "./public/miso.js",
 		outputMap = "./public/miso.map.json",
 		//	If the server config wants a minified miso.js
+
+		//	TODO: We MUST generate a source map to make it nice to debug.
+		//	
+
 		browserifyCmd = serverConfig.minify? 
 			"browserify -t ./system/browserifymiso " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
 			"browserify -t ./system/browserifymiso " + mainFile + " >" + output,

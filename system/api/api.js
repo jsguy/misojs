@@ -1,12 +1,16 @@
 /*
-	The concept for the apis is that we can create an api for
+	The concept for the apis is that we can create an endpoint for
 	any action, with arbitrary arguments, and the framework will
 	pass those arguments to the same serverside action
 
 	ie: we are not opinionated of how it works, beyond how 
 		to call methods, so that we can override them.
 
+	TODO: Figure out how to meaningfully debug this?
+
 */
+
+//	TODO: Authentication goes in here... I think.
 
 var fs = require('fs'),
 	miso = require('../../modules/miso.util.js'),
@@ -33,7 +37,26 @@ var fs = require('fs'),
 	//	Creates actions for use in the server generated code
 	//	Note: cannot use a real promise here, as mithril breaks...
 	makeServerGenerateAction = function(action, api){
+		var authList = api.authenticate,
+			shallAuth = false;
+		authList = typeof authList == 'object'? authList: [authList];
+		console.log('authList', typeof authList);
+		_.each(authList, function(auth){
+			if(auth == action) {
+				shallAuth = true;
+				return false;
+			}
+		});
+
+		//	TODO: Apply authentication here.
+		//	We simply need to check misoGlobal.isLoggedIn
+		if(api.authenticate) {
+			console.log('auth', api.authenticate, shallAuth);
+		}
+
+
 		return ["function(){",
+			"	console.log('API call "+action+"');",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
 			"		errResult,",
 			"		errFunc = function(){errResult=arguments; doneFunc()},",
@@ -43,7 +66,15 @@ var fs = require('fs'),
 			"		doneFunc = function(){isReady = true;};",
 			"	",
 			"	args.unshift(successFunc, errFunc);",
-			"	result = myApi['"+action+"'].apply(this, args);",
+
+			(shallAuth? "": ""
+				// "console.log('auth "+action+"');": 
+				// "console.log('no auth "+action+"');"
+			),
+
+			"	myApi['"+action+"'].apply(this, args);",
+
+
 			//	Add a binding object, so we can block till ready
 			"	var bindScope = arguments.callee.caller;",
 			"	bindScope._misoReadyBinding = miso.readyBinderFactory();",
@@ -62,6 +93,10 @@ var fs = require('fs'),
 			"		}",
       		"   	return deferred.promise;",
 			"	}};",
+
+
+
+
 			"}"].join("\n");
 	},
 
@@ -155,7 +190,7 @@ module.exports = function() {
 
 		//	Server api - makes calls to the actual api
 		createServer: function(api, utils) {
-			var obj = {}
+			var obj = {};
 
 			for(var i in api) {
 				obj[i] = makeServerGenerateAction(i, api);
