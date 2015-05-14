@@ -373,20 +373,27 @@ module.exports = function(app, options) {
 	//	Grab our controller file names
 	var routeList = [],
 		mainFile = './system/main.js',
-
 		output = "./public/miso.js",
 		outputMap = "./public/miso.map.json",
-		//	If the server config wants a minified miso.js
-
-		//	TODO: We MUST generate a source map to make it nice to debug.
-		//	
-
-		browserifyCmd = serverConfig.minify? 
-			"browserify -t ./system/browserifymiso " + mainFile + " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] >" + output:
-			"browserify -t ./system/browserifymiso " + mainFile + " >" + output,
-
+		browserifyCmd = "browserify -t ./system/browserifymiso " + mainFile;
 		mainFileModified = fs.existsSync(mainFile)? fs.statSync(mainFile).mtime: new Date(1970,0,1),
 		lastRouteModified = new Date(1970,0,1);
+
+	//	If the server config wants a minified miso.js
+	if(serverConfig.minify) {
+		if(serverConfig.sourceMap) {
+			browserifyCmd += " -d -p [minifyify --map /miso.map.json --output "+outputMap+"] ";
+		} else {
+			browserifyCmd += " -p [minifyify --no-map] ";
+		}
+	}
+
+	//	Only add inline source map if not minifying
+	if(serverConfig.sourceMap && !serverConfig.minify) {
+		browserifyCmd += " -d ";
+	}
+
+	browserifyCmd += ">" + output;
 
 
 	//	Sort routes so that "new" comes before "index", otheriwse index 

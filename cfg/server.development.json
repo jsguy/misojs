@@ -1,6 +1,7 @@
 {
 	"port": 6476,
 	"minify": false,
+	"sourceMap": true,
 	"pretty": true,
 	"reload": true,
 	"api": ["flatfiledb", "session", "authentication"]
