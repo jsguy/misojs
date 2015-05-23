@@ -12,6 +12,7 @@
     "miso": "bin/miso.bin.js"
   },
   "dependencies": {
+    "async": "^1.0.0",
     "bcrypt": "^0.8.1",
     "body-parser": "^1.10.2",
     "browserify": "^8.1.0",
