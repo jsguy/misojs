@@ -11,6 +11,7 @@
 		"middleware": "../system/auth_middle"
 	},
 	"routeMiddleware": ["../system/default_middle"],
+	"layout": "../mvc/layout.js",
 	"apiPath": "/api",
 	"COMMENT_api": "mongoose",
 	"api": ["flatfiledb", "session", "authentication"],

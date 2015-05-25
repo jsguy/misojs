@@ -196,8 +196,8 @@ module.exports = function(app, options) {
 	//	Import non configured routes
 	fs.readdirSync(routesPath)
 		.filter(function(file) {
-			//	All js files that don't start with '.' and are not layout.js
-			return (file.indexOf('.') !== 0) && (file !== 'layout.js') && getExtension(file) == "js";
+			//	All js files that don't start with '.' and are not layout related
+			return (file.indexOf('.') !== 0) && (file.indexOf('layout') == -1) && getExtension(file) == "js";
 		})
 		.forEach(function(file) {
 			var routeFile = path.join(routesPath, file),
@@ -280,9 +280,9 @@ module.exports = function(app, options) {
 			});
 		});
 
-	//	Load layout here, as it now includes authentication, 
-	//	and the authentication api must be generated first.
-	layout = require('../mvc/layout.js');
+	//	Load layout here - we delay it till now, as it can include
+	//	authentication and other components that must be loaded first.
+	layout = require(serverConfig.layout);
 
 	var routeMap = {},
 		//	route, name, path, method, action
@@ -332,29 +332,27 @@ module.exports = function(app, options) {
 							session: session
 						}),
 						bindScope = args.route[args.action].controller,
-						mvc = args.route[args.action];
+						mvc = args.route[args.action],
+						applySkin = function(res, mvc, session, scope){
+							res.end(skin(
+								_.isFunction(mvc.view)? 
+									mvc.view(scope): 
+									mvc.view,
+								session
+							));
+						};
 
 					//	Check for ready binder - we only use
 					//	it if there is asyc data loading to be done,
 					//	to maintain compatibility with mithril-style
 					//	requests.
-					if (!bindScope._misoReadyBinding) {
-						//options.verbose && console.log("No blocking binding:", args.action + " - " + args.path);
-						res.end(skin(_.isFunction(mvc.view)? 
-							mvc.view(scope): 
-							mvc.view,
-							session
-						));
-					} else {
-						//options.verbose && console.log("Blocking binding:", args.action + " - " + args.path);
+					if (bindScope._misoReadyBinding) {
 						//	Add "last" binding for miso ready event
 						bindScope._misoReadyBinding.bindLast(function() {
-							res.end(skin(_.isFunction(mvc.view)? 
-								mvc.view(scope): 
-								mvc.view,
-								session
-							));
+							applySkin(res, mvc, session, scope);
 						});
+					} else {
+						applySkin(res, mvc, session, scope);
 					}
 				} catch(ex){
 					var problem = args.action + " - " + args.path + " threw: " + ex;
