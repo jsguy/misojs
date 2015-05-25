@@ -40,7 +40,6 @@ var fs = require('fs'),
 		var authList = api.authenticate,
 			shallAuth = false;
 		authList = typeof authList == 'object'? authList: [authList];
-		console.log('authList', typeof authList);
 		_.each(authList, function(auth){
 			if(auth == action) {
 				shallAuth = true;
@@ -51,12 +50,11 @@ var fs = require('fs'),
 		//	TODO: Apply authentication here.
 		//	We simply need to check misoGlobal.isLoggedIn
 		if(api.authenticate) {
-			console.log('auth', api.authenticate, shallAuth);
+			//console.log('auth', api.authenticate, shallAuth);
 		}
 
 
 		return ["function(){",
-			"	console.log('API call "+action+"');",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
 			"		errResult,",
 			"		errFunc = function(){errResult=arguments; doneFunc()},",
