@@ -32,7 +32,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 	//	What to exclude
 	excludeFiles = ['mvc', 'documentation', 'skeletons', 'bin', 'README.md'],
 	//	What to always copy
-	copyFiles = ['mvc/layout.js', 'modules'],
+	copyFiles = ['mvc/layout_plain.js', 'modules'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {

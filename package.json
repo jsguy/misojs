@@ -1,6 +1,6 @@
 {
   "name": "misojs",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": false,
   "scripts": {
     "development": "touch -t 197804100000.00 system/main.js && nodemon --debug -e js,css,json --watch package.json --watch modules/ --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
