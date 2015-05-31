@@ -29,7 +29,7 @@ var fs			= require('fs'),
 	misoAttachmentNode = "misoAttachmentNode",
 	attachmentNodeSelector = "document.getElementById('"+misoAttachmentNode+"')",
 
-	layout,
+	defaultLayout,
 	apiPath = "../",
 	//	Where we put our API files
 	apiDirectory = './system/api/',
@@ -65,19 +65,21 @@ var fs			= require('fs'),
 	},
 
 	//  Puts the lotion on its...
-	skin = function(content, session) {
+	skin = function(content, layout, session) {
 		var obj = {
 			reload: serverConfig.reload,
 			misoAttachmentNode: misoAttachmentNode,
 			content: content
 		};
 
-		//	If we have header content
-		if(layout.headerContent){
-			obj.headerContent = layout.headerContent;
-		}
+		layout = layout || defaultLayout;
 
-		//	HERE: Add misoGlobal.authEnable
+		//	If we have header content
+		obj.headerContent = layout.headerContent?
+			layout.headerContent:
+			function(){return "";};
+
+		//	Add misoGlobal.authEnable
 		obj.misoGlobal = {
 			authenticationEnabled: serverConfig.authentication.enabled
 		};
@@ -282,7 +284,7 @@ module.exports = function(app, options) {
 
 	//	Load layout here - we delay it till now, as it can include
 	//	authentication and other components that must be loaded first.
-	layout = require(serverConfig.layout);
+	defaultLayout = require(serverConfig.layout);
 
 	var routeMap = {},
 		//	route, name, path, method, action
@@ -334,10 +336,12 @@ module.exports = function(app, options) {
 						bindScope = args.route[args.action].controller,
 						mvc = args.route[args.action],
 						applySkin = function(res, mvc, session, scope){
+							var myLayout = defaultLayout;
 							res.end(skin(
 								_.isFunction(mvc.view)? 
 									mvc.view(scope): 
 									mvc.view,
+								myLayout,
 								session
 							));
 						};
@@ -426,7 +430,8 @@ module.exports = function(app, options) {
 	fs.writeFileSync(mainFile, render(mainView({
 		routes: routeList,
 		permissions: JSON.stringify(permissions),
-		attachmentNodeSelector: attachmentNodeSelector
+		attachmentNodeSelector: attachmentNodeSelector,
+		serverConfig: serverConfig
 	}), true));
 
 	//	Run browserify when either a controller or view has changed.

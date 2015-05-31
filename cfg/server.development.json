@@ -4,5 +4,6 @@
 	"sourceMap": true,
 	"pretty": true,
 	"reload": true,
+	"layout": "../mvc/layout_plain.js",
 	"api": ["flatfiledb", "session", "authentication"]
 }
