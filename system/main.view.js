@@ -31,6 +31,8 @@ module.exports.index = function(ctrl){
 			//	functionality.
 			"var restrict = function(route, actionName){",
 
+			//	Only include this if authentication is enabled
+			//	TODO: Move this out and make configurable
 			(GLOBAL.serverConfig.authentication.enabled? [
 
 				//	If authentication is turned on, we can use permissions
@@ -46,6 +48,8 @@ module.exports.index = function(ctrl){
 				"		route.controller = function() {",
 				//	We trust the isLoggedIn attribute - the server
 				//	will guard against non-logged in data.
+
+
 				"			var isLoggedIn = misoGlobal.isLoggedIn;",
 
 							//	Hardcoded login path for now
@@ -77,11 +81,14 @@ module.exports.index = function(ctrl){
 
 			"	return route;",
 
-			"};",
+			"},",
 
 //			"var permissionObj = (" + ctrl.permissions + ");",
 			//"var permissionObj = (" + (ctrl.permissions? JSON.stringify(ctrl.restrictions): "{}") + ");",
-			"var permissionObj = {};",
+			"permissionObj = {};",
+
+			//	Ensure we always have misoGlobal
+			"var misoGlobal = misoGlobal || {};",
 
 			//	All our route files
 			(ctrl.routes.map(function(route, idx) {
