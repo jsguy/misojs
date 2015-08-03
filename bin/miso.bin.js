@@ -154,9 +154,7 @@ try {
 			print("Help for " + item + " not found.");
 		}
 	} else if(argv._.indexOf('run') !== -1){
-
-		//	TODO: check this is a miso project.
-		print("Running project for: " + environment);
+		print("Environment: " + environment);
 		npm.load(pjson, function (err) {
 			npm.commands.run([environment], function(){
 				print("Miso run completed");
