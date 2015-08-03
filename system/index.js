@@ -99,6 +99,7 @@ var fs			= require('fs'),
 	//	Apply any route middleware
 	middlewareList,
 	applyMiddleware = function(args){
+		//	Check for authentiction middleware
 		if(!middlewareList) {
 			if(serverConfig.authentication && serverConfig.authentication.enabled && serverConfig.authentication.middleware) {
 				middlewareList = [require(serverConfig.authentication.middleware)];

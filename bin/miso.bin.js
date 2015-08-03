@@ -128,8 +128,12 @@ try {
 					"",
 					"Will create a new project in the 'myapp' directory, (as long as it is empty)"
 				],
-				'u': [
-					"Not yet ready..."
+				'i': [
+					"Installs a miso package, for example:",
+					"",
+					"  " + name + " -i misojs-codemirror-component",
+					"",
+					"Will install the misojs codemirror component"
 				],
 				'run': [
 				]
@@ -158,6 +162,42 @@ try {
 				print("Miso run completed");
 			});
 		});
+
+	} else if(argv.i) {
+
+		print("Installing: " + argv.i);
+
+		npm.load(pjson, function (err) {
+			npm.commands.install([argv.i], function(err, status, result) {
+				if(err) {
+					print("Error: " + JSON.stringify(err));
+				} else {
+					var installDir = process.cwd() + "/" + Object.keys(result)[0];
+					var pjfile = installDir + "/package.json";
+					if(pjfile){
+						print('grab', pjfile);
+						//	Read package.json
+						var packagejson = require(pjfile);
+						//print(packagejson);
+						//	See if there are any external parts
+						if(packagejson.miso && packagejson.miso.external) {
+							//	Install externals
+							_.each(packagejson.miso.external, function(value, key) {
+								var src = installDir + "/" + key,
+									dest = "./public/external/" + value,
+									dirStructure = dest.substr(0, dest.lastIndexOf("/"));
+								print('Copy', src, "->", dest);
+								fs.mkdirsSync(dirStructure);
+								fs.copySync(src, dest);
+							});
+						}
+					} else {
+						print("Error: not installed as expected");
+					}
+				}
+			});
+		});
+
 
 	} else if(argv.n) {
 		//	Check for absolute path
@@ -208,6 +248,7 @@ try {
 			"  -n                  Create a new project",
 			"  -s                  Add a skeleton to your new app",
 			"  -a                  Add authentication capability to your new app",
+			"  -i                  Install a miso package",
 			"  run                 Runs the project in the current directory"
 		];
 		_.each(helpText, function(txt){

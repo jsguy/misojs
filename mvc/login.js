@@ -50,6 +50,7 @@ var index = module.exports.index = {
 		};
 
 		if(logout) {
+			//	TODO: Handle error
 			authentication.logout({}).then(function(data){
 				console.log("You've been logged out");
 				//	Woot, we're out!
@@ -69,8 +70,12 @@ var index = module.exports.index = {
 				ctrl.model.isLoggedIn()? "You've been logged in": [
 				DIV(ctrl.model.url? "Please log in to go to " + ctrl.model.url: "Please log in"),
 				FORM({ onsubmit: ctrl.login }, [
-					INPUT({ type: "text", value: ctrl.model.username, placeholder: "Username"}),
-					INPUT({ type: "password", value: ctrl.model.password}),
+					DIV(
+						INPUT({ type: "text", value: ctrl.model.username, placeholder: "Username"})
+					),
+					DIV(
+						INPUT({ type: "password", value: ctrl.model.password})
+					),
 					BUTTON({ type: "submit"}, "Login")
 				])
 			]);

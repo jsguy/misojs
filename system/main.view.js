@@ -88,7 +88,7 @@ module.exports.index = function(ctrl){
 			"permissionObj = {};",
 
 			//	Ensure we always have misoGlobal
-			"var misoGlobal = misoGlobal || {};",
+			//"var misoGlobal = misoGlobal || {};",
 
 			//	All our route files
 			(ctrl.routes.map(function(route, idx) {
@@ -123,6 +123,7 @@ module.exports.index = function(ctrl){
 			"		m.render(document.getElementById('misoHeaderNode'), layout.headerContent? layout.headerContent({misoGlobal: obj || misoGlobal}): '');",
 			"	}",
 			"};",
+
 			"misoGlobal.renderHeader();"
 		];
 	};
