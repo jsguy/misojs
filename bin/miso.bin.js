@@ -12,7 +12,8 @@ var argv = require('minimist')(process.argv.slice(2)),
 	fs = require('fs-extra'),
 	npm = require('npm'),
 	_ = require("lodash"),
-	pjson = require('../package.json'),
+	packagePath = '../package.json',
+	pjson = require(packagePath),
 	serverConfigFile = 'cfg/server.json',
 	serverConfig = require('../' + serverConfigFile),
 	routesConfigFile = 'cfg/routes.json',
@@ -21,6 +22,10 @@ var argv = require('minimist')(process.argv.slice(2)),
 	version = pjson.version,
 	misoPath = __dirname + "/../",
 	userPath = process.cwd(),
+
+	userPackagePath = userPath + '/package.json',
+	userPjson = require(userPackagePath),
+
 	print = function(){
 		console.log.apply(console, arguments);
 	},
@@ -184,11 +189,22 @@ try {
 								var src = installDir + "/" + key,
 									dest = "./public/external/" + value,
 									dirStructure = dest.substr(0, dest.lastIndexOf("/"));
-								print('Copy', src, "->", dest);
+								print('Install external:', dest);
 								fs.mkdirsSync(dirStructure);
 								fs.copySync(src, dest);
 							});
 						}
+
+						//	Save in package.json as a miso dependancy
+						userPjson.miso = userPjson.miso || {};
+						userPjson.miso.dependencies = userPjson.miso.dependencies || {};
+						//	Add our package here...
+						userPjson.miso.dependencies[userPjson.name] = userPjson.version;
+
+						//	Update the package
+						print('Update package:', userPjson, userPackagePath);
+						fs.writeFileSync(userPackagePath, JSON.stringify(userPjson, false, 2));
+
 					} else {
 						print("Error: not installed as expected");
 					}
