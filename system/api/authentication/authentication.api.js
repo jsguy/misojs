@@ -1,11 +1,11 @@
 //	Miso authentication api example
 //
-//	This example uses bcrypt to encode/decode passwords, 
+//	This example uses bcryptjs to encode/decode passwords, 
 //
 var ffdba = require('../../../system/api/flatfiledb/flatfiledb.api.js'),
 	_ = require('lodash'),
 	uuid = require('node-uuid'),
-	bcrypt = require('bcrypt'),
+	bcryptjs = require('bcryptjs'),
 	secret = GLOBAL.serverConfig.authentication.secret;
 
 //	Extend the flatfiledb api with login-specfic methods
@@ -19,7 +19,7 @@ module.exports = function(utils){
 		db.find(function(data) {
 			if(data.length > 0) {
 				//	Compare to hashed password
-				bcrypt.compare(args.model.password, data[0].password, function(error, res) {
+				bcryptjs.compare(args.model.password, data[0].password, function(error, res) {
 					if(error) {
 						return err(false);
 					}
@@ -90,9 +90,9 @@ module.exports = function(utils){
 			//	TODO: fix _id issue.
 			data._id = data.id || data._id || uuid.v4();
 
-			//	Use bcrypt to salt and save password
-			bcrypt.genSalt(10, function(err, salt) {
-				bcrypt.hash(data.password, salt, function(err, hash) {
+			//	Use bcryptjs to salt and save password
+			bcryptjs.genSalt(10, function(err, salt) {
+				bcryptjs.hash(data.password, salt, function(err, hash) {
 					data.password = hash;
 					db.save(cb, err, {
 						type: modelType, 
