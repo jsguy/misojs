@@ -360,8 +360,8 @@ module.exports = function(app, options) {
 						applySkin(res, mvc, session, scope);
 					}
 				} catch(ex){
-					var problem = args.action + " - " + args.path + " threw: " + ex;
-					console.log(ex, problem);
+					var problem = args.action + " - " + args.path + " threw: \n" + ex.stack;
+					console.log(problem);
 					next(problem);
 				}
 			};
