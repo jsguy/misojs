@@ -10,7 +10,8 @@ var m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m);
 
 module.exports.index = function(ctrl){
-	var usedRoute = {};
+	var usedRoute = {},
+		serverConfig = ctrl.serverConfig;
 
 	with(sugartags) {
 		return [
@@ -24,7 +25,7 @@ module.exports.index = function(ctrl){
 			"var permissions = require('../system/miso.permissions.js');",
 			
 			//	Grab the header so we can re-render
-			"var layout = require('"+ctrl.serverConfig.layout+"');",
+			"var layout = require('"+serverConfig.layout+"');",
 
 			//	Setup a restrict method
 			//	TODO: Need user roles here, then copy index.js
@@ -33,10 +34,10 @@ module.exports.index = function(ctrl){
 
 			//	Only include this if authentication is enabled
 			//	TODO: Move this out and make configurable
-			(GLOBAL.serverConfig.authentication.enabled? [
+			(serverConfig.authentication.enabled? [
 
 				//	If authentication is turned on, we can use permissions
-				"	if(typeof route.authenticate !== 'undefined'? route.authenticate: "+GLOBAL.serverConfig.all+"){",
+				"	if(typeof route.authenticate !== 'undefined'? route.authenticate: "+serverConfig.all+"){",
 
 				//	Hardcoded user for now
 				//	TODO: need real user for permissions!
@@ -106,6 +107,11 @@ module.exports.index = function(ctrl){
 			"	",
 			"m.route.mode = 'pathname';",
 
+			//	Wait for cordova
+			(serverConfig.cordova?
+				"document.addEventListener('deviceready', function(){":
+				""),
+
 			//	Setup our routes
 			"m.route("+ctrl.attachmentNodeSelector+", '/', {",
 				//	Add the route map
@@ -124,7 +130,12 @@ module.exports.index = function(ctrl){
 			"	}",
 			"};",
 
-			"misoGlobal.renderHeader();"
+			"misoGlobal.renderHeader();",
+
+			//	Wait for cordova
+			(serverConfig.cordova?
+				"}, false);":
+				"")
 		];
 	};
 };

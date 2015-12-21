@@ -34,6 +34,8 @@ module.exports.index = function(ctrl){
 		"		return result;",
 		"	};",
 
+		"var apiClientPath = '" + (ctrl.apiClientPath? ctrl.apiClientPath: "") + "';",
+
 		"	return {",
 		//	Grab our api action methods
 		(Object.keys(ctrl.api).map(function(key) {

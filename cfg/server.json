@@ -13,6 +13,8 @@
 	"routeMiddleware": ["../system/default_middle"],
 	"layout": "../mvc/layout_miso.js",
 	"apiPath": "/api",
+	"apiClientPath": "",
+	"cordova": false,
 	"COMMENT_api": "mongoose",
 	"api": ["flatfiledb", "session", "authentication"],
 	"minify": true,

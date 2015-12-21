@@ -157,7 +157,8 @@ module.exports = function(app, options) {
 
 			//	Client file
 			fs.writeFileSync(apiDir + api + "/" + apiClientFile, render(apiClientView({
-				api: dbApi.client.api
+				api: dbApi.client.api,
+				apiClientPath: serverConfig.apiClientPath
 			}), true));
 
 			//	Server file

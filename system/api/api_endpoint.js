@@ -27,13 +27,21 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 		var action = req.params.action,
 			data = req.body,
 			respond = function(){
-
 				//	TODO: we want to expose responseType
-
 				//console.log('respond', responseType, req.session, arguments);
-
 				res[responseType](apiInstance.utils.response.apply(null, arguments));
 			};
+
+		//	CORS headers to allow Cordova to work
+		//	TODO: Limit to required domain
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+		res.header("Access-Control-Allow-Headers", "Content-type,Accept,X-Custom-Header");
+		//	CORS required response
+		if (req.method === "OPTIONS") {
+		    return res.status(200).end();
+		}
+
 
 		if(action){
 			//api.api[action](data).then(respond, respond);
