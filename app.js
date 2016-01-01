@@ -39,6 +39,10 @@ app.use(bodyParser.json());
 
 //	Static directory for our client-side JS
 app.use(express.static(path.join(__dirname, '/public')));
+if(serverConfig.staticPath) {
+	app.use(serverConfig.staticPath, express.static('public'));
+}
+
 
 //	Basic error handling
 //	TODO: make configurable
@@ -47,28 +51,45 @@ app.use(function(err, req, res, next){
 	res.status(500).send('Something broke!');
 });
 
-//	Create our miso app
-mvc(app, {
+var misoAppOptions = {
 	routeConfig: routeConfig,
 	throwUnmappedActions: true,
 	verbose: true
-});
+}, exitWhenReady;
 
-//	Run the server
-var server = app.listen(serverConfig.port, function () {
-	var info = server.address(),
-		address = info.address;
-
-	if(address == "::") {
-		address = "localhost";
-	}
-
-	console.log('');
-	console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, environment);
-	console.log('');
-
-	//	For dev-eyes only
-	if(environment !== 'production') {
-		reload(server, app);
+//	Check for exit
+process.argv.forEach(function(val, index) {
+	if(val == "exitWhenReady") {
+		exitWhenReady = true;
 	}
 });
+
+if(exitWhenReady) {
+	misoAppOptions.exitWhenReady = true;
+	misoAppOptions.forceBrowserify = true;
+}
+
+//	Create our miso app
+mvc(app, misoAppOptions);
+
+//	Either wait for misoready then exit or run the server
+if(!misoAppOptions.exitWhenReady) {
+	//	Run the server
+	var server = app.listen(serverConfig.port, function () {
+		var info = server.address(),
+			address = info.address;
+
+		if(address == "::") {
+			address = "localhost";
+		}
+
+		console.log('');
+		console.log('Miso is listening at http://%s:%s in %s mode', address, info.port, environment);
+		console.log('');
+
+		//	For dev-eyes only
+		if(environment !== 'production') {
+			reload(server, app);
+		}
+	});		
+}

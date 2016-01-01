@@ -14,6 +14,7 @@ var miso = require('../../modules/miso.util.js');
 module.exports = function(app, apiType, apiPath, apiRequirePath){
 	apiPath = apiPath || "/api";
 	apiRequirePath = (typeof apiRequirePath !== 'undefined')? apiRequirePath: '../api/' + apiType + '/' + apiType + '.api.js';
+
 	var apiInstance = require('../api/api.js')(app),
 		myApi = require(apiRequirePath)(apiInstance.utils),
 		api = apiInstance.create(myApi),

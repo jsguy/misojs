@@ -1,0 +1,4 @@
+{
+	"/": { "method": "get", "name": "mobilehome", "action": "index" },
+	"/test": { "method": "get", "name": "mobilehome", "action": "test" }
+}

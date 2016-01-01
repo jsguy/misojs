@@ -1,11 +1,12 @@
 {
   "name": "misojs",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "private": false,
   "scripts": {
     "development": "touch -t 197804100000.00 system/main.js && nodemon --debug -e js,css,json --watch package.json --watch modules/ --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
     "developmentforever": "touch -t 197804100000.00 system/main.js && nodemon --exitcrash -e js,css,json --watch package.json --watch modules/ --watch system/ --watch cfg/ --watch mvc/ --watch client/ --watch server/ --watch app.js app.js",
-    "production": "touch -t 197804100000.00 system/main.js && node app.js"
+    "production": "touch -t 197804100000.00 system/main.js && node app.js",
+    "cordova": "node app.js exitWhenReady"
   },
   "bin": {
     "miso": "bin/miso.bin.js"
@@ -21,6 +22,7 @@
     "flat-file-db": "^0.1.3",
     "fs-extra": "^0.14.0",
     "grunt": "*",
+    "instagram-node": "^0.5.8",
     "js-beautify": "^1.5.4",
     "lodash": ">=2.4.1",
     "marked": "^0.3.3",

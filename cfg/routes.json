@@ -1,5 +1,7 @@
 {
 	"/": { "method": "get", "name": "home", "action": "index" },
 	"/user/:user_id": { "method": "get", "name": "user", "action": "edit" },
-	"/login": { "method": "get", "name": "login", "action": "index" }
+	"/login": { "method": "get", "name": "login", "action": "index" },
+	"/mobilehome": { "method": "get", "name": "mobilehome", "action": "index" },
+	"/mobiletest": { "method": "get", "name": "mobilehome", "action": "test" }
 }

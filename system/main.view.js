@@ -6,7 +6,8 @@
 
 	* Ability to configure required libs
 */
-var m = require('mithril'),
+var fs = require('fs'),
+	m = require('mithril'),
 	sugartags = require('mithril.sugartags')(m);
 
 module.exports.index = function(ctrl){
@@ -91,6 +92,10 @@ module.exports.index = function(ctrl){
 			//	Ensure we always have misoGlobal
 			"var misoGlobal = misoGlobal || {};",
 
+			"if(typeof window !== \"undefined\"){",
+			"	window.misoGlobal = misoGlobal;",
+			"}",
+
 			//	All our route files
 			(ctrl.routes.map(function(route, idx) {
 				var result = usedRoute[route.name]? "" :
@@ -109,8 +114,34 @@ module.exports.index = function(ctrl){
 
 			//	Wait for cordova
 			(serverConfig.cordova?
-				"document.addEventListener('deviceready', function(){":
+
+				// dispatch deviceready event for local testing
+				["(function(doc){",
+				"	var eName = 'deviceready',",
+				"		event = new Event(eName),",
+				"		eventFired = false;",
+				"",
+				"	doc.addEventListener(eName, function(){",
+				"		eventFired = true;",
+				"	});",
+				"",
+				"	setTimeout(function(){",
+				"		if(!eventFired) {",
+				"			doc.dispatchEvent(event);",
+				"		}",
+				"	}, 1000);",
+				"}(typeof document !== 'undefined'? document: {",
+				"	addEventListener: function(){},",
+				"	dispatchEvent: function(){}",
+				"}))",
+				//	Listen for the event
+				"document.addEventListener('deviceready', function(){"].join("\n"):
 				""),
+
+			//	Any layout add-ins
+			(ctrl.serverConfig.layoutComponents? ctrl.serverConfig.layoutComponents.map(function(file, idx) {
+				return fs.readFileSync(file, {encoding: "utf8"});
+			}): []).join("\n"),
 
 			//	Setup our routes
 			"m.route("+ctrl.attachmentNodeSelector+", '/', {",

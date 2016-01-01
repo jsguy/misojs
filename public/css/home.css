@@ -1,0 +1,56 @@
+.photo-thumb {width: 8rem; height: 8rem; position: relative; overflow: hidden; border-radius: 50%; display: inline-block; margin: 2rem; }
+.photo-thumb img {display: inline; margin: 0 auto; height: 100%; width: auto; }
+
+.intro-items {display: inline-block; vertical-align: top; margin-top: 2rem; width: 28rem;}
+.intro-item {display: inline-block; width: 6.5rem; margin: 0 0.5rem; text-align: center; }
+
+.intro-count {font-size: 2rem; font-weight: bold; color: #555; }
+.intro-label {font-size: 1.4rem; color: #aaa; margin-top: 0.4rem;}
+
+.follow-items {display: inline-block; margin-top: 0.9rem;}
+
+.follow-item { border: 1px solid #4090db; text-align: center; display: inline-block; font-size: 1.3rem; padding: 0.4rem; color: #4090db; }
+
+.follow-button {width: 20rem;margin-right: 0.3rem; }
+.follow-button-dropdown {width: 2.6rem;}
+
+.user-summary {padding: 0 2rem;}
+.user-name {font-weight: bold; }
+.user-status {}
+
+.photo-container {
+	background: #f0f0f0;
+	padding: 0rem;
+	margin: 1rem 0;
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-flow: row wrap;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+	align-items: stretch;
+}
+
+.photo-item {
+	margin: 0;
+	width: 33.3%;
+	height: 12rem;
+	line-height: 12rem;
+	color: white;
+	font-weight: bold;
+	font-size: 3rem;
+	text-align: center;
+}
+
+img.photo-small {
+	opacity:0;
+	-moz-transition: opacity 2s;
+	-webkit-transition: opacity 2s;
+	-o-transition: opacity 2s;
+	transition: opacity 2s;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}

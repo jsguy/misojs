@@ -1,0 +1,10 @@
+{
+	"port": 6476,
+	"minify": false,
+	"sourceMap": true,
+	"pretty": true,
+	"reload": true,
+	"layout": "../mvc/layout_mobilefirst.js",
+	"layoutComponents": ["mvc/layout.header.js", "mvc/layout.nav.js"],
+	"api": ["flatfiledb", "session", "authentication", "flickr"]
+}

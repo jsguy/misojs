@@ -14,9 +14,10 @@
 	"layout": "../mvc/layout_miso.js",
 	"apiPath": "/api",
 	"apiClientPath": "",
+	"COMMENT_apiClientPath": "http://192.168.43.50:6476",
 	"cordova": false,
 	"COMMENT_api": "mongoose",
-	"api": ["flatfiledb", "session", "authentication"],
+	"api": ["flatfiledb", "session", "authentication", "instagram"],
 	"minify": true,
 	"sourceMap": true,
 	"pretty": false

@@ -139,6 +139,13 @@ try {
 					"",
 					"Will create a new project in the 'myapp' directory, (as long as it is empty)"
 				],
+				'c': [
+					"Compiles miso.js and exits, optionally specify an environemnt for the config, for example:",
+					"",
+					"  " + name + " -c development",
+					"",
+					"Will compile miso.js for the project in the current directory"
+				],
 				'i': [
 					"Installs a miso package, for example:",
 					"",
@@ -264,6 +271,18 @@ try {
 			}
 		}
 
+
+	} else if(argv.c){
+		var env = argv.c !== "true"?
+			argv.c:
+			environment;
+
+		npm.load(pjson, function (err) {
+			process.env.NODE_ENV = env;
+			npm.commands.run([env], function(){
+				print("Miso run completed");
+			});
+		});
 	} else {
 		//	Show the help screen
 		var helpText = [

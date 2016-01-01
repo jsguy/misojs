@@ -13,6 +13,7 @@ module.exports.view = function(ctrl){
 			HTML([
 				HEAD([
 					TITLE("Miso app"),
+					LINK({href: '/css/reset.css', rel:'stylesheet'}),
 					LINK({href: '/css/style.css', rel:'stylesheet'})
 				]),
 				BODY([

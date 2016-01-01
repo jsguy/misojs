@@ -58,6 +58,7 @@ module.exports.view = function(ctrl){
 			m.trust("<!doctype html>"),
 			HTML([
 				HEAD([
+					LINK({href: '/css/reset.css', rel:'stylesheet'}),
 					LINK({href: '/css/style.css', rel:'stylesheet'}),
 					//	Add in the misoGlobal object...
 					SCRIPT("var misoGlobal = "+(ctrl.misoGlobal? JSON.stringify(ctrl.misoGlobal): {})+";")

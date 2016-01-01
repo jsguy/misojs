@@ -127,6 +127,8 @@ module.exports = function(app, options) {
 
 	serverConfig = require('../system/config.js')(app.get('environment'));
 
+	forceBrowserify = forceBrowserify || options.forceBrowserify;
+
 	//	Where we keep our routes
 	var routesPath = __dirname + "/../mvc/";
 

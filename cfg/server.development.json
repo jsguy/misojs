@@ -4,6 +4,7 @@
 	"sourceMap": true,
 	"pretty": true,
 	"reload": true,
-	"layout": "../mvc/layout_plain.js",
-	"api": ["flatfiledb", "session", "authentication"]
+	"layout": "../mvc/layout_mobilefirst.js",
+	"layoutComponents": ["mvc/layout.header.js", "mvc/layout.nav.js"],
+	"api": ["flatfiledb", "session", "authentication", "flickr"]
 }
