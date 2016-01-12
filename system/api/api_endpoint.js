@@ -34,7 +34,7 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 			};
 
 		//	CORS headers to allow Cordova to work
-		//	TODO: Limit to required domain
+		//	TODO: Limit to allowed origin
 		res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
 		res.header("Access-Control-Allow-Headers", "Content-type,Accept,X-Custom-Header");

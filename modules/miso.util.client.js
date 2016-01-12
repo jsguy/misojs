@@ -51,6 +51,16 @@ module.exports = {
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;
 	},
 
+	//	Get cordova or normal relative url
+	url: function(relativeUrl){
+		var myCordova = typeof cordova !== "undefined"? cordova: {
+			file: {
+				applicationDirectory: ""
+			}
+		};
+		return myCordova.file.applicationDirectory + relativeUrl;
+	},
+
 	//	Get info for an action from the params
 	routeInfo: function(params){
 		/*

@@ -72,6 +72,16 @@ module.exports = {
 			obj.query[key]: def;
 	},
 
+	//	Get cordova or normal relative url
+	url: function(relativeUrl){
+		var myCordova = typeof cordova !== "undefined"? cordova: {
+			file: {
+				applicationDirectory: ""
+			}
+		};
+		return myCordova.file.applicationDirectory + relativeUrl;
+	},
+
 	//	Testing ready binder
 	//	NOTE: We somehow need to share this with the createRoute method...
 	readyBinderFactory: function(){
