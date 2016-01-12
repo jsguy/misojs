@@ -37,7 +37,7 @@ module.exports = function(utils){
 				//	Add parameters
 				url += miso.each(args, function(value, key){
 					return "&" + key + "=" + value;
-				});
+				}).join("");
 				request(url, function (error, response, body) {
 					if (!error && response.statusCode == 200) {
 						photoDataCache = jsonParser(body);
