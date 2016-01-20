@@ -34,8 +34,8 @@ app.use(session(serverConfig.session));
 
 //	We parse application/x-www-form-urlencoded and application/json
 //	TODO: Add any further defaults here and make configurable
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: serverConfig.uploadLimit, extended: false}));
+app.use(bodyParser.json({limit: serverConfig.uploadLimit}));
 
 //	Static directory for our client-side JS
 app.use(express.static(path.join(__dirname, '/public')));

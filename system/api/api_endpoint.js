@@ -28,13 +28,14 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 		var action = req.params.action,
 			data = req.body,
 			respond = function(){
-				//	TODO: we want to expose responseType
-				//console.log('respond', responseType, req.session, arguments);
 				res[responseType](apiInstance.utils.response.apply(null, arguments));
+			},
+			respondErr = function(){
+				res[responseType](apiInstance.utils.response.apply(null, [null, arguments]));
 			};
 
 		//	CORS headers to allow Cordova to work
-		//	TODO: Limit to allowed origin
+		//	TODO: Limit to required domain
 		res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
 		res.header("Access-Control-Allow-Headers", "Content-type,Accept,X-Custom-Header");
@@ -43,10 +44,8 @@ module.exports = function(app, apiType, apiPath, apiRequirePath){
 		    return res.status(200).end();
 		}
 
-
 		if(action){
-			//api.api[action](data).then(respond, respond);
-			api.api[action](data, req, res).then(respond, respond);
+			api.api[action](data, req, res).then(respond, respondErr);
 		} else {
 			res[responseType](apiInstance.utils.response.apply(null, [null, "No action specified"]));
 		}

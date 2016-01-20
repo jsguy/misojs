@@ -20,5 +20,6 @@
 	"api": ["flatfiledb", "session", "authentication", "instagram"],
 	"minify": true,
 	"sourceMap": true,
-	"pretty": false
+	"pretty": false,
+	"uploadLimit": "50mb"
 }
