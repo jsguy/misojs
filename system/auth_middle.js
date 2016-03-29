@@ -11,6 +11,8 @@ module.exports = function(args, req, res, next) {
 			args.route[args.action].authenticate: 
 			serverConfig.authentication.all;
 
+	//console.log('auth check', shallAuthenticate, args.action);
+
 	//	Only authenticate if needed
 	if(shallAuthenticate) {
 		//	Apply the authentication middleware

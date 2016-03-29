@@ -1,11 +1,12 @@
 /* Example login mvc */
 var m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
+	mdl = require('mithril.component.mdl')(m),
 	sugartags = require('mithril.sugartags')(m),
 	authentication = require('../system/api/authentication/api.server.js')(m),
 	session = require('../system/api/session/api.server.js')(m);
 
-var index = module.exports.index = {
+var index = module.exports.login = {
 	models: {
 		login: function(data){
 			this.url = data.url;
@@ -30,10 +31,10 @@ var index = module.exports.index = {
 				if(data.result.isLoggedIn == true) {
 					//	Woot, we're in!
 					misoGlobal.isLoggedIn = true;
-					misoGlobal.userName = data.result.userName;
+					misoGlobal.user = data.result.user;
 					ctrl.model.isLoggedIn(true);
 
-					console.log("Welcome " + misoGlobal.userName + ", you've been logged in");
+					console.log("Welcome " + misoGlobal.user.name + ", you've been logged in");
 
 					//	Will show the username when logged in
 					misoGlobal.renderHeader();
@@ -44,6 +45,9 @@ var index = module.exports.index = {
 						//	Go to default URL?
 						m.route("/");
 					}
+				} else {
+					//	Nope, nope, nope
+					console.log("Invalid username/password combination");
 				}
 			});
 			return false;
@@ -76,7 +80,7 @@ var index = module.exports.index = {
 					DIV(
 						INPUT({ type: "password", value: ctrl.model.password})
 					),
-					BUTTON({ type: "submit"}, "Login")
+					mdl.mButton({type: "submit", text: "Login"})
 				])
 			]);
 		}

@@ -1,28 +1,32 @@
 {
-	"_COMMENT": "Default is allow: '*', if you specify an 'allow', it will override",
-	"_COMMENT2": "If you specify an 'allow', it will override",
-	"app": {
-		"COMMENT_todo.index": {
-			"deny": ["finance", "support"]
-		},
-		"COMMENT_hello.edit": {
-			"deny": "*",
-			"allow": ["support"]
-		},
-		"COMMENT_user.edit": {
-			"deny": "*",
-			"allow": ["support"]
-		}
+	"_COMMENT": "Default is allow: '*'",
+	"_COMMENT2": "If you specify a 'deny':m '*' or an 'allow', it will override",
+	"COMMENT_todo.index": {
+		"deny": ["finance", "support"]
 	},
-	"api": {
-		"_COMMENT": "Ok, we need to figure out how to secure stuff",
-		"_COMMENT2": " - we now have a generic 'find' method",
-		"_COMMENT3": " - what we really want to do is lock down specific",
-		"_COMMENT4": " models, so let's try to use that...",
-		"COMMENT_/find": {
-			"todo.index.todo": {
-				"allow": ["admin", "support"]
-			}
-		}
+	"COMMENT_hello.edit": {
+		"deny": "*",
+		"allow": ["support"]
+	},
+	"COMMENT_user.edit": {
+		"deny": "*",
+		"allow": ["support"]
+	},
+	"mobilehome.test": {
+		"deny": "*",
+		"allow": ["support"]
+	},
+	"_COMMENT": "Lock down API access",
+	"api.flickr.photos": {
+		"deny": "*",
+		"allow": ["support"]
+	},
+	"COMMENT_api.authentication.saveUser": {
+		"deny": "*",
+		"allow": ["admin"]
+	},
+	"api.test.get": {
+		"deny": "*",
+		"allow": ["xadmin"]
 	}
 }

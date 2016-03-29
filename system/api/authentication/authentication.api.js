@@ -8,7 +8,7 @@ var ffdba = require('../../../system/api/flatfiledb/flatfiledb.api.js'),
 	bcryptjs = require('bcryptjs'),
 	secret = GLOBAL.serverConfig.authentication.secret;
 
-//	Extend the flatfiledb api with login-specfic methods
+//	Extends the flatfiledb api with login-specfic methods
 module.exports = function(utils){
 	var db = ffdba(utils),
 		modelType = 'user.edit.user';
@@ -19,16 +19,20 @@ module.exports = function(utils){
 		db.find(function(data) {
 			if(data.length > 0) {
 				//	Compare to hashed password
-				bcryptjs.compare(args.model.password, data[0].password, function(error, res) {
+				bcryptjs.compare(args.model.password, data[0].password, function(error, result) {
 					if(error) {
 						return err(false);
 					}
-				    if(res == true) {
-				    	//	Set the authSecret - this is the only place 
-				    	//	where this should happen.
+				    if(result) {
+				    	//	Set the authSecret - this is the only
+				    	//	place where this happens.
+				    	//	The value is used in auth_middle.js
 				    	req.session.authenticationSecret = secret;
-				    	req.session.userName = data[0].name;
-				    	cb({isLoggedIn: true, userName: data[0].name});
+						req.session.user = {
+							name: data[0].name,
+							roles: data[0].roles
+						};
+				    	cb({isLoggedIn: true, user: req.session.user});
 				    } else {
 				    	cb({isLoggedIn: false});
 				    }
@@ -47,6 +51,7 @@ module.exports = function(utils){
 	//	Log out a user
 	db.logout = function(cb, err, args, req){
 		delete req.session.authenticationSecret;
+		delete req.session.user;
 		cb({isLoggedIn: false});
 	};
 
@@ -61,12 +66,19 @@ module.exports = function(utils){
 					delete result[result.length-1].password;
 				});
 			}
+
+
+ 			console.log('found user', result);
+
+
 			cb(result);
 		}, err, {
 			type: modelType, 
 			query: args.query
 		});
 	};
+
+	//	TODO: Requires auth for this method.
 
 	//	Save a user including password hash
 	//	ref: http://codahale.com/how-to-safely-store-a-password/
@@ -78,17 +90,45 @@ module.exports = function(utils){
 			return err("Model not found " + modelType);
 		}
 
+		/*
+			The process
+
+			* Get model data
+			* Re-create nodel from data
+			* Validate the model
+			* Get data from model
+			* Save data
+
+		*/
+
+		console.log("=================================");
+		console.log('args.model', args.model);
+		console.log("=================================");
+
 		model = new Model(args.model);
+
+		console.log("------- roles -------");
+		console.log(model.roles[0]());
+		console.log("---------------------");
+
+
 		//	We require validation to create a user.
 		//	Models that cannot be validated are not saved
 		validation = model.isValid? model.isValid(): false;
 
+		console.log('save user roles', validation);
+
 		//	Validate the model data
 		if(validation === true) {
-			var data = utils.getModelData(model);
+			console.log('Save user');
+			var data = utils.rGetModelData(model);
+
+			console.log('Got data', data);
 
 			//	TODO: fix _id issue.
 			data._id = data.id || data._id || uuid.v4();
+
+			//	Fix 
 
 			//	Use bcryptjs to salt and save password
 			bcryptjs.genSalt(10, function(err, salt) {

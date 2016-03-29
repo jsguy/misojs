@@ -10,7 +10,6 @@ var fs			= require('fs'),
 	permissions = require('../cfg/permissions.json'),
 	m = require('mithril'),
 	miso = require('../modules/miso.util.js'),
-	permit = require('../system/miso.permissions.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
 	vm = require('vm'),
@@ -60,7 +59,7 @@ var fs			= require('fs'),
 	globalProvider = function(obj){
 		return {
 			isLoggedIn: obj.isLoggedIn,
-			userName: obj.userName
+			user: obj.user
 		};
 	},
 
@@ -155,19 +154,27 @@ module.exports = function(app, options) {
 			}
 
 			//	Create API for configured api (serverConfig.api)
-			var dbApi = require('./api/api_endpoint.js')(app, api, serverConfig.apiPath, apiRequirePath);
+			var dbApi = require('./api/api_endpoint.js')({
+				app: app,
+				apiType: api,
+				serverConfig: serverConfig,
+				apiRequirePath: apiRequirePath,
+				permissions: permissions
+			});
 
 			//	Client file
 			fs.writeFileSync(apiDir + api + "/" + apiClientFile, render(apiClientView({
 				api: dbApi.client.api,
-				apiClientPath: serverConfig.apiClientPath
+				apiClientPath: serverConfig.apiClientPath,
+				serverConfig: serverConfig
 			}), true));
 
 			//	Server file
 			fs.writeFileSync(apiDir + api + "/" + apiServerFile, render(apiServerView({
 				api: dbApi.server.api,
 				api_endpoint: api,
-				apiPath: myApiPath
+				apiPath: myApiPath,
+				serverConfig: serverConfig
 			}), true));
 		});
 	}
@@ -311,18 +318,17 @@ module.exports = function(app, options) {
 
 				//	Here I need the user roles - let's assume we can
 				//	use the session...
-				//sess=req.session;
-				var permitObj = permissions["app"][args.name + "." + args.action],
-					session = req.session || {},
+				var session = req.session || {},
 					//	TODO: hard coded user! Should be real...
 					user = session && session.user? session.user: {
 						name: "you",
 						roles: ['admin']
 					};
 
-				if(!permit.app(permitObj, user)){
+				if(serverConfig.authentication.enabled && !miso.checkPermissions(permissions, user, args.name, args.action)){
 					//	ACCESS DENIED
-					return res.end(skin(["ACCESS DENIED"]));
+					//	TODO: Allow this to be configured
+					return res.status(403).end(skin(["ACCESS DENIED"]));
 				}
 
 				try{
@@ -442,7 +448,6 @@ module.exports = function(app, options) {
 	//	We use exec to run it - this gives us a little more flexibility
 	//	Set MISOREADY when we are up and running
 	if(forceBrowserify || lastRouteModified > mainFileModified) {
-
 		options.verbose && console.log('\nBrowserifying...');
 		var startBrowserify = (new Date()).getTime();
 

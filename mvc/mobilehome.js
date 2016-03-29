@@ -22,25 +22,29 @@ var self = module.exports.index = {
 
 		//	Load some pictures
 		flickr.photos({tags: "Sydney opera house", tagmode: "any"}, {background: true, initialValue: []}).then(function(data){
-			if(data.result.errno) {
-				if(data.result.errno == "ENOTFOUND") {
-					//	Offline error?
-					ctrl.model.flickrData([]);
+				if(data.error) {
+					//	TODO: The endpoint should emit an event
+					//	that we can use to redir to login
+					console.log("ERROR", data.error);
+					//m.route("/login");
+				} else if(data.result.errno) {
+					if(data.result.errno == "ENOTFOUND") {
+						//	Offline error?
+						ctrl.model.flickrData([]);
+					} else {
+						//	Something else?
+						ctrl.model.flickrData([]);
+					}
+
 				} else {
-					//	Something else?
-					ctrl.model.flickrData([]);
+					ctrl.model.flickrData(data.result.items || []);
 				}
+			},
 
-			} else {
-				ctrl.model.flickrData(data.result.items || []);
+			//	Note: This error runs serverside only!
+			function(errorData){
+				console.log(errorData);
 			}
-		},
-
-		//	This error runs serverside only!
-		function(errorData){
-			console.log(errorData);
-		}
-
 		);
 
 

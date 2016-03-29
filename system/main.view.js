@@ -23,7 +23,6 @@ module.exports.index = function(ctrl){
 			"var sugartags = require('mithril.sugartags')(m);",
 			"var bindings = require('mithril.bindings')(m);",
 			"var animate = require('../public/js/mithril.animate.js')(m);",
-			"var permissions = require('../system/miso.permissions.js');",
 			
 			//	Grab the header so we can re-render
 			"var layout = require('"+serverConfig.layout+"');",
@@ -39,6 +38,8 @@ module.exports.index = function(ctrl){
 
 				//	If authentication is turned on, we can use permissions
 				"	if(typeof route.authenticate !== 'undefined'? route.authenticate: "+serverConfig.all+"){",
+
+				"console.log('secured route', route, actionName);",
 
 				//	Hardcoded user for now
 				//	TODO: need real user for permissions!
@@ -56,7 +57,10 @@ module.exports.index = function(ctrl){
 
 							//	Hardcoded login path for now
 				"			if(!isLoggedIn) {",
-				"				return m.route('/login?url=' + m.route() );",
+				//"				return m.route('/login?url=' + m.route() );",
+
+				"				return m.route('"+serverConfig.authentication.loginUrlPattern+"'.replace('[ORIGINALURL]', m.route()));",
+
 				"			} else {",
 				"				console.log('You are logged in!');",
 				"			}",
@@ -64,6 +68,8 @@ module.exports.index = function(ctrl){
 				//	Apply permissions
 				//	TODO: We need to add a method to do this, as the 
 				//	permissions might not exist, etc...
+
+				"console.log('permissionObj', permissionObj);",
 
 				//	Use trust, so && is rendered correctly
 				m.trust("	if(permissionObj && permissionObj.app && permissionObj.app[actionName] && !permissions(permissionObj.app[actionName], user)){"),
@@ -114,8 +120,7 @@ module.exports.index = function(ctrl){
 
 			//	Wait for cordova
 			(serverConfig.cordova?
-
-				// dispatch deviceready event for local testing
+				// dispatch deviceready event eventually (for local testing)
 				["(function(doc){",
 				"	var eName = 'deviceready',",
 				"		event = new Event(eName),",
@@ -134,7 +139,6 @@ module.exports.index = function(ctrl){
 				"	addEventListener: function(){},",
 				"	dispatchEvent: function(){}",
 				"}))",
-				//	Listen for the event
 				"document.addEventListener('deviceready', function(){"].join("\n"):
 				""),
 

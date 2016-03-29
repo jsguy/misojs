@@ -65,6 +65,48 @@ module.exports = {
 		return res;
 	},
 
+	//	Check permissions for a given user and name -> action
+	checkPermissions: function(permissions, user, name, action){
+		var hasRole = function(userRoles, roles){
+			var hasRole = false;
+			//	All roles
+			if(userRoles == "*") {
+				return true;
+			}
+			//	Search each user role
+			module.exports.each(userRoles, function(userRole){
+				userRole = (typeof userRole !== "string")? userRole: [userRole];
+				//	Search each role
+				module.exports.each(roles, function(role){
+					if(userRole == role) {
+						hasRole = true;
+						return false;
+					}
+				});
+			});
+			return hasRole;
+		},
+		//	Determine if the user has access to an action
+		permit = function(permissions, userRoles){
+			var pass = true;
+
+			//	Apply deny first, then allow.
+			if(permissions && userRoles){
+				if(permissions.deny) {
+					pass = ! hasRole(userRoles, permissions.deny);
+				}
+				if(permissions.allow) {
+					pass = hasRole(userRoles, permissions.allow);
+				}
+			}
+
+			return pass;
+		};
+
+		return permit(permissions[name + "." + action], user);
+	},
+
+
 	//	Get parameters for an action
 	getParam: function(key, obj, def){
 		return typeof obj.params[key] !== "undefined"? 

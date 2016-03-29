@@ -8,7 +8,11 @@ var miso = require('../modules/miso.util.js'),
 	sugartags = require('mithril.sugartags')(m),
 	bindings = require('mithril.bindings')(m),
 	api = require('../system/api/authentication/api.server.js')(m),
-	self = module.exports;
+	self = module.exports,
+	rolesEnum = [
+		{name: 'admin', text: 'Admin'},
+		{name: 'support', text: 'Support'}
+	];
 
 //	Shared view
 var editView = function(ctrl){
@@ -34,6 +38,20 @@ var editView = function(ctrl){
 						ctrl.user.isValid('password') == true || !ctrl.showErrors? "": ctrl.user.isValid('password').join(", ")
 					])
 				]),
+				
+				DIV([
+					LABEL("Roles"), 
+					DIV(rolesEnum.map(function(role, index){
+						return LABEL([
+							INPUT({value: role.name, type: 'checkbox', checked: ctrl.user.roles[index]}),
+							SPAN(role.text)
+						]);
+					})),
+					DIV({"class": (ctrl.user.isValid('roles') == true || !ctrl.showErrors? "valid": "invalid") + " indented" }, [
+						ctrl.user.isValid('roles') == true || !ctrl.showErrors? "": ctrl.user.isValid('roles').join(", ")
+					])
+				]),
+
 				DIV({"class": "indented"},[
 					BUTTON({onclick: ctrl.save, class: "positive"}, "Save user"),
 					BUTTON({onclick: ctrl.remove, class: "negative"}, "Delete user")
@@ -123,14 +141,21 @@ module.exports.new = {
 module.exports.edit = {
 	models: {
 		user: function(data){
-			this.name = m.p(data.name||"");
-			this.email = m.p(data.email||"");
+			var me = this, i;
+			me.name = m.p(data.name||"");
+			me.email = m.p(data.email||"");
 			//	Password is always empty first
-			this.password = m.p(data.password||"");
-			this.id = m.p(data._id||"");
+			me.password = m.p(data.password||"");
+			me.id = m.p(data._id||"");
+			me.roles = [];
+
+			rolesEnum.map(function(role, index){
+				//	This will just be true/false - we need the string for saving...
+				me.roles.push(m.p( (data.roles && data.roles.indexOf(role.name) !== -1)? role.name: false ));
+			});
 
 			//	Validate the model
-			this.isValid = validate.bind(this, {
+			me.isValid = validate.bind(this, {
 				name: {
 					isRequired: "You must enter a name"
 				},
@@ -143,7 +168,7 @@ module.exports.edit = {
 				}
 			});
 
-			return this;
+			return me;
 		}
 	},
 	controller: function(params) {
@@ -169,6 +194,18 @@ module.exports.edit = {
 				ctrl.showErrors = true;
 				console.log('User is not valid');
 			} else {
+
+				//	Set roles
+				var newRoles = [];
+				rolesEnum.map(function(role, index){
+					if(ctrl.user.roles[index]()){
+						newRoles.push(role.name);
+					}
+				});
+
+				ctrl.user.roles = newRoles;
+				console.log('newRoles', newRoles);
+
 				api.saveUser({ type: 'user.edit.user', model: ctrl.user } ).then(function(){
 					console.log("Saved user", arguments);
 					m.route("/users");

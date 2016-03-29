@@ -5,13 +5,7 @@
 
 	ie: we are not opinionated of how it works, beyond how 
 		to call methods, so that we can override them.
-
-	TODO: Figure out how to meaningfully debug this?
-
 */
-
-//	TODO: Authentication goes in here... I think.
-
 var fs = require('fs'),
 	miso = require('../../modules/miso.util.js'),
 	_ = require('lodash'),
@@ -37,23 +31,6 @@ var fs = require('fs'),
 	//	Creates actions for use in the server generated code
 	//	Note: cannot use a real promise here, as mithril breaks...
 	makeServerGenerateAction = function(action, api){
-		var authList = api.authenticate,
-			shallAuth = false;
-		authList = typeof authList == 'object'? authList: [authList];
-		_.each(authList, function(auth){
-			if(auth == action) {
-				shallAuth = true;
-				return false;
-			}
-		});
-
-		//	TODO: Apply authentication here.
-		//	We simply need to check misoGlobal.isLoggedIn
-		if(api.authenticate) {
-			//console.log('auth', api.authenticate, shallAuth);
-		}
-
-
 		return ["function(){",
 			"	var args = Array.prototype.slice.call(arguments, 0),",
 			"		errResult,",
@@ -64,15 +41,7 @@ var fs = require('fs'),
 			"		doneFunc = function(){isReady = true;};",
 			"	",
 			"	args.unshift(successFunc, errFunc);",
-
-			(shallAuth? "": ""
-				// "console.log('auth "+action+"');": 
-				// "console.log('no auth "+action+"');"
-			),
-
 			"	myApi['"+action+"'].apply(this, args);",
-
-
 			//	Add a binding object, so we can block till ready
 			"	var bindScope = arguments.callee.caller;",
 			"	bindScope._misoReadyBinding = miso.readyBinderFactory();",
@@ -95,10 +64,6 @@ var fs = require('fs'),
 			"		}",
       		"   	return deferred.promise;",
 			"	}};",
-
-
-
-
 			"}"].join("\n");
 	},
 
@@ -147,13 +112,68 @@ module.exports = function() {
 			getModel: function(type){
 				return GLOBAL.misoModels["model." + type];
 			},
+
+
+// var stringifyObjectNumbers = function(obj){
+//     if(typeof obj === "object" && obj !== null) {
+//         for(var i in obj) {if(obj.hasOwnProperty(i)) {
+//             obj[i] = stringifyObjectNumbers(obj[i]);
+//         }}
+//         return obj;
+//     } else if(Object.prototype.toString.call(obj) === '[object Array]') {
+//         for(var i = 0; i < obj.length; i += 1) {
+//             obj[i] = stringifyObjectNumbers(obj[i]);
+//         }
+//         return obj;
+//     } else if(!isNaN(obj)) {
+//         return "" + obj;
+//     }
+//     return obj;
+// };
+
+
+			//	Remove any unrequired model data, and get actual values
+			rGetModelData: function(obj){
+				console.log('rGet --------------------------------------');
+				if(Object.prototype.toString.call(obj) === '[object Array]') {
+					console.log('rGet array');
+					var result = [];
+					for(var i = 0; i < obj.length; i += 1) {
+						console.log('check array', i);
+						result[i] = self.utils.rGetModelData(obj[i]);
+					}
+					return result;
+				} else if(typeof obj === "object" && obj !== null) {
+					console.log('rGet obj', obj);
+					var result = {};
+					for(var i in obj) {if(i !== "isValid" && obj.hasOwnProperty(i)) {
+						console.log('check', i);
+						result[i] = self.utils.rGetModelData(obj[i]);
+					}}
+					return result;
+				} else if(typeof obj == "function") {
+					console.log('rGet function');
+					return obj();
+				}
+				console.log('rGet nothing');
+				return obj;
+			},
+
+
+
 			//	Remove any unrequired model data, and get actual values
 			getModelData: function(model){
 				//	Excludes isValid method
 				var i, result = {};
 				for(i in model) {if(model.hasOwnProperty(i)) {
 					if(i !== "isValid") {
-						result[i] = (typeof model[i] == "function")? model[i](): model[i];
+						//result[i] = (typeof model[i] == "function")? model[i](): model[i];
+						if(typeof model[i] == "function") {
+							result[i] = model[i]();
+						} else {
+
+							result[i] = model[i];
+						}
 					}
 				}}
 

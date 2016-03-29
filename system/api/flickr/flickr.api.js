@@ -26,6 +26,7 @@ var request = require('request'),
 	photoDataCache = JSON.parse(fs.readFileSync('public/testdata/photocache.json', {encoding: 'utf8'}));;
 
 module.exports = function(utils){
+	console.log('FLICKR API', arguments);
 	return {
 		photos: function(cb, err, args){
 			//	TESTING WITH PHOTO CACHE

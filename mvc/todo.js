@@ -89,5 +89,5 @@ var self = module.exports.index = {
 		}
 	}
 	//	Test authenticate
-	//,authenticate: true
+	,authenticate: true
 };

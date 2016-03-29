@@ -1,11 +1,4 @@
-/*	Miso main javascript file generator
-
-	* Is used by browserify to create /miso.js
-
-	TODO:
-
-	* Ability to configure required libs
-*/
+/* API server view - this is used on the server */
 var m = require('mithril');
 
 module.exports.index = function(ctrl){
