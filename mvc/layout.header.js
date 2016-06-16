@@ -5,7 +5,8 @@ var headerMVC = {
 			var me = this;
 			me.text = m.p("Header");
 			me.isMenuShown = m.p(false);
-			me.toggleMenu = function(){
+			me.toggleMenu = function(e){
+				e.preventDefault();
 				me.isMenuShown(!me.isMenuShown());
 				var el = document.body;
 				el.className = "";
@@ -25,7 +26,7 @@ var headerMVC = {
 		with(sugartags){
 			return m("div", [
 				SPAN({className: "button-back"}, I({className: "fa fa-chevron-left"})),
-				SPAN(o.text()),
+				SPAN(m.trust(o.text())),
   				A({href: "#", class: "button-menu", onclick: o.toggleMenu},
   					SPAN(I({className: "fa fa-bars"}))
   				)
