@@ -1,4 +1,5 @@
 var m = require('mithril'),
+	mdl = require('mithril.component.mdl')(m),
 	sugartags = require('mithril.sugartags')(m),
 	db = require('../system/api/flatfiledb/api.server.js')(m);
 
@@ -72,10 +73,10 @@ var self = module.exports.index = {
 	},
 	view: function(ctrl) {
 		with(sugartags) {
-			return DIV({"class": "cw cf"}, [
-				STYLE(".done{text-decoration: line-through;}"),
-				H1("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
-				BUTTON({ onclick: ctrl.archive }, "Archive"),
+			return DIV({"class": "container"}, [
+				LINK({href: '/css/todos.css', rel:'stylesheet'}),
+				H4("Todos - " + ctrl.vm.left() + " of " + ctrl.list.length + " remaining"),
+				mdl.mButton({text: "Archive", onclick: ctrl.archive}),
 				UL([
 					ctrl.list.map(function(todo){
 						return LI({ class: todo.done()? "done": "", onclick: ctrl.vm.done(todo) }, todo.text);
@@ -89,5 +90,5 @@ var self = module.exports.index = {
 		}
 	}
 	//	Test authenticate
-	,authenticate: true
+	//,authenticate: true
 };

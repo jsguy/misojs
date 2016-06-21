@@ -1,3 +1,5 @@
+var miso = require('../modules/miso.util.js');
+
 //	Header MVC
 var headerMVC = {
 	models: {
@@ -14,25 +16,42 @@ var headerMVC = {
 					el.className = "menu-active";
 				}
 			};
+			me.scrollOffset = m.p();
 		}
 	},
 	controller: function() {
 		//	Expose the header model
-		misoGlobal.header = new headerMVC.models.header();
-		return {model: misoGlobal.header};
+		var model = this.model = misoGlobal.header = new headerMVC.models.header();
+
+		//	Check for the offset
+		if(!miso.isServer()) {
+			//	Ref: http://stackoverflow.com/a/3464890
+			var doc = document.documentElement,
+				top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+			var setOffset = function(){
+				top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+				//console.log('so', top);
+				model.scrollOffset(top);
+			}
+			setInterval(setOffset, 300);
+		}
+
+		return this;
 	},
 	view: function(ctrl) {
 		var o = ctrl.model;
 		with(sugartags){
-			return m("div", [
-				SPAN({className: "button-back"}, I({className: "fa fa-chevron-left"})),
-				SPAN(m.trust(o.text())),
-  				A({href: "#", class: "button-menu", onclick: o.toggleMenu},
-  					SPAN(I({className: "fa fa-bars"}))
-  				)
-			]);
+			return m("SECTION", {className: "miso-header" + (o.scrollOffset() > 400? " scrolled": "")},
+				m("div", [
+					SPAN({className: "button-back"}, I({className: "fa fa-chevron-left"})),
+					SPAN(m.trust(o.text())),
+	  				A({href: "#", class: "button-menu", onclick: o.toggleMenu},
+	  					SPAN(I({className: "fa fa-bars"}))
+	  				)
+				])
+			);
 		}
 	}
 };
 
-m.mount(document.getElementsByClassName("miso-header")[0], headerMVC);
+m.mount(document.getElementsByClassName("miso-header--surround")[0], headerMVC);

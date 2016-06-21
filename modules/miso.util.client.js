@@ -46,6 +46,13 @@ module.exports = {
 		};
 	},
 
+	setHeader: function(text){
+		//	Set header
+		if(typeof misoGlobal !== "undefined" && misoGlobal.header !== "undefined") {
+			misoGlobal.header.text(text);
+		}
+	},
+
 	//	Get parameters for an action
 	getParam: function(key, params, def){
 		return typeof m.route.param(key) !== "undefined"? m.route.param(key): def;

@@ -39,12 +39,19 @@ var fs			= require('fs'),
 	apiServerFile = 'api.server.js',
 
 	render = function(view, ignorePretty){
+		//	Override escape string so it doesn't escape - we're generating code, not HTML.
+		var escapeString = function(str){
+			return str;
+		}, options = {
+			escapeString: escapeString
+		};
+
 		if(serverConfig.pretty && !ignorePretty) {
-			return beautify_html(mithrilRender(view), {
+			return beautify_html(mithrilRender(view, options), {
 				wrap_line_length: 999999
 			});
 		} else {
-			return mithrilRender(view);
+			return mithrilRender(view, options);
 		}
 	},
 

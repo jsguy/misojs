@@ -22,10 +22,11 @@ module.exports.view = function(ctrl){
 					,LINK({href: '/external/font-awesome/css/font-awesome.css', rel:'stylesheet'})
 				]),
 				BODY([
-					SECTION({className: "miso-header"}),
+					SECTION({className: "miso-header--surround"}),
 					SECTION({className: "miso-nav"}),
 					SECTION({id: ctrl.misoAttachmentNode}, ctrl.content),
 					SECTION({className: "miso-footer"}),
+					
 					//	MDL TODO: integrate this in mithril.component.mdl?
 					SCRIPT({src: '/external/mdl/material.min.js'}),
 					SCRIPT({src: '/miso.js'}),

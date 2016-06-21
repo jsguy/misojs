@@ -45,6 +45,13 @@ module.exports = {
 		};
 	},
 
+	setHeader: function(text){
+		//	Set header
+		if(typeof misoGlobal !== "undefined" && misoGlobal.header !== "undefined") {
+			misoGlobal.header.text(text);
+		}
+	},
+
 	/*	Use a JSON RPC 2.0 response
 		this is used by the server response in the api.
 	*/

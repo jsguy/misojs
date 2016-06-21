@@ -1,6 +1,35 @@
 .photo-thumb {width: 8rem; height: 8rem; position: relative; overflow: hidden; border-radius: 50%; display: inline-block; margin: 2rem; }
 .photo-thumb img {display: inline; margin: 0 auto; height: 100%; width: auto; }
 
+.intro {display: flex; align-items: center; height: 60rem; }
+
+.box {padding: 1rem;border-top: 0.1rem solid #e0e0e0; }
+.box h2 {margin: 0 0 1rem; font-size: 3rem;}
+.box h3 {margin: 0 0 1rem; font-size: 2rem;}
+.box--even {}
+.box--odd {margin-top: 1rem; background-color:#f3f3f3;}
+.box.intro {border-top: 0; }
+.box .inner.inner--intro {margin: 0 auto; text-align: center; }
+.box .inner {margin: 0 auto; width: 99rem; }
+
+.intro .intro-heading {font-weight: bold; font-size: 4rem; margin: 1rem 0; color: #f89d26; }
+.intro .intro-byline,
+.intro .intro-text {color: #aaa; font-weight: lighter; }
+.intro .intro-byline {font-size: 2rem; }
+
+.box ul.dotList { list-style: disc; margin: 1em; }
+.box ul.dotList li { margin: 0.25em 0.5em; }
+
+.box pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; border-radius: 2px}
+
+
+
+.main-container h2,
+.main-container h2 a{color: #f89d26;}
+
+.main-container h3,
+.main-container h3 a {color: #777;}
+
 .intro-items {display: inline-block; vertical-align: top; margin-top: 2rem; width: 28rem;}
 .intro-item {display: inline-block; width: 6.5rem; margin: 0 0.5rem; text-align: center; }
 

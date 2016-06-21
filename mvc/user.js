@@ -141,6 +141,9 @@ module.exports.new = {
 module.exports.edit = {
 	models: {
 		user: function(data){
+
+			console.log('DATA', data);
+
 			var me = this, i;
 			me.name = m.p(data.name||"");
 			me.email = m.p(data.email||"");

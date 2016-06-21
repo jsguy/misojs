@@ -124,9 +124,32 @@ var argv = require('minimist')(process.argv.slice(2)),
 		} else {
 			error("Skeleton not found: " + type);
 		}
+	},
+	showHelp = function(){
+		//	Show the help screen
+		var helpText = [
+			"Usage: "+name+" <command> [args]",
+			"       "+name+" -? [command]",
+			"",
+			"Commands:",
+			"  -?                  Shows help for a particular command, eg: '"+name+" -? n' shows help for creating a new project",
+			"  -n                  Create a new project",
+			"  -s                  Add a skeleton to your new app",
+			"  -a                  Add authentication capability to your new app",
+			"  -i                  Install a miso package",
+			"  run                 Runs the project in the current directory"
+		];
+		_.each(helpText, function(txt){
+			print(txt);
+		});
 	};
 
 print("Miso version " + version);
+
+//	Default to run
+if(argv._.length == 0) {
+	argv._.push('run');
+}
 
 try {
 	if(argv["?"]) {
@@ -157,19 +180,23 @@ try {
 				]
 			};
 
-		if(item.indexOf("-") ==0) {
-			item = item.substr(1);
-		}
-
-		print("Help for:", argv["?"]);
-		print("");
-
-		if(helpObjects[item]) {
-			_.each(helpObjects[item], function(txt){
-				print(txt);
-			})
+		if(item === true) {
+			showHelp();
 		} else {
-			print("Help for " + item + " not found.");
+			if(item.indexOf("-") ==0) {
+				item = item.substr(1);
+			}
+
+			print("Help for:", argv["?"]);
+			print("");
+
+			if(helpObjects[item]) {
+				_.each(helpObjects[item], function(txt){
+					print(txt);
+				})
+			} else {
+				print("Help for " + item + " not found.");
+			}
 		}
 	} else if(argv._.indexOf('run') !== -1){
 		print("Environment: " + environment);
@@ -284,22 +311,7 @@ try {
 			});
 		});
 	} else {
-		//	Show the help screen
-		var helpText = [
-			"Usage: "+name+" <command> [args]",
-			"       "+name+" -? [command]",
-			"",
-			"Commands:",
-			"  -?                  Shows help for a particular command, eg: '"+name+" -? n' shows help for creating a new project",
-			"  -n                  Create a new project",
-			"  -s                  Add a skeleton to your new app",
-			"  -a                  Add authentication capability to your new app",
-			"  -i                  Install a miso package",
-			"  run                 Runs the project in the current directory"
-		];
-		_.each(helpText, function(txt){
-			print(txt);
-		});
+		showHelp();
 	}
 } catch(ex) {
 	error("Exception:", ex);

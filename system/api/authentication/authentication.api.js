@@ -68,7 +68,7 @@ module.exports = function(utils){
 			}
 
 
- 			console.log('found user', result);
+ 			console.log('found user', result[0].roles);
 
 
 			cb(result);
