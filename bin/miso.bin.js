@@ -43,7 +43,8 @@ var argv = require('minimist')(process.argv.slice(2)),
 	//	What to exclude
 	excludeFiles = ['mvc', 'documentation', 'skeletons', 'bin', 'README.md'],
 	//	What to always copy
-	copyFiles = ['mvc/layout_plain.js', 'modules'],
+	//copyFiles = ['mvc/layout_plain.js', 'modules'],
+	copyFiles = ['mvc/layout_mobilefirst.js', 'mvc/layout.header.js', 'mvc/layout.nav.js', 'modules'],
 	//	Creates a new project folder and copies all required files
 	createProject = function(projectPath, projectName){
 		if(!fs.existsSync(projectPath)) {
@@ -147,10 +148,9 @@ var argv = require('minimist')(process.argv.slice(2)),
 print("Miso version " + version);
 
 //	Default to run
-if(argv._.length == 0) {
-	argv._.push('run');
-}
-
+// if(argv._.length == 0) {
+// 	argv._.push('run');
+// }
 try {
 	if(argv["?"]) {
 		var item = argv["?"],
@@ -198,14 +198,6 @@ try {
 				print("Help for " + item + " not found.");
 			}
 		}
-	} else if(argv._.indexOf('run') !== -1){
-		print("Environment: " + environment);
-		npm.load(pjson, function (err) {
-			npm.commands.run([environment], function(){
-				print("Miso run completed");
-			});
-		});
-
 	} else if(argv.i) {
 
 		print("Installing: " + argv.i);
@@ -311,7 +303,21 @@ try {
 			});
 		});
 	} else {
-		showHelp();
+		npm.load(pjson, function (err) {
+			npm.commands.run([environment], function(err){
+				if(err) {
+					if(err.errno == -2) {
+						print("Error: Not a project directory - Miso needs a package.json file to run");
+					} else {
+						print("Error: Something went wrong");
+						print(err);
+					}
+					print("Run Miso with '-?' to get help");
+				} else {
+					print("Miso run completed");
+				}
+			});
+		});
 	}
 } catch(ex) {
 	error("Exception:", ex);
