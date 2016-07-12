@@ -25,7 +25,7 @@ html, body, #misoAttachmentNode {margin: 0; padding: 0; background: #fff; font-s
 
 .menu-active .miso-nav {overflow-y: scroll }
 
-#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 5rem; background: #fff; }
+#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 5rem; background: #fff; overflow-x: hidden}
 
 
 .main-container {padding: 0}

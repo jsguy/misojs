@@ -32,6 +32,11 @@ module.exports = {
 		}
 	},
 
+	//	Returns a default value, if value is undefined
+	def: function(value, defValue) {
+		return (typeof value !== "undefined")? value: defValue;
+	},
+
 	readyBinder: function(){
 		var bindings = [];
 		return {
