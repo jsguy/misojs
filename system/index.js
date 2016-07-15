@@ -472,11 +472,6 @@ module.exports = function(app, options) {
 		}
 	},
 	execExternalScript = function(script, callback){
-		//	Assume local directory if not full path
-		if(!(script.indexOf(".") == 0 || script.indexOf("/") == 0)) {
-			script = "./" + script;
-		}
-
 		//	Run the build step
 		exec(script, function (error, stdout, stderr) {
 			if(stdout) {
@@ -492,10 +487,9 @@ module.exports = function(app, options) {
 		});
 	};
 
-
-	//	TODO: Add buildfiles to serverconfig for bespoke items to prebuild...
+	//	If serverconfig has prebuild, these will be executed first
 	if(serverConfig.prebuild) {
-		async.mapSeries(serverConfig.prebuild, execExternalScript,function(){
+		async.mapSeries(serverConfig.prebuild, execExternalScript, function(){
 			runMiso();
 		});
 	} else {
