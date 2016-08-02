@@ -142,10 +142,10 @@ module.exports.index = function(ctrl){
 				"document.addEventListener('deviceready', function(){"].join("\n"):
 				""),
 
-			//	Any layout add-ins
-			(ctrl.serverConfig.layoutComponents? ctrl.serverConfig.layoutComponents.map(function(file, idx) {
+			//	Any layout add-ins, use m.trust to allow encoded chars to work as expected
+			m.trust((ctrl.serverConfig.layoutComponents? ctrl.serverConfig.layoutComponents.map(function(file, idx) {
 				return fs.readFileSync(file, {encoding: "utf8"});
-			}): []).join("\n"),
+			}): []).join("\n")),
 
 			//	Setup our routes
 			"m.route("+ctrl.attachmentNodeSelector+", '/', {",
