@@ -3,8 +3,8 @@
   "version": "0.0.27",
   "private": false,
   "scripts": {
-    "development": "touch -t 197804100000.00 system/main.js && nodemon -e js,css,json --watch package.json --watch modules/ --watch system/ --ignore 'system/api/*/api.*.js' --ignore 'system/main.js' --watch cfg/ --watch mvc/ --ignore mvc/model/generated/ --watch client/ --watch server/ --watch app.js app.js",
-    "developmentforever": "touch -t 197804100000.00 system/main.js && nodemon --exitcrash -e js,css,json --watch package.json --watch modules/ --watch system/ --ignore 'system/api/*/api.*.js' --ignore 'system/main.js' --watch cfg/ --watch mvc/ --ignore mvc/model/generated/ --watch client/ --watch server/ --watch app.js app.js",
+    "development": "touch -t 197804100000.00 system/main.js && nodemon -e js,css,json --watch package.json --watch modules/ --ignore 'modules/api/*/api.*.js' --watch system/ --ignore 'system/api/*/api.*.js' --ignore 'system/main.js' --watch cfg/ --watch mvc/ --ignore mvc/model/*.generated.js --watch client/ --watch server/ --watch app.js app.js",
+    "developmentforever": "touch -t 197804100000.00 system/main.js && nodemon --exitcrash -e js,css,json --watch package.json --watch modules/ --ignore 'modules/api/*/api.*.js' --watch system/ --ignore 'system/api/*/api.*.js' --ignore 'system/main.js' --watch cfg/ --watch mvc/ --ignore mvc/model/*.generated.js --watch client/ --watch server/ --watch app.js app.js",
     "production": "touch -t 197804100000.00 system/main.js && node app.js",
     "cordova": "node app.js exitWhenReady"
   },

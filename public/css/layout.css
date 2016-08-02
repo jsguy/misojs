@@ -12,8 +12,7 @@ html, body, #misoAttachmentNode {margin: 0; padding: 0; background: #fff; font-s
 
 
 .miso-header .button-menu {position: absolute; top: 1rem; right: 1rem; color: #333; padding: 0.5rem; line-height: 1rem; display: block; }
-/* TODO: complete back-button functionality; */
-.miso-header .button-back {display: none; padding-right: 1rem; }
+.miso-header .button-back {padding-right: 1rem; }
 
 .miso-logo {height: 2rem;}
 
@@ -25,7 +24,7 @@ html, body, #misoAttachmentNode {margin: 0; padding: 0; background: #fff; font-s
 
 .menu-active .miso-nav {overflow-y: scroll }
 
-#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 5rem; background: #fff; overflow-x: hidden}
+#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 5rem; background: #fff; overflow-x: hidden; box-shadow: 0.5rem 0 0.5rem #333;}
 
 
 .main-container {padding: 0}

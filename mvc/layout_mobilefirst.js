@@ -30,7 +30,16 @@ module.exports.view = function(ctrl){
 					//	MDL TODO: integrate this in mithril.component.mdl?
 					SCRIPT({src: '/external/mdl/material.min.js'}),
 					SCRIPT({src: '/miso.js'}),
-					(ctrl.reload? SCRIPT({src: '/reload.js'}): "")
+					(ctrl.reload? SCRIPT({src: '/reload.js'}): ""),
+					/* Put google fonts at the bottom 
+
+						Candidates:
+
+						https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700
+						https://fonts.googleapis.com/css?family=Montserrat:400,700
+
+					*/
+					LINK({href: "https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700", rel:"stylesheet"})
 				])
 			])
 		];

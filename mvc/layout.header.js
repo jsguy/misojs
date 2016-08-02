@@ -43,8 +43,12 @@ var headerMVC = {
 		with(sugartags){
 			return m("SECTION", {className: "miso-header" + (o.scrollOffset() > 400? " scrolled": "")},
 				m("div", [
-					SPAN({className: "button-back"}, I({className: "fa fa-chevron-left"})),
-					SPAN(m.trust(o.text())),
+					(o.backLink()? 
+						A({href: o.backLink(), config: m.route}, [
+							SPAN({className: "button-back"}, I({className: "fa fa-arrow-left"})),
+							SPAN(m.trust(o.text()))
+						])
+					: SPAN(m.trust(o.text()))),
 	  				A({href: "#", class: "button-menu", onclick: o.toggleMenu},
 	  					SPAN(I({className: "fa fa-bars"}))
 	  				)
