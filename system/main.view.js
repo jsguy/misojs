@@ -91,6 +91,17 @@ module.exports.index = function(ctrl){
 
 			"},",
 
+			//	Inject the parameters
+			"injectParams = function(route){",
+			"	var oldController = route.controller;",
+			"	route.controller = function() {",
+			"		var args = [].slice.apply(arguments);",
+			"		args.unshift({params: m.route.param()});",
+			"		oldController.apply(this, args);",
+			"	};",
+			"	return route;",
+			"},",
+
 //			"var permissionObj = (" + ctrl.permissions + ");",
 			//"var permissionObj = (" + (ctrl.permissions? JSON.stringify(ctrl.restrictions): "{}") + ");",
 			"permissionObj = {};",
@@ -152,7 +163,7 @@ module.exports.index = function(ctrl){
 				//	Add the route map
 				(ctrl.routes.map(function(route, idx) {
 					return [
-						"'" + route.path + "': restrict(" + route.name + "." + route.action + ", '" + route.name + "." + route.action + "')"
+						"'" + route.path + "': restrict(injectParams(" + route.name + "." + route.action + "), '" + route.name + "." + route.action + "')"
 					].join("\n");
 				})).join(",\n"),
 			"});",

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
 	WIP: when the app is created, we should have options to include:
 
@@ -73,7 +74,9 @@ if(exitWhenReady) {
 mvc(app, misoAppOptions);
 
 //	Either wait for misoready then exit or run the server
-if(!misoAppOptions.exitWhenReady) {
+if(misoAppOptions.exitWhenReady) {
+	process.exit();
+} else {
 	//	Run the server
 	var server = app.listen(serverConfig.port, function () {
 		var info = server.address(),

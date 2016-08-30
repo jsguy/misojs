@@ -52,7 +52,7 @@ var fs = require('fs'),
 			"				if(err) {",
 			" 					err(errResult);",
 			" 				} else {",
-			" 					throw JSON.stringify(errResult);",
+			" 					throw JSON.stringify(errResult, null, 4);",
 			" 				}",
 			" 			} else {",
 			"				cb(miso.response(successResult[0]));",
@@ -166,12 +166,15 @@ module.exports = function() {
 				//	Excludes isValid method
 				var i, result = {};
 				for(i in model) {if(model.hasOwnProperty(i)) {
-					if(i !== "isValid") {
+					if(i !== "isValid" && i !== "__structure") {
 						//result[i] = (typeof model[i] == "function")? model[i](): model[i];
 						if(typeof model[i] == "function") {
 							result[i] = model[i]();
+							//	Remove _id if it is undefined
+							if(i == "_id" && typeof result[i] == "undefined") {
+								delete result[i];
+							}
 						} else {
-
 							result[i] = model[i];
 						}
 					}
@@ -182,10 +185,26 @@ module.exports = function() {
 			//	Returns structure of a model
 			getModelStructure: function(type){
 				var model = GLOBAL.misoModels["model." + type],
-					st = self.utils.getModelData(new model({}));
+					structure = (new model({})).__structure,
+					st = {},
+					s, t;
 
-				for(var s in st) {
-					st[s] = String;
+				if(st) {
+					for(s in structure) {
+						t = structure[s];
+						st[s] = (
+							t == "String"? String:
+							t == "Number"? Number:
+							t == "Date"? Date:
+							//t == "Buffer"? Buffer:
+							t == "Boolean"? Boolean:
+							//t == "Mixed"? Mixed:
+							//t == "Objectid"? Objectid:
+							t == "Array"? Array:
+							String
+						);
+
+					}
 				}
 
 				return st;
@@ -215,7 +234,12 @@ module.exports = function() {
 			var obj = {};
 
 			for(var i in api) {
-				obj[i] = makeServerGenerateAction(i, api);
+				//	Direct access to anything starting with an _
+				if(i.indexOf("_") !== 0) {
+					obj[i] = makeServerGenerateAction(i, api);
+				} else {
+					obj[i] = "myApi['"+i+"']";//api[i];
+				}
 			}
 
 			return {
@@ -230,7 +254,10 @@ module.exports = function() {
 			var obj = {};
 			
 			for(var i in api) {
-				obj[i] = makeClientAction(i, api, apiPath);
+				//	Exclude anything that starts with an "_"
+				if(i.indexOf("_") !== 0) {
+					obj[i] = makeClientAction(i, api, apiPath);
+				}
 			}
 
 			return {

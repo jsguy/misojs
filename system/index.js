@@ -21,6 +21,7 @@ var fs			= require('fs'),
 	//	View for API files
 	apiClientView = require('../system/api.client.view.js').index,
 	apiServerView = require('../system/api.server.view.js').index,
+	apiModelRegister = require('../system/api/api.model.register.js'),
 	routes		= {},
 	serverConfig,
 	//	Force the browserify process to run
@@ -314,13 +315,8 @@ module.exports = function(app, options) {
 
 				//	Add pointer to models for use in store/save/whatever we call it...
 				if(args.route[args.action].models) {
-					GLOBAL.misoModels = GLOBAL.misoModels || {};
-					for(var m in args.route[args.action].models) {
-						var key = "model." + args.name + "." + args.action + "." + m
-							value = args.route[args.action].models[m];
-
-						app.set(key, value);
-						GLOBAL.misoModels[key] = value;
+					for(var modelName in args.route[args.action].models) {
+						apiModelRegister(modelName, args.route[args.action].models[modelName]);
 					}
 				}
 
@@ -344,15 +340,19 @@ module.exports = function(app, options) {
 
 					try{
 
-						//	WIP: Consolidate params and query, session into
-						//	one object "routeInfo", and add the current
-						//	route path, so you can use it to route with.
+						//	TODO: Give access to session here
+
+						//	Merge params/query, to match mithril functionality
+						var params = {}, i;
+						for(i in req.params) {
+							params[i] = req.params[i];
+						}
+						for(i in req.query) {
+							params[i] = req.query[i];
+						}
 
 						var scope = args.route[args.action].controller({
-								path: req.path,
-								params: req.params, 
-								query: req.query, 
-								session: session
+								params: params
 							}),
 							bindScope = args.route[args.action].controller,
 							mvc = args.route[args.action],
