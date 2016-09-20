@@ -8,7 +8,8 @@
 .box h3 {margin: 0 0 1rem; font-size: 2rem;}
 .box--even {}
 .box--odd {margin-top: 1rem; background-color:#f3f3f3;}
-.box.intro {border-top: 0;  position: relative; }
+.box.nomargin {margin-top: 0}
+.box.intro {border-top: 0;  position: relative; background-color:#333;}
 .box .inner.inner--intro {margin: 0 auto; text-align: center;}
 .box .inner {margin: 0 auto; width: 99rem; }
 
