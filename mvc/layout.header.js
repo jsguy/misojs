@@ -32,10 +32,9 @@ var headerMVC = {
 				top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
 			var setOffset = function(){
 				top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-				//console.log('so', top);
 				model.scrollOffset(top);
 			}
-			setInterval(setOffset, 300);
+			setInterval(setOffset, 125);
 		}
 
 		return this;
@@ -43,7 +42,7 @@ var headerMVC = {
 	view: function(ctrl) {
 		var o = ctrl.model;
 		with(sugartags){
-			return m("SECTION", {className: "miso-header" + (o.scrollOffset() > 400? " scrolled": "")},
+			return m("SECTION", {className: "miso-header" + (o.scrollOffset() > 570? " scrolled": "")},
 				m("div", [
 					(typeof o.backLink !== "undefined" && o.backLink()? 
 						A({href: o.backLink(), config: m.route}, [
