@@ -192,7 +192,7 @@ var canvasAnimation = function(args){
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p.closest[i].x, p.closest[i].y);
-            ctx.strokeStyle = rainbow[offset].split(")").join(", " + p.active/4 + ")");
+            ctx.strokeStyle = rainbow[offset].split(")").join(", " + p.active/2 + ")");
             ctx.stroke();
         }
     }
@@ -216,7 +216,7 @@ var canvasAnimation = function(args){
             if(!_this.active) return;
             ctx.beginPath();
             ctx.arc(_this.pos.x, _this.pos.y, _this.radius, 0, 2 * Math.PI, false);
-            ctx.fillStyle = rainbow[offset].split(")").join(", " + _this.active/4 + ")");
+            ctx.fillStyle = rainbow[offset].split(")").join(", " + _this.active/2 + ")");
             ctx.fill();
         };
     }
@@ -297,7 +297,7 @@ var self = module.exports.index = {
 					])
 				]),
 
-				DIV({"class": "box box--odd"}, 
+				DIV({"class": "box box--odd nomargin"}, 
 					DIV({"class": "inner"}, [
 						H2(A({name: "what", "class": "heading"},"What is miso?") ),
 						P("Miso is an open source isomorphic javascript framework that allows you to write complete apps with much less effort than other frameworks. Miso features:",[
