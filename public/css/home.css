@@ -8,9 +8,13 @@
 .box h3 {margin: 0 0 1rem; font-size: 2rem;}
 .box--even {}
 .box--odd {margin-top: 1rem; background-color:#f3f3f3;}
-.box.intro {border-top: 0; }
-.box .inner.inner--intro {margin: 0 auto; text-align: center; }
+.box.intro {border-top: 0;  position: relative; }
+.box .inner.inner--intro {margin: 0 auto; text-align: center;}
 .box .inner {margin: 0 auto; width: 99rem; }
+
+@media (max-width: 768px) {
+	.box .inner {width: inherit; }
+}
 
 .intro .intro-heading {font-weight: bold; font-size: 4rem; margin: 1rem 0; color: #f89d26; }
 .intro .intro-byline,
@@ -22,6 +26,7 @@
 
 .box pre.javascript { margin: 1em 0; padding: 1em; background: #333; color: #fff; border-radius: 2px}
 
+.ani-canvas {position: absolute; top: 0; left: 0;}
 
 
 .main-container h2,
