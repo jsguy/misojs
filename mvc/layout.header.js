@@ -8,7 +8,9 @@ var headerMVC = {
 			me.text = m.p("Header");
 			me.isMenuShown = m.p(false);
 			me.toggleMenu = function(e){
-				e.preventDefault();
+				if(e){
+					e.preventDefault();
+				}
 				me.isMenuShown(!me.isMenuShown());
 				var el = document.body;
 				el.className = "";
@@ -43,7 +45,7 @@ var headerMVC = {
 		with(sugartags){
 			return m("SECTION", {className: "miso-header" + (o.scrollOffset() > 400? " scrolled": "")},
 				m("div", [
-					(o.backLink()? 
+					(typeof o.backLink !== "undefined" && o.backLink()? 
 						A({href: o.backLink(), config: m.route}, [
 							SPAN({className: "button-back"}, I({className: "fa fa-arrow-left"})),
 							SPAN(m.trust(o.text()))
