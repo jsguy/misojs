@@ -7,11 +7,23 @@ html, body, #misoAttachmentNode {margin: 0; padding: 0; background: #fff; font-s
 
 .miso-header, #misoAttachmentNode, .miso-footer {-webkit-transition: -webkit-transform 0.2s ease-in-out; transition: transform 0.2s ease-in-out; }
 
-.miso-header {-webkit-backface-visibility: hidden; backface-visibility: hidden; color: #fff; display: block; height: 5rem; line-height: 5rem; font-size: 2rem; left: 0; min-width: 25rem; position: fixed; right: 100%; top: 0; width: 100%; z-index: 11; padding: 0 1rem; background-color: rgba(248, 248, 248, 0); }
+.miso-header {
+    -webkit-transition: background-color 500ms ease;
+    -moz-transition: background-color 500ms ease;
+    -o-transition: background-color 500ms ease;
+    -ms-transition: background-color 500ms ease;
+    transition: background-color 500ms ease;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden; color: #fff; display: block; height: 5rem; line-height: 5rem; font-size: 2rem; left: 0; min-width: 25rem; position: fixed; right: 100%; top: 0; width: 100%; z-index: 11; padding: 0 1rem; background-color: rgba(248, 248, 248, 0); }
 .miso-header.scrolled {background-color: rgba(248, 248, 248, 0.85);}
 
-
-.miso-header .button-menu {position: absolute; top: 1rem; right: 1rem; color: #333; padding: 0.5rem; line-height: 1rem; display: block; }
+.miso-header .button-menu {
+    -webkit-transition: color 500ms ease;
+    -moz-transition: color 500ms ease;
+    -o-transition: color 500ms ease;
+    -ms-transition: color 500ms ease;
+    transition: color 500ms ease;
+    position: absolute; top: 1rem; right: 1rem; color: #fff; padding: 0.5rem; line-height: 1rem; display: block; }
+.miso-header.scrolled .button-menu {color: #333 }
 .miso-header .button-back {padding-right: 1rem; }
 
 .miso-logo {height: 2rem;}
@@ -24,7 +36,7 @@ html, body, #misoAttachmentNode {margin: 0; padding: 0; background: #fff; font-s
 
 .menu-active .miso-nav {overflow-y: scroll }
 
-#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 5rem; background: #fff; overflow-x: hidden; box-shadow: 0.5rem 0 0.5rem #333;}
+#misoAttachmentNode {font-size: 1.6rem; position: relative; width: 100%; padding-top: 0; background: #fff; overflow-x: hidden; box-shadow: 0.5rem 0 0.5rem #333;}
 
 
 .main-container {padding: 0}
