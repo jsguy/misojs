@@ -3,11 +3,19 @@
 */
 var canvasAnimation = function(m){
     return function(args){
-        var width, height, largeHeader, canvas, ctx, points, target, animateHeader = true,
+        var width, height, largeHeader, canvas, ctx, points, target, divider = 30, animateHeader = true,
         	//	Let's add some colour
     		rainbow = ["rgba(248, 12, 18)", "rgba(238, 17, 0)", "rgba(255, 51, 17)", "rgba(255, 68, 34)", "rgba(255, 102, 68)", "rgba([255, 153, 51)", "rgba(254, 174, 45)", "rgba(204, 187, 51)", "rgba(208, 195, 16)", "rgba(170, 204, 34)", "rgba([105, 208, 37)", "rgba(34, 204, 170)", "rgba(18, 189, 185)", "rgba(17, 170, 187)", "rgba(68, 68, 221)", "rgba(51, [17, 187)", "rgba(59, 12, 189)", "rgba(68, 34, 153)"];
     
         function initHeader(element) {
+            var browserWidth = typeof window !== "undefined"? window.innerWidth: null;
+            
+            if(browserWidth) {
+                if(browserWidth <= 640) {
+                    divider = 10;
+                }
+            }
+            
         	canvas = element;
         	//	Size it according to containing element
             width = canvas.parentNode.clientWidth;
@@ -20,10 +28,10 @@ var canvasAnimation = function(m){
     
             // create points
             points = [];
-            for(var x = 0; x < width; x = x + width/20) {
-                for(var y = 0; y < height; y = y + height/20) {
-                    var px = x + Math.random()*width/20;
-                    var py = y + Math.random()*height/20;
+            for(var x = 0; x < width; x = x + width/divider) {
+                for(var y = 0; y < height; y = y + height/divider) {
+                    var px = x + Math.random()*width/divider;
+                    var py = y + Math.random()*height/divider;
                     var p = {x: px, originX: px, y: py, originY: py };
                     points.push(p);
                 }
@@ -110,24 +118,22 @@ var canvasAnimation = function(m){
         }
     
         function animate() {
+            var maxDist = 25000,
+                pActive = 0.3,
+                cActive = 0.6;
             if(animateHeader) {
                 ctx.clearRect(0,0,width,height);
                 for(var i in points) {
-                    // detect points in range
-                    if(Math.abs(getDistance(target, points[i])) < 4000) {
-                        points[i].active = 0.3;
-                        points[i].circle.active = 0.6;
-                    } else if(Math.abs(getDistance(target, points[i])) < 20000) {
-                        points[i].active = 0.1;
-                        points[i].circle.active = 0.3;
-                    } else if(Math.abs(getDistance(target, points[i])) < 40000) {
-                        points[i].active = 0.02;
-                        points[i].circle.active = 0.1;
+                    var dist = Math.abs(getDistance(target, points[i]));
+                    
+                    if(dist < maxDist) {
+                        points[i].active = pActive - ((dist/maxDist) * pActive);
+                        points[i].circle.active = cActive - ((dist/maxDist) * cActive);
                     } else {
                         points[i].active = 0;
                         points[i].circle.active = 0;
                     }
-    
+                    
                     drawLines(points[i]);
                     points[i].circle.draw();
                 }
@@ -164,7 +170,7 @@ var canvasAnimation = function(m){
     
         function shiftPoint(p) {
             tweenTo(p, 
-            	1+1*Math.random(), 
+            	2+10*Math.random(), 
             	{
             		x: p.originX-50+Math.random()*100,
                 	y: p.originY-50+Math.random()*100, 
@@ -187,7 +193,7 @@ var canvasAnimation = function(m){
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(p.closest[i].x, p.closest[i].y);
-                ctx.strokeStyle = rainbow[offset].split(")").join(", " + p.active/2 + ")");
+                ctx.strokeStyle = rainbow[offset].split(")").join(", " + p.active/3 + ")");
                 ctx.stroke();
             }
         }
