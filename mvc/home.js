@@ -1,11 +1,11 @@
 var m = require('mithril'),
-	mdl = require('mithril.component.mdl')(m),
+	//mdl = require('mithril.component.mdl')(m),
 	sugartags = require('mithril.sugartags')(m),
 	miso = require('../modules/miso.util.js'),
 	smoothScroll = require('../public/js/mithril.smoothscroll.js'),
 	canvasAnimation = require('../public/js/mithril.intro.animation.js')(m);
 
-//	Home page - 
+//	Home page -
 var self = module.exports.index = {
 	models: {
 		intro: function() {
@@ -30,12 +30,12 @@ var self = module.exports.index = {
 					DIV({"class": "inner inner--intro"}, [
 						DIV({"class": "intro-byline"}, o.textByline()),
 						H1({"class": "intro-heading"}, "UNIVERSAL JAVASCRIPT APPS"),
-						P({"class": "intro-text"}, "Miso.js is a framework that enables you to create sites and apps for desktop and mobile"),
-						mdl.mLinkButton({text: "Install miso now", config: smoothScroll(ctrl), href: "#installation"})
+						P({"class": "intro-text"}, "Miso.js is a framework that enables you to create sites and apps for desktop and mobile")
+						//, mdl.mLinkButton({text: "Install miso now", config: smoothScroll(ctrl), href: "#installation"})
 					])
 				]),
 
-				DIV({"class": "box box--odd nomargin"}, 
+				DIV({"class": "box box--odd nomargin"},
 					DIV({"class": "inner"}, [
 						H2(A({name: "what", "class": "heading"},"What is miso?") ),
 						P("Miso is an open source isomorphic javascript framework that allows you to write complete apps with much less effort than other frameworks. Miso features:",[

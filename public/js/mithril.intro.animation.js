@@ -1,4 +1,4 @@
-/*	Background dot line animation 
+/*	Background dot line animation
 	Modified version of this: http://codepen.io/MarcoGuglielmelli/pen/lLCxy?editors=0010
 */
 var canvasAnimation = function(m){
@@ -6,26 +6,26 @@ var canvasAnimation = function(m){
         var width, height, largeHeader, canvas, ctx, points, target, divider = 30, animateHeader = true,
         	//	Let's add some colour
     		rainbow = ["rgba(248, 12, 18)", "rgba(238, 17, 0)", "rgba(255, 51, 17)", "rgba(255, 68, 34)", "rgba(255, 102, 68)", "rgba([255, 153, 51)", "rgba(254, 174, 45)", "rgba(204, 187, 51)", "rgba(208, 195, 16)", "rgba(170, 204, 34)", "rgba([105, 208, 37)", "rgba(34, 204, 170)", "rgba(18, 189, 185)", "rgba(17, 170, 187)", "rgba(68, 68, 221)", "rgba(51, [17, 187)", "rgba(59, 12, 189)", "rgba(68, 34, 153)"];
-    
+
         function initHeader(element) {
             var browserWidth = typeof window !== "undefined"? window.innerWidth: null;
-            
+
             if(browserWidth) {
                 if(browserWidth <= 640) {
                     divider = 10;
                 }
             }
-            
+
         	canvas = element;
         	//	Size it according to containing element
             width = canvas.parentNode.clientWidth;
             height = canvas.parentNode.clientHeight;
             target = {x: width/2, y: height/2};
-    
+
             canvas.width = width;
             canvas.height = height;
             ctx = canvas.getContext('2d');
-    
+
             // create points
             points = [];
             for(var x = 0; x < width; x = x + width/divider) {
@@ -36,7 +36,7 @@ var canvasAnimation = function(m){
                     points.push(p);
                 }
             }
-    
+
             // for each point find the 5 closest points
             for(var i = 0; i < points.length; i++) {
                 var closest = [];
@@ -53,7 +53,7 @@ var canvasAnimation = function(m){
                                 }
                             }
                         }
-    
+
                         for(var k = 0; k < 5; k++) {
                             if(!placed) {
                                 if(getDistance(p1, p2) < getDistance(p1, closest[k])) {
@@ -66,14 +66,14 @@ var canvasAnimation = function(m){
                 }
                 p1.closest = closest;
             }
-    
+
             // assign a circle to each point
             for(var i in points) {
                 var c = new Circle(points[i], 2+Math.random()*2, 'rgba(255,255,255,0.3)');
                 points[i].circle = c;
             }
         }
-    
+
         // Event handling
         function addListeners() {
             if(!('ontouchstart' in window)) {
@@ -82,7 +82,7 @@ var canvasAnimation = function(m){
             window.addEventListener('scroll', scrollCheck);
             window.addEventListener('resize', resize);
         }
-    
+
         function mouseMove(e) {
             var posx = posy = 0;
             if (e.pageX || e.pageY) {
@@ -96,19 +96,19 @@ var canvasAnimation = function(m){
             target.x = posx;
             target.y = posy;
         }
-    
+
         function scrollCheck() {
             if(document.body.scrollTop > height) animateHeader = false;
             else animateHeader = true;
         }
-    
+
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
         }
-    
+
         // animation
         function initAnimation() {
             animate();
@@ -116,7 +116,7 @@ var canvasAnimation = function(m){
                 shiftPoint(points[i]);
             }
         }
-    
+
         function animate() {
             var maxDist = 25000,
                 pActive = 0.3,
@@ -125,7 +125,7 @@ var canvasAnimation = function(m){
                 ctx.clearRect(0,0,width,height);
                 for(var i in points) {
                     var dist = Math.abs(getDistance(target, points[i]));
-                    
+
                     if(dist < maxDist) {
                         points[i].active = pActive - ((dist/maxDist) * pActive);
                         points[i].circle.active = cActive - ((dist/maxDist) * cActive);
@@ -133,14 +133,14 @@ var canvasAnimation = function(m){
                         points[i].active = 0;
                         points[i].circle.active = 0;
                     }
-                    
+
                     drawLines(points[i]);
                     points[i].circle.draw();
                 }
             }
             requestAnimationFrame(animate);
         }
-        
+
         //	Custom tween - no need for a lib.
         function tweenTo(point, time, options) {
         	var timeInMs = time * 1000,
@@ -167,20 +167,20 @@ var canvasAnimation = function(m){
         		};
         	requestAnimationFrame(animateTo);
         }
-    
+
         function shiftPoint(p) {
-            tweenTo(p, 
-            	2+10*Math.random(), 
+            tweenTo(p,
+            	2+10*Math.random(),
             	{
             		x: p.originX-50+Math.random()*100,
-                	y: p.originY-50+Math.random()*100, 
+                	y: p.originY-50+Math.random()*100,
                 	onComplete: function() {
                     	shiftPoint(p);
                 	}
             	}
             );
         }
-    
+
         // Canvas manipulation
         function drawLines(p) {
             if(!p.active) return;
@@ -188,7 +188,7 @@ var canvasAnimation = function(m){
     		offset = offset > rainbow.length - 1?
     			rainbow.length - 1:
     			offset < 0? 0: offset;
-    
+
             for(var i in p.closest) {
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
@@ -197,22 +197,22 @@ var canvasAnimation = function(m){
                 ctx.stroke();
             }
         }
-    
+
         function Circle(pos,rad,color) {
             var _this = this;
-    
+
             // constructor
             (function() {
                 _this.pos = pos || null;
                 _this.radius = rad || null;
                 _this.color = color || null;
             })();
-    
+
     		var offset = parseInt((rainbow.length - 1) * (_this.pos.y/height), 10);
     		offset = offset > rainbow.length - 1?
     			rainbow.length - 1:
     			offset < 0? 0: offset;
-    
+
             this.draw = function() {
                 if(!_this.active) return;
                 ctx.beginPath();
@@ -221,12 +221,12 @@ var canvasAnimation = function(m){
                 ctx.fill();
             };
         }
-    
+
         // Util
         function getDistance(p1, p2) {
             return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
         }
-    
+
         var aniComponent = {
         	config: function(ctrl){
         		return function(element, isInitialized) {
@@ -239,15 +239,15 @@ var canvasAnimation = function(m){
         		}
         	},
         	controller: function(data){
-        		
+
         	},
         	view: function(ctrl){
         		return m('canvas', {config: aniComponent.config(ctrl), className: "ani-canvas"});
         	}
         };
-    
-    
-    	return m.component(aniComponent, args);
+
+
+    	return m(aniComponent, args);
     };
 };
 
